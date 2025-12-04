@@ -391,12 +391,7 @@
   ></script>
 
   <!-- jsPDF for generating PDF reports -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-    onload="window.jsPDF = window.jspdf.jsPDF;"
-  ></script>
+
 </head>
 <body>
   <div class="app">
@@ -853,6 +848,8 @@
   </div>
 
   <!-- ===== Firebase + المنطق كامل في سكربت واحد ===== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        onload="window.jsPDF = window.jspdf.jsPDF;"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import {
@@ -2036,5 +2033,6 @@
   </script>
 </body>
 </html>
+
 
 
