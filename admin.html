@@ -210,20 +210,6 @@
     .two-column{
       display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,0.9fr);gap:14px;
     }
-
-    /* شبكة 3 كروت لصفحة Analyze */
-    .analyze-grid{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:14px;
-    }
-
-    @media(max-width:1100px){
-      .analyze-grid{
-        grid-template-columns:repeat(2,minmax(0,1fr));
-      }
-    }
-
     @media(max-width:900px){
       .two-column{grid-template-columns:minmax(0,1fr);}
       header{flex-direction:column;align-items:flex-start;}
@@ -232,10 +218,11 @@
       .header-right{margin-left:0;}
     }
 
-    @media(max-width:700px){
-      .analyze-grid{
-        grid-template-columns:minmax(0,1fr);
-      }
+    /* grid خاصة لقسم Analyze: 3 كروت جنب بعض */
+    .analyze-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
     }
 
     .kpi-grid{
@@ -394,11 +381,21 @@
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+
   <!-- Leaflet JS -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
+    defer
+  ></script>
+
+  <!-- jsPDF for generating PDF reports -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    integrity="sha512-CqNn3VbPNE7VtUAmDJwD7PvsZyGq8lTDaJJziEtGlUZEM6IuLJ+mLjxJvLC+OtJk9gDC11FXGeUXrXe3LkY0pg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
     defer
   ></script>
 </head>
@@ -772,22 +769,25 @@
               <div>
                 <div class="card-title" id="pdf_title">PDF AI Report</div>
                 <div class="card-sub" id="pdf_sub">
-                  Generate an AI-powered summary report (demo).
+                  Generate a printable KPI report for your company based on the current demo optimization.
                 </div>
               </div>
             </div>
 
-            <form class="signup-form" onsubmit="event.preventDefault(); generatePdfReport();">
-              <p class="hint" id="pdf_hint">
-                In this demo, we simulate generating a PDF report based on your latest optimization.
-              </p>
+            <p class="hint" id="pdf_hint">
+              This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.
+            </p>
 
-              <button class="btn btn-secondary" id="pdf_btn" type="submit">
-                Generate PDF Report
-              </button>
+            <button
+              class="btn btn-secondary"
+              type="button"
+              id="pdf_btn"
+              onclick="generatePdfReport()"
+            >
+              Generate PDF Report
+            </button>
 
-              <p id="pdf_message" class="hint"></p>
-            </form>
+            <p id="pdf_message" class="hint"></p>
           </div>
         </div>
       </section>
@@ -968,9 +968,8 @@
         btn_csv: "Analyze CSV",
 
         pdf_title: "PDF AI Report",
-        pdf_sub: "Generate an AI-powered summary report (demo).",
+        pdf_sub: "Generate a printable KPI report for your company based on the current demo optimization.",
         pdf_btn: "Generate PDF Report",
-        pdf_hint: "In this demo, we simulate generating a PDF report based on your latest optimization.",
 
         opt_title: "Optimization Result",
         opt_sub: "Recommended load distribution.",
@@ -1064,10 +1063,9 @@
         csv_label: "اختر ملف CSV",
         btn_csv: "تحليل الملف",
 
-        pdf_title: "تقرير PDF بالذكاء الاصطناعي",
-        pdf_sub: "إنشاء تقرير مختصر بالذكاء الاصطناعي (تجريبي).",
+        pdf_title: "تقرير PDF ذكي",
+        pdf_sub: "إنشاء تقرير قابل للطباعة عن مؤشرات الأداء بناءً على النموذج التجريبي الحالي.",
         pdf_btn: "إنشاء تقرير PDF",
-        pdf_hint: "في هذا النموذج، نقوم بمحاكاة إنشاء تقرير PDF مبني على آخر عملية تحسين.",
 
         opt_title: "نتيجة التحسين",
         opt_sub: "التوزيع المقترح للأحمال.",
@@ -1168,7 +1166,6 @@
       document.getElementById("pdf_title").innerText = t.pdf_title;
       document.getElementById("pdf_sub").innerText = t.pdf_sub;
       document.getElementById("pdf_btn").innerText = t.pdf_btn;
-      document.getElementById("pdf_hint").innerText = t.pdf_hint;
 
       document.getElementById("opt_title").innerText = t.opt_title;
       document.getElementById("opt_sub").innerText = t.opt_sub;
@@ -1772,8 +1769,10 @@
       setActiveView("optimization-view");
     }
 
+    // ===== PDF GENERATION =====
     function generatePdfReport() {
       const msg = document.getElementById("pdf_message");
+
       if (!isLoggedIn) {
         msg.textContent = currentLang === "ar"
           ? "يرجى تسجيل الدخول أولاً لإنشاء تقرير."
@@ -1781,9 +1780,237 @@
         return;
       }
 
-      msg.textContent = currentLang === "ar"
-        ? "تم إنشاء تقرير PDF (محاكاة). في النسخة الكاملة سيتم إنشاء تقرير ذكي بناءً على بيانات رحلاتك والتحسينات."
-        : "PDF report generated (demo). In the full version, an AI engine will build a smart PDF based on your trips and optimizations.";
+      try {
+        // jsPDF UMD استخراج الكونستراكتور من
+        const jsPDFConstructor =
+          (window.jspdf && window.jspdf.jsPDF)
+            ? window.jspdf.jsPDF
+            : (typeof window.jsPDF === "function" ? window.jsPDF : null);
+
+        if (!jsPDFConstructor) {
+          msg.textContent = currentLang === "ar"
+            ? "تعذر تحميل مكتبة إنشاء ملفات الـ PDF. تأكد أن سكربت jsPDF مضاف في <head>."
+            : "Could not load the PDF library (jsPDF). Make sure the jsPDF script is included in <head>.";
+          return;
+        }
+
+        const doc = new jsPDFConstructor();
+
+        // ========== HEADER / LOGO ==========
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.text("Logixperts - Smart Load Analyzer", 10, 18);
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text("Naqlthon 4 - Smart Load Optimization Demo", 10, 26);
+
+        // Company info
+        const companyName = currentCompanyData?.companyName || "Demo Company";
+        const companyEmail = currentCompanyData?.email || "demo@logixperts.sa";
+        const fleetSize = currentCompanyData?.fleetSize || 4;
+        const companyCode = currentCompanyData?.companyCode || "DEMO123";
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Company:", 10, 38);
+        doc.setFont("helvetica", "normal");
+        doc.text(companyName, 35, 38);
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Email:", 10, 44);
+        doc.setFont("helvetica", "normal");
+        doc.text(String(companyEmail), 35, 44);
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Fleet size:", 10, 50);
+        doc.setFont("helvetica", "normal");
+        doc.text(String(fleetSize), 35, 50);
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Company code:", 10, 56);
+        doc.setFont("helvetica", "normal");
+        doc.text(String(companyCode), 42, 56);
+
+        // Contact block
+        doc.setFont("helvetica", "bold");
+        doc.text("Contact:", 120, 38);
+        doc.setFont("helvetica", "normal");
+        doc.text("Smart Load Analyzer / Logixperts", 120, 44);
+        doc.text("Phone: +966 55 555 5555", 120, 50);
+        doc.text("Email: support@logixperts.com", 120, 56);
+
+        doc.setFontSize(10);
+        doc.text(
+          "Generated at: " + new Date().toLocaleString("en-SA"),
+          10,
+          64
+        );
+
+        // ========== KPIs SUMMARY ==========
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text("1. KPIs Summary (Before vs After Optimization)", 10, 76);
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+
+        const avgBefore = (baselineAvgLoad * 100).toFixed(0);
+        const avgAfterText = document.getElementById("kpi-load-after").textContent || "–";
+        const costBeforeText = document.getElementById("kpi-cost-before").textContent || "–";
+        const costAfterText = document.getElementById("kpi-cost-after").textContent || "–";
+        const co2BeforeText = document.getElementById("kpi-co2-before").textContent || "–";
+        const co2AfterText = document.getElementById("kpi-co2-after").textContent || "–";
+
+        // نحسب التوفير التقريبي لو البيانات موجودة
+        let costSavingsPctStr = "N/A";
+        let co2SavingsPctStr = "N/A";
+
+        if (
+          typeof baselineCost === "number" &&
+          baselineCost > 0 &&
+          typeof baselineCO2 === "number" &&
+          baselineCO2 > 0 &&
+          typeof companyStats === "object"
+        ) {
+          // نقرأ من كروت الداشبورد بدل إعادة الحساب
+          const costAfterNum = parseFloat(
+            (costAfterText || "").replace(/[^\d.]/g, "") || "0"
+          );
+          const co2AfterNum = parseFloat(
+            (co2AfterText || "").replace(/[^\d.]/g, "") || "0"
+          );
+
+          if (!isNaN(costAfterNum) && costAfterNum > 0) {
+            const costSave = ((baselineCost - costAfterNum) / baselineCost) * 100;
+            costSavingsPctStr = costSave.toFixed(1) + "%";
+          }
+
+          if (!isNaN(co2AfterNum) && co2AfterNum > 0) {
+            const co2Save = ((baselineCO2 - co2AfterNum) / baselineCO2) * 100;
+            co2SavingsPctStr = co2Save.toFixed(1) + "%";
+          }
+        }
+
+        let y = 84;
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Metric", 10, y);
+        doc.text("Before", 70, y);
+        doc.text("After", 120, y);
+        doc.text("Savings", 170, y);
+        doc.setDrawColor(0, 0, 0);
+        doc.line(10, y + 2, 200, y + 2);
+        y += 8;
+
+        doc.setFont("helvetica", "normal");
+        doc.text("Average load factor (%)", 10, y);
+        doc.text(avgBefore + "%", 70, y);
+        doc.text(avgAfterText, 120, y);
+        doc.text(
+          avgAfterText !== "–"
+            ? (Number(avgAfterText.replace(/[^\d.]/g, "")) - Number(avgBefore)).toFixed(1) + " pp"
+            : "N/A",
+          170,
+          y
+        );
+        y += 7;
+
+        doc.text("Operating cost per day", 10, y);
+        doc.text(costBeforeText, 70, y);
+        doc.text(costAfterText, 120, y);
+        doc.text(costSavingsPctStr, 170, y);
+        y += 7;
+
+        doc.text("CO2 emissions per day", 10, y);
+        doc.text(co2BeforeText, 70, y);
+        doc.text(co2AfterText, 120, y);
+        doc.text(co2SavingsPctStr, 170, y);
+        y += 10;
+
+        // ========== PER-TRUCK TABLE ==========
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text("2. Per-Truck Load Factors", 10, y);
+        y += 6;
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("Truck / Route", 10, y);
+        doc.text("Load Before", 80, y);
+        doc.text("Load After", 140, y);
+        doc.line(10, y + 2, 200, y + 2);
+        y += 7;
+
+        doc.setFont("helvetica", "normal");
+
+        // نبني جدول بسيط من الـ scenario (قبل) + أي newLoad (بعد)
+        trucksScenario.forEach(tr => {
+          const beforePct = (tr.currentLoad * 100).toFixed(0) + "%";
+          const afterLoad = typeof tr.newLoad === "number" ? tr.newLoad : tr.currentLoad;
+          const afterPct = (afterLoad * 100).toFixed(0) + "%";
+
+          const label = `${tr.id} ${tr.origin}→${tr.dest}`;
+          doc.text(label, 10, y);
+          doc.text(beforePct, 80, y);
+          doc.text(afterPct, 140, y);
+          y += 6;
+        });
+
+        y += 4;
+
+        // ========== RECOMMENDATIONS ==========
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text("3. Recommendations for Small and Medium Carriers", 10, y);
+        y += 7;
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+
+        const recommendations = [
+          "Start by focusing on return trips with low load factor (below 60%). Use them to bundle new shipments.",
+          "Track your average fleet load every week. Aim to move it gradually from the current level towards 80%+.",
+          "Use the system to simulate what-if scenarios before accepting new shipments, to avoid empty or half-empty runs.",
+          "Prioritize routes where fuel and toll costs are high – these gain the most from better load consolidation.",
+          "Share simple monthly PDF reports like this with management and customers to demonstrate cost and CO2 savings."
+        ];
+
+        recommendations.forEach((line, index) => {
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.text(`• ${line}`, 10, y);
+          y += 6;
+        });
+
+        y += 4;
+
+        // ========== FOOTER NOTE ==========
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "italic");
+        doc.text(
+          "Note: This PDF is generated from a Naqlthon demo scenario. In a production version, an AI engine would use real trip data and KPIs.",
+          10,
+          y
+        );
+
+        doc.save("SmartLoad_Report_demo.pdf");
+
+        msg.textContent = currentLang === "ar"
+          ? "تم إنشاء وتحميل تقرير PDF تجريبي باللغة الإنجليزية بنجاح."
+          : "Demo PDF report generated and downloaded successfully.";
+      } catch (e) {
+        console.error(e);
+        msg.textContent = currentLang === "ar"
+          ? "حدث خطأ أثناء إنشاء ملف الـ PDF."
+          : "An error occurred while generating the PDF file.";
+      }
     }
 
     window.addEventListener("load", () => {
