@@ -1208,6 +1208,9 @@
       { id: "Truck #4", origin: "Dammam", dest: "Riyadh", currentLoad: 0.50, coords: [26.4207, 50.0888] },
     ];
 
+    // ⭐ متغير لتخزين آخر نتيجة تحسين للشاحنات
+    let lastOptimizationTrucks = null;
+
     const cityCoords = {
       riyadh:  [24.7136, 46.6753],
       jeddah:  [21.4858, 39.1925],
@@ -1469,8 +1472,8 @@
     }
 
     function initCharts(loadBefore, loadAfter) {
- const beforeVal = Math.round(loadBefore * 100);
-  const afterVal = Math.round(loadAfter * 100);
+      const beforeVal = Math.round(loadBefore * 100);
+      const afterVal = Math.round(loadAfter * 100);
 
       const dbCtx = document.getElementById("dashboardChart");
       if (dbCtx && window.Chart && !dashboardChart) {
@@ -1521,14 +1524,13 @@
       }
     }
 
-   function updateOptChart(loadAfter) {
-  if (!optChart) return;
-  const beforeVal = Math.round(baselineAvgLoad * 100);
-  const afterVal = Math.round(loadAfter * 100);
-  optChart.data.datasets[0].data = [beforeVal, afterVal];
-  optChart.update();
-}
-
+    function updateOptChart(loadAfter) {
+      if (!optChart) return;
+      const beforeVal = Math.round(baselineAvgLoad * 100);
+      const afterVal = Math.round(loadAfter * 100);
+      optChart.data.datasets[0].data = [beforeVal, afterVal];
+      optChart.update();
+    }
 
     function initMap() {
       const mapEl = document.getElementById("map");
@@ -1633,6 +1635,7 @@
       let destinationInput = (document.getElementById("destination").value || "").toLowerCase();
       const priority = document.getElementById("priority").value;
 
+      // نشتغل على نسخة من السيناريو الأصلي عشان ما نخربه
       const trucks = trucksScenario.map(t => Object.assign({}, t));
 
       let destKey = destinationInput.trim();
@@ -1660,6 +1663,7 @@
       const newLoadFactor = Math.min(1, newTotalTons / CAPACITY_TONS);
       target.newLoad = newLoadFactor;
 
+      // باقي الشاحنات تبقى على نفس currentLoad كـ newLoad
       trucks.forEach(t => {
         if (t.id !== target.id) t.newLoad = t.currentLoad;
       });
@@ -1669,6 +1673,9 @@
 
       const costAfter = baselineCost * (baselineAvgLoad / afterAvgLoad);
       const co2After = baselineCO2 * (costAfter / baselineCost);
+
+      // ⭐ تخزين آخر نتيجة تحسين لاستخدامها في تقرير الـ PDF
+      lastOptimizationTrucks = trucks;
 
       const loadAfterPct = (afterAvgLoad * 100).toFixed(0) + "%";
       document.getElementById("kpi-load-after").textContent = loadAfterPct;
@@ -1778,9 +1785,7 @@
       }
 
       try {
-        // jsPDF UMD استخراج الكونستراكتور من
-       const jsPDFConstructor = window.jsPDF;
-
+        const jsPDFConstructor = window.jsPDF;
 
         if (!jsPDFConstructor) {
           msg.textContent = currentLang === "ar"
@@ -1856,7 +1861,6 @@
         const co2BeforeText = document.getElementById("kpi-co2-before").textContent || "–";
         const co2AfterText = document.getElementById("kpi-co2-after").textContent || "–";
 
-        // نحسب التوفير التقريبي لو البيانات موجودة
         let costSavingsPctStr = "N/A";
         let co2SavingsPctStr = "N/A";
 
@@ -1864,10 +1868,8 @@
           typeof baselineCost === "number" &&
           baselineCost > 0 &&
           typeof baselineCO2 === "number" &&
-          baselineCO2 > 0 &&
-          typeof companyStats === "object"
+          baselineCO2 > 0
         ) {
-          // نقرأ من كروت الداشبورد بدل إعادة الحساب
           const costAfterNum = parseFloat(
             (costAfterText || "").replace(/[^\d.]/g, "") || "0"
           );
@@ -1938,8 +1940,10 @@
 
         doc.setFont("helvetica", "normal");
 
-        // نبني جدول بسيط من الـ scenario (قبل) + أي newLoad (بعد)
-        trucksScenario.forEach(tr => {
+        // ⭐ استخدام آخر نتيجة تحسين، أو السيناريو الأصلي لو ما فيه تحسين
+        const trucksForReport = lastOptimizationTrucks || trucksScenario;
+
+        trucksForReport.forEach(tr => {
           const beforePct = (tr.currentLoad * 100).toFixed(0) + "%";
           const afterLoad = typeof tr.newLoad === "number" ? tr.newLoad : tr.currentLoad;
           const afterPct = (afterLoad * 100).toFixed(0) + "%";
@@ -1970,7 +1974,7 @@
           "Share simple monthly PDF reports like this with management and customers to demonstrate cost and CO2 savings."
         ];
 
-        recommendations.forEach((line, index) => {
+        recommendations.forEach(line => {
           if (y > 270) {
             doc.addPage();
             y = 20;
@@ -1981,7 +1985,6 @@
 
         y += 4;
 
-        // ========== FOOTER NOTE ==========
         if (y > 270) {
           doc.addPage();
           y = 20;
@@ -2023,7 +2026,6 @@
       populateOptimizationTableInitial();
     });
 
-    // expose to window
     window.toggleLanguage  = toggleLanguage;
     window.togglePassword  = togglePassword;
     window.demoLogin       = demoLogin;
@@ -2034,7 +2036,3 @@
   </script>
 </body>
 </html>
-
-
-
-
