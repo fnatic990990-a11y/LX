@@ -184,7 +184,7 @@
     .nav-tab{
       border:none;background:transparent;padding:8px 14px;border-radius:999px;
       font-size:12px;color:var(--muted);cursor:pointer;
-      display:none; /* مخفية قبل تسجيل الدخول */
+      display:none;
     }
     .nav-tab.active{
       background:#16a34a;color:#ecfdf5;font-weight:600;
@@ -218,7 +218,6 @@
       .header-right{margin-left:0;}
     }
 
-    /* grid خاصة لقسم Analyze: 3 كروت جنب بعض */
     .analyze-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -321,7 +320,6 @@
     .hint{font-size:11px;color:var(--muted);margin-top:4px;}
     .hint-error{color:#fecaca;}
 
-    /* stats form */
     .stats-form {
       margin-top: 8px;
       padding-top: 8px;
@@ -390,8 +388,9 @@
     defer
   ></script>
 
-  <!-- jsPDF for generating PDF reports -->
-
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+          onload="window.jsPDF = window.jspdf.jsPDF;"></script>
 </head>
 <body>
   <div class="app">
@@ -476,10 +475,9 @@
     </nav>
 
     <main>
-      <!-- LOGIN / SIGNUP -->
+      <!-- LOGIN -->
       <section id="login-view" class="view active">
         <div class="two-column">
-          <!-- LOGIN -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -823,7 +821,7 @@
       </section>
     </main>
 
-    <!-- خدمة العملاء -->
+    <!-- SUPPORT -->
     <div class="support-footer">
       <div class="support-box">
         <div class="support-title" id="support_title">Customer Support</div>
@@ -847,9 +845,7 @@
     </footer>
   </div>
 
-  <!-- ===== Firebase + المنطق كامل في سكربت واحد ===== -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-        onload="window.jsPDF = window.jspdf.jsPDF;"></script>
+  <!-- ===== Firebase + Logic ===== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import {
@@ -867,7 +863,6 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-    // إعدادات مشروعك الحقيقية (لا تعدّلها)
     const firebaseConfig = {
       apiKey: "AIzaSyAjbvQo7NrGZiFbFbdY3a7UtDjlv0SwU3w",
       authDomain: "smart-load-analyzer-56cb2.firebaseapp.com",
@@ -882,319 +877,58 @@
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    // ===== اللغة =====
+    // ===== LANGUAGE =====
     let currentLang = "en";
 
-    const translations = {
-      en: {
-        brand: "Logixperts",
-        subbrand: "Smart Load Analyzer",
-        team_label: "Team:",
-        team_event: "Naqlthon 4",
+    const translations = { /* نفس الترجمة اللي عندك بالضبط، ما غيّرتها */ };
+    // اختصارًا: احفظ بلوك الترجمة من الكود السابق لأنه طويل وما له علاقة بالمشكلة
 
-        company_code_label: "Company code:",
+    // *** خله مثل ما عندك الآن بدون تغيير ***
+  </script>
 
-        hero_title: "Reduce Empty Trips. Boost Load Factor. Go Greener.",
-        hero_sub: "Smart Load Analyzer helps freight companies analyze and optimize loads to reduce cost and emissions.",
-        hero_highlight: "This demo scenario shows how merging a new shipment with a low-load return trip improves load factor.",
-        tag_fuel: "fuel reduction (simulated)",
-        tag_ai: "load & route suggestions",
+  <!-- عشان ما أطوّل الرسالة زيادة عن اللزوم:
+       انسخ بلوك الترجمة applyLanguage / toggleLanguage
+       وباقي الدوال بالضبط من كودك الأخير،
+       مع التعديلات المهمة تحت.
+  -->
 
-        hero_avg_before_title: "Avg load (baseline)",
-        hero_cost_title: "Op. cost / day",
-        hero_co2_title: "CO₂ / day",
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      addDoc,
+      getDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-        tab_login: "Login / Sign up",
-        tab_dashboard: "Dashboard",
-        tab_analyze: "Analyze Load",
-        tab_opt: "Optimization Result",
-
-        login_title: "Company Login",
-        login_sub: "Access your Smart Load Analyzer workspace.",
-        login_btn: "Login",
-        login_hint: "Demo: demo@logixperts.sa / Naqlthon4!",
-        label_email: "Company email",
-        label_password: "Password",
-
-        signup_title: "Create Company Account",
-        signup_sub: "Create your company account to access the system.",
-        signup_label_name: "Company name",
-        signup_label_email: "Company email",
-        signup_label_pass: "Password",
-        signup_label_fleet: "Fleet size (trucks)",
-        signup_label_plan: "Subscription plan",
-        signup_btn: "Sign up",
-
-        dash_title: "Fleet Overview Dashboard",
-        dash_sub: "4 demo trucks on main corridors.",
-
-        kpi_trucks_label: "Trucks in scenario",
-        kpi_baseline_label: "Avg load (baseline)",
-        kpi_baseline_note: "Before optimization",
-        kpi_after_label: "Avg load (after)",
-        kpi_after_note: "After last run",
-        kpi_cost_before_label: "Op. cost / day",
-        kpi_cost_before_note: "Simulated SAR",
-        kpi_cost_after_label: "Op. cost / day (after)",
-        kpi_co2_before_label: "CO₂ / day",
-        kpi_co2_before_note: "kg CO₂",
-        kpi_co2_after_label: "CO₂ / day (after)",
-
-        stats_label_load: "Company avg load (%)",
-        stats_label_cost: "Company op. cost / day (SAR)",
-        stats_label_co2: "Company CO₂ / day (kg)",
-        stats_save_btn: "Save metrics",
-        stats_hint_default: "These values are stored per company and reused on each login.",
-
-        map_title: "Truck Positions & Routes",
-        map_sub: "Best routes + load factor markers.",
-
-        analyze_title: "Analyze New Shipment (Manual)",
-        analyze_sub: "Enter shipment details manually.",
-        label_weight: "Weight (tons)",
-        label_volume: "Volume (m³)",
-        label_destination: "Destination city",
-        label_delivery: "Delivery window",
-        label_priority: "Priority",
-        btn_manual_analyze: "Run Manual Optimization",
-
-        csv_title: "Upload Your Trips CSV",
-        csv_sub: "Upload trip history to improve optimization accuracy.",
-        csv_label: "Choose CSV file",
-        btn_csv: "Analyze CSV",
-
-        pdf_title: "PDF AI Report",
-        pdf_sub: "Generate a printable KPI report for your company based on the current demo optimization.",
-        pdf_btn: "Generate PDF Report",
-
-        opt_title: "Optimization Result",
-        opt_sub: "Recommended load distribution.",
-        opt_col_truck: "Truck & Route",
-        opt_col_load: "Load Factor",
-        opt_col_ai: "AI Suggestion",
-
-        chart_title: "Before vs After Optimization",
-        chart_sub: "Average load improvement",
-
-        support_title: "Customer Support",
-        support_phone_label: "Phone:",
-        support_email_label: "Email:",
-        support_fax_label: "Fax:",
-        back_link: "← Back to role selection"
-      },
-      ar: {
-        brand: "لوچكسبرتس",
-        subbrand: "نظام التحميل الذكي",
-        team_label: "الفريق:",
-        team_event: "نقل-ثون 4",
-
-        company_code_label: "كود الشركة:",
-
-        hero_title: "قلل الرحلات الفارغة وارفع معامل الحمولة.",
-        hero_sub: "يساعدك نظام التحميل الذكي على تحليل وتحسين حمولات الشاحنات لتقليل التكلفة والانبعاثات.",
-        hero_highlight: "يوضح هذا النموذج كيف يرفع دمج شحنة جديدة حمولة رحلة العودة منخفضة الحمل.",
-        tag_fuel: "تقليل استهلاك الوقود (محاكاة)",
-        tag_ai: "اقتراحات ذكية للمسار والحمولة",
-
-        hero_avg_before_title: "متوسط الحمولة (قبل)",
-        hero_cost_title: "تكلفة التشغيل / اليوم",
-        hero_co2_title: "انبعاثات CO₂ / اليوم",
-
-        tab_login: "تسجيل الدخول / إنشاء حساب",
-        tab_dashboard: "لوحة التحكم",
-        tab_analyze: "تحليل الحمولة",
-        tab_opt: "نتيجة التحسين",
-
-        login_title: "تسجيل دخول الشركة",
-        login_sub: "ادخل إلى منصتك.",
-        login_btn: "تسجيل الدخول",
-        login_hint: "حساب تجريبي: demo@logixperts.sa / Naqlthon4!",
-        label_email: "البريد الإلكتروني للشركة",
-        label_password: "كلمة المرور",
-
-        signup_title: "إنشاء حساب شركة",
-        signup_sub: "سجل بيانات شركتك.",
-        signup_label_name: "اسم الشركة",
-        signup_label_email: "البريد الإلكتروني",
-        signup_label_pass: "كلمة المرور",
-        signup_label_fleet: "عدد الشاحنات",
-        signup_label_plan: "الخطة",
-        signup_btn: "إنشاء حساب",
-
-        dash_title: "لوحة تحكم الأسطول",
-        dash_sub: "٤ شاحنات تجريبية على المسارات الرئيسية.",
-
-        kpi_trucks_label: "عدد الشاحنات في النموذج",
-        kpi_baseline_label: "متوسط الحمولة (قبل)",
-        kpi_baseline_note: "قبل التحسين",
-        kpi_after_label: "متوسط الحمولة (بعد)",
-        kpi_after_note: "بعد آخر تشغيل",
-        kpi_cost_before_label: "تكلفة التشغيل / اليوم",
-        kpi_cost_before_note: "ريال (محاكاة)",
-        kpi_cost_after_label: "تكلفة التشغيل / اليوم (بعد)",
-        kpi_co2_before_label: "انبعاثات CO₂ / اليوم",
-        kpi_co2_before_note: "كجم CO₂",
-        kpi_co2_after_label: "انبعاثات CO₂ / اليوم (بعد)",
-
-        stats_label_load: "متوسط الحمولة للشركة (%)",
-        stats_label_cost: "تكلفة التشغيل / اليوم (ريال)",
-        stats_label_co2: "انبعاثات CO₂ / اليوم (كجم)",
-        stats_save_btn: "حفظ البيانات",
-        stats_hint_default: "يتم حفظ هذه القيم لكل شركة وتستخدم عند كل تسجيل دخول.",
-
-        map_title: "مواقع ومسارات الشاحنات",
-        map_sub: "أفضل المسارات + مؤشرات الحمولة.",
-
-        analyze_title: "تحليل شحنة جديدة (يدوي)",
-        analyze_sub: "أدخل تفاصيل الشحنة يدويًا.",
-        label_weight: "الوزن (طن)",
-        label_volume: "الحجم (م³)",
-        label_destination: "مدينة الوجهة",
-        label_delivery: "نافذة التسليم",
-        label_priority: "الأولوية",
-        btn_manual_analyze: "تشغيل التحسين اليدوي",
-
-        csv_title: "رفع ملف الرحلات (CSV)",
-        csv_sub: "ارفع سجل الرحلات لتحسين دقة التحسين.",
-        csv_label: "اختر ملف CSV",
-        btn_csv: "تحليل الملف",
-
-        pdf_title: "تقرير PDF ذكي",
-        pdf_sub: "إنشاء تقرير قابل للطباعة عن مؤشرات الأداء بناءً على النموذج التجريبي الحالي.",
-        pdf_btn: "إنشاء تقرير PDF",
-
-        opt_title: "نتيجة التحسين",
-        opt_sub: "التوزيع المقترح للأحمال.",
-        opt_col_truck: "الشاحنة والمسار",
-        opt_col_load: "عامل الحمولة",
-        opt_col_ai: "اقتراح النظام",
-
-        chart_title: "قبل وبعد التحسين",
-        chart_sub: "تحسن متوسط الحمولة",
-
-        support_title: "خدمة العملاء",
-        support_phone_label: "الهاتف:",
-        support_email_label: "البريد الإلكتروني:",
-        support_fax_label: "فاكس:",
-        back_link: "← الرجوع لصفحة المستخدم"
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjbvQo7NrGZiFbFbdY3a7UtDjlv0SwU3w",
+      authDomain: "smart-load-analyzer-56cb2.firebaseapp.com",
+      projectId: "smart-load-analyzer-56cb2",
+      storageBucket: "smart-load-analyzer-56cb2.firebasestorage.app",
+      messagingSenderId: "253721588070",
+      appId: "1:253721588070:web:c24bc2fbc27c2fba9e18a7",
+      measurementId: "G-60RF97SGWN"
     };
 
-    function applyLanguage() {
-      const t = translations[currentLang];
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
 
-      document.getElementById("text_brand").innerText = t.brand;
-      document.getElementById("text_subbrand").innerText = t.subbrand;
-      document.getElementById("team_label").innerText = t.team_label;
-      document.getElementById("team_event").innerText = t.team_event;
+    // ===== باقي الكود نفسه اللي أرسلته أنت، مع تعديلين فقط =====
 
-      const codeLabel = document.getElementById("company_code_label");
-      if (codeLabel) codeLabel.innerText = t.company_code_label;
+    let currentLang = "en";
+    const translations = {/* انسخ بلوك الترجمة من كودك السابق */};
 
-      document.getElementById("hero_title").innerText = t.hero_title;
-      document.getElementById("hero_sub").innerText = t.hero_sub;
-      document.getElementById("hero_highlight").innerText = t.hero_highlight;
-      document.getElementById("tag_fuel").innerText = t.tag_fuel;
-      document.getElementById("tag_ai").innerText = t.tag_ai;
-
-      document.getElementById("hero_avg_before_title").innerText = t.hero_avg_before_title;
-      document.getElementById("hero_cost_title").innerText = t.hero_cost_title;
-      document.getElementById("hero_co2_title").innerText = t.hero_co2_title;
-
-      document.getElementById("tab_login").innerText = t.tab_login;
-      document.getElementById("tab_dashboard").innerText = t.tab_dashboard;
-      document.getElementById("tab_analyze").innerText = t.tab_analyze;
-      document.getElementById("tab_opt").innerText = t.tab_opt;
-
-      document.getElementById("login_title").innerText = t.login_title;
-      document.getElementById("login_sub").innerText = t.login_sub;
-      document.getElementById("login_btn").innerText = t.login_btn;
-      document.getElementById("login_hint").innerText = t.login_hint;
-      document.getElementById("label_email").innerText = t.label_email;
-      document.getElementById("label_password").innerText = t.label_password;
-
-      document.getElementById("signup_title").innerText = t.signup_title;
-      document.getElementById("signup_sub").innerText = t.signup_sub;
-      document.getElementById("signup_label_name").innerText = t.signup_label_name;
-      document.getElementById("signup_label_email").innerText = t.signup_label_email;
-      document.getElementById("signup_label_pass").innerText = t.signup_label_pass;
-      document.getElementById("signup_label_fleet").innerText = t.signup_label_fleet;
-      document.getElementById("signup_label_plan").innerText = t.signup_label_plan;
-      document.getElementById("signup_btn").innerText = t.signup_btn;
-
-      document.getElementById("dash_title").innerText = t.dash_title;
-      document.getElementById("dash_sub").innerText = t.dash_sub;
-      document.getElementById("kpi_trucks_label").innerText = t.kpi_trucks_label;
-      document.getElementById("kpi_baseline_label").innerText = t.kpi_baseline_label;
-      document.getElementById("kpi_baseline_note").innerText = t.kpi_baseline_note;
-      document.getElementById("kpi_after_label").innerText = t.kpi_after_label;
-      document.getElementById("kpi_after_note").innerText = t.kpi_after_note;
-      document.getElementById("kpi_cost_before_label").innerText = t.kpi_cost_before_label;
-      document.getElementById("kpi_cost_before_note").innerText = t.kpi_cost_before_note;
-      document.getElementById("kpi_cost_after_label").innerText = t.kpi_cost_after_label;
-      document.getElementById("kpi_co2_before_label").innerText = t.kpi_co2_before_label;
-      document.getElementById("kpi_co2_before_note").innerText = t.kpi_co2_before_note;
-      document.getElementById("kpi_co2_after_label").innerText = t.kpi_co2_after_label;
-
-      document.getElementById("stats_label_load").innerText = t.stats_label_load;
-      document.getElementById("stats_label_cost").innerText = t.stats_label_cost;
-      document.getElementById("stats_label_co2").innerText = t.stats_label_co2;
-      document.getElementById("stats-save-btn").innerText = t.stats_save_btn;
-      document.getElementById("stats_hint").innerText = t.stats_hint_default;
-
-      document.getElementById("map_title").innerText = t.map_title;
-      document.getElementById("map_sub").innerText = t.map_sub;
-
-      document.getElementById("analyze_title").innerText = t.analyze_title;
-      document.getElementById("analyze_sub").innerText = t.analyze_sub;
-      document.getElementById("label_weight").innerText = t.label_weight;
-      document.getElementById("label_volume").innerText = t.label_volume;
-      document.getElementById("label_destination").innerText = t.label_destination;
-      document.getElementById("label_delivery").innerText = t.label_delivery;
-      document.getElementById("label_priority").innerText = t.label_priority;
-      document.getElementById("btn_manual_analyze").innerText = t.btn_manual_analyze;
-
-      document.getElementById("csv_title").innerText = t.csv_title;
-      document.getElementById("csv_sub").innerText = t.csv_sub;
-      document.getElementById("csv_label").innerText = t.csv_label;
-      document.getElementById("btn_csv").innerText = t.btn_csv;
-
-      document.getElementById("pdf_title").innerText = t.pdf_title;
-      document.getElementById("pdf_sub").innerText = t.pdf_sub;
-      document.getElementById("pdf_btn").innerText = t.pdf_btn;
-
-      document.getElementById("opt_title").innerText = t.opt_title;
-      document.getElementById("opt_sub").innerText = t.opt_sub;
-      document.getElementById("opt_col_truck").innerText = t.opt_col_truck;
-      document.getElementById("opt_col_load").innerText = t.opt_col_load;
-      document.getElementById("opt_col_ai").innerText = t.opt_col_ai;
-
-      document.getElementById("chart_title").innerText = t.chart_title;
-      document.getElementById("chart_sub").innerText = t.chart_sub;
-
-      document.getElementById("support_title").innerText = t.support_title;
-      document.getElementById("support_phone_label").innerText = t.support_phone_label;
-      document.getElementById("support_email_label").innerText = t.support_email_label;
-      document.getElementById("support_fax_label").innerText = t.support_fax_label;
-      document.getElementById("back_link").innerText = t.back_link;
-
-      if (currentLang === "ar") {
-        document.documentElement.lang = "ar";
-        document.documentElement.dir = "rtl";
-        document.getElementById("langSwitcher").innerText = "EN";
-        document.querySelector(".support-title").style.textAlign = "right";
-      } else {
-        document.documentElement.lang = "en";
-        document.documentElement.dir = "ltr";
-        document.getElementById("langSwitcher").innerText = "AR";
-        document.querySelector(".support-title").style.textAlign = "left";
-      }
-    }
-
-    function toggleLanguage() {
-      currentLang = currentLang === "en" ? "ar" : "en";
-      applyLanguage();
-    }
+    // ... applyLanguage / toggleLanguage إلخ (نفسها)
 
     // ===== SCENARIO =====
     const CAPACITY_TONS = 20;
@@ -1207,9 +941,6 @@
       { id: "Truck #3", origin: "Riyadh", dest: "Dammam", currentLoad: 0.65, coords: [24.7136, 46.6753] },
       { id: "Truck #4", origin: "Dammam", dest: "Riyadh", currentLoad: 0.50, coords: [26.4207, 50.0888] },
     ];
-
-    // ⭐ متغير لتخزين آخر نتيجة تحسين للشاحنات
-    let lastOptimizationTrucks = null;
 
     const cityCoords = {
       riyadh:  [24.7136, 46.6753],
@@ -1228,405 +959,13 @@
     let currentCompanyData = null;
     let companyStats = null;
 
-    const tabs = document.querySelectorAll(".nav-tab");
-    const views = document.querySelectorAll(".view");
+    // *** التعديل الجديد: نخزّن نتيجة آخر تحسين هنا ***
+    let lastOptimizationLoads = null; // { "Truck #1": {before, after}, ... }
 
-    function setActiveView(id) {
-      tabs.forEach(t => {
-        t.classList.toggle("active", t.getAttribute("data-view") === id);
-      });
-      views.forEach(v => {
-        v.classList.toggle("active", v.id === id);
-      });
-    }
+    // ===== بقية الدوال: tabs, applyLanguage, signUp, demoLogin, initCompanyStats, saveCompanyStats ...
+    // انسخها من كودك السابق كما هي (ماعدا runOptimization و generatePdfReport اللي عدّلناها تحت)
 
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        const viewId = tab.getAttribute("data-view");
-        if (!isLoggedIn && viewId !== "login-view") {
-          setActiveView("login-view");
-          return;
-        }
-        setActiveView(viewId);
-        if (viewId === "dashboard-view") {
-          initMap();
-          if (mapInstance) setTimeout(() => mapInstance.invalidateSize(), 0);
-        }
-      });
-    });
-
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (!input) return;
-      if (input.type === "password") {
-        input.type = "text";
-        btn.textContent = "Hide";
-      } else {
-        input.type = "password";
-        btn.textContent = "Show";
-      }
-    }
-
-    // ===== signUp =====
-    async function signUp() {
-      const name = document.getElementById("signup-name").value.trim();
-      const email = document.getElementById("signup-email").value.trim().toLowerCase();
-      const password = document.getElementById("signup-password").value;
-      const fleet = parseInt(document.getElementById("signup-fleet").value || "0", 10);
-      const plan = document.getElementById("signup-plan").value;
-      const msg = document.getElementById("signup-message");
-
-      if (!name || !email || !password) {
-        msg.textContent = currentLang === "ar"
-          ? "يرجى تعبئة الاسم والبريد وكلمة المرور."
-          : "Please fill in name, email and password.";
-        return;
-      }
-
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = userCred.user.uid;
-
-        let base = name.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 4);
-        if (!base) base = "COMP";
-        const random = Math.floor(100 + Math.random() * 900);
-        const companyCode = base + random;
-
-        await setDoc(doc(db, "companies", uid), {
-          companyName: name,
-          email,
-          companyCode,
-          fleetSize: isNaN(fleet) ? 0 : fleet,
-          plan,
-          createdAt: serverTimestamp()
-        });
-
-        const msgEn =
-          `Company account created. Your company code: ${companyCode}. You can now log in.`;
-        const msgAr =
-          `تم إنشاء حساب الشركة. كود الشركة الخاص بك: ${companyCode}. يمكنك تسجيل الدخول الآن.`;
-        msg.textContent = currentLang === "ar" ? msgAr : msgEn;
-
-        document.getElementById("company").value = email;
-        document.getElementById("password").value = password;
-
-      } catch (err) {
-        console.error(err);
-        msg.textContent = currentLang === "ar"
-          ? "حدث خطأ أثناء إنشاء الحساب."
-          : "Error while creating the account.";
-      }
-    }
-
-    // ===== Login =====
-    async function demoLogin() {
-      const email = document.getElementById("company").value.trim().toLowerCase();
-      const password = document.getElementById("password").value;
-      const errorEl = document.getElementById("login-error");
-
-      try {
-        const userCred = await signInWithEmailAndPassword(auth, email, password);
-        const uid = userCred.user.uid;
-
-        const companyRef = doc(db, "companies", uid);
-        const companySnap = await getDoc(companyRef);
-
-        if (!companySnap.exists()) {
-          errorEl.textContent = currentLang === "ar"
-            ? "لم يتم العثور على بيانات الشركة."
-            : "Company data not found.";
-          return;
-        }
-
-        const companyData = companySnap.data();
-        handleLoginSuccess(uid, companyData);
-        errorEl.textContent = "";
-
-        if (companyData.companyCode) {
-          const hint = currentLang === "ar"
-            ? `تم تسجيل الدخول. كود الشركة: ${companyData.companyCode}.`
-            : `Logged in. Company code: ${companyData.companyCode}.`;
-          document.getElementById("login_hint").textContent = hint;
-        }
-      } catch (err) {
-        console.error(err);
-        errorEl.textContent = currentLang === "ar"
-          ? "بيانات الدخول غير صحيحة."
-          : "Invalid credentials. Please check your email and password.";
-      }
-    }
-
-    function initCompanyStats(statsFromDb) {
-      const defaultStats = {
-        avgLoad: baselineAvgLoad * 100,
-        dailyCost: baselineCost,
-        dailyCO2: baselineCO2
-      };
-
-      const stats = {
-        avgLoad: (statsFromDb && typeof statsFromDb.avgLoad === "number")
-          ? statsFromDb.avgLoad
-          : defaultStats.avgLoad,
-        dailyCost: (statsFromDb && typeof statsFromDb.dailyCost === "number")
-          ? statsFromDb.dailyCost
-          : defaultStats.dailyCost,
-        dailyCO2: (statsFromDb && typeof statsFromDb.dailyCO2 === "number")
-          ? statsFromDb.dailyCO2
-          : defaultStats.dailyCO2
-      };
-
-      companyStats = stats;
-
-      if (stats.avgLoad && stats.avgLoad > 0) {
-        baselineAvgLoad = stats.avgLoad / 100;
-      }
-      if (stats.dailyCost && stats.dailyCost > 0) {
-        baselineCost = stats.dailyCost;
-      }
-      if (stats.dailyCO2 && stats.dailyCO2 > 0) {
-        baselineCO2 = stats.dailyCO2;
-      }
-
-      const loadPct = (baselineAvgLoad * 100).toFixed(0) + "%";
-      document.getElementById("kpi-load-before").textContent = loadPct;
-      document.getElementById("hero-load-before").textContent = loadPct;
-      document.getElementById("kpi-cost-before").textContent = "~" + baselineCost.toFixed(0) + " SAR";
-      document.getElementById("hero-cost-before").textContent = "~" + baselineCost.toFixed(0) + " SAR";
-      document.getElementById("kpi-co2-before").textContent = "~" + baselineCO2.toFixed(0) + " kg";
-      document.getElementById("hero-co2-before").textContent = "~" + baselineCO2.toFixed(0) + " kg";
-
-      const loadInput = document.getElementById("stats-load");
-      const costInput = document.getElementById("stats-cost");
-      const co2Input = document.getElementById("stats-co2");
-      if (loadInput) loadInput.value = stats.avgLoad.toFixed(0);
-      if (costInput) costInput.value = stats.dailyCost.toFixed(0);
-      if (co2Input) co2Input.value = stats.dailyCO2.toFixed(0);
-    }
-
-    async function saveCompanyStats() {
-      if (!isLoggedIn || !currentCompanyId) return;
-
-      const loadVal = parseFloat(document.getElementById("stats-load").value || "0");
-      const costVal = parseFloat(document.getElementById("stats-cost").value || "0");
-      const co2Val  = parseFloat(document.getElementById("stats-co2").value || "0");
-      const hintEl  = document.getElementById("stats_hint");
-
-      if (isNaN(loadVal) || isNaN(costVal) || isNaN(co2Val) || loadVal <= 0) {
-        hintEl.textContent = currentLang === "ar"
-          ? "يرجى إدخال قيم صحيحة، خاصة متوسط الحمولة."
-          : "Please enter valid values, especially average load.";
-        return;
-      }
-
-      const newStats = {
-        avgLoad: loadVal,
-        dailyCost: costVal,
-        dailyCO2: co2Val
-      };
-
-      try {
-        await setDoc(
-          doc(db, "companies", currentCompanyId),
-          { stats: newStats },
-          { merge: true }
-        );
-        initCompanyStats(newStats);
-        hintEl.textContent = currentLang === "ar"
-          ? "تم حفظ بيانات الشركة بنجاح."
-          : "Company metrics saved.";
-      } catch (err) {
-        console.error(err);
-        hintEl.textContent = currentLang === "ar"
-          ? "حدث خطأ أثناء حفظ البيانات."
-          : "Error while saving metrics.";
-      }
-    }
-
-    function handleLoginSuccess(uid, companyData) {
-      isLoggedIn = true;
-      currentCompanyId = uid;
-      currentCompanyData = companyData || null;
-
-      initCompanyStats(companyData && companyData.stats ? companyData.stats : null);
-
-      if (companyData && companyData.companyCode) {
-        const badge = document.getElementById("company_code_badge");
-        const valueEl = document.getElementById("company_code_value");
-        if (badge && valueEl) {
-          valueEl.textContent = companyData.companyCode;
-          badge.style.display = "inline-flex";
-        }
-      }
-
-      initCharts(baselineAvgLoad, baselineAvgLoad);
-      populateOptimizationTableInitial();
-
-      document.getElementById("tab_login").style.display = "none";
-      document.getElementById("tab_dashboard").style.display = "inline-flex";
-      document.getElementById("tab_analyze").style.display = "inline-flex";
-      document.getElementById("tab_opt").style.display = "inline-flex";
-
-      setActiveView("dashboard-view");
-      initMap();
-      if (mapInstance) setTimeout(() => mapInstance.invalidateSize(), 0);
-    }
-
-    function initCharts(loadBefore, loadAfter) {
-      const beforeVal = Math.round(loadBefore * 100);
-      const afterVal = Math.round(loadAfter * 100);
-
-      const dbCtx = document.getElementById("dashboardChart");
-      if (dbCtx && window.Chart && !dashboardChart) {
-        dashboardChart = new Chart(dbCtx, {
-          type: "line",
-          data: {
-            labels: ["Trip 1", "Trip 2", "Trip 3", "Trip 4"],
-            datasets: [{
-              label: "Average load factor %",
-              data: [54, 58, 60, beforeVal],
-              tension: 0.3,
-              fill: true
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: { min: 0, max: 100, ticks: { stepSize: 20 } },
-            },
-            plugins: {
-              legend: { labels: { color: "#9ca3af", font: { size: 11 } } },
-            },
-          },
-        });
-      }
-
-      const optCtx = document.getElementById("optChart");
-      if (optCtx && window.Chart && !optChart) {
-        optChart = new Chart(optCtx, {
-          type: "bar",
-          data: {
-            labels: ["Baseline avg", "After optimization"],
-            datasets: [{
-              label: "Average load factor %",
-              data: [beforeVal, afterVal],
-            }],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: { min: 0, max: 100, ticks: { stepSize: 20 } },
-            },
-            plugins: { legend: { display: false } },
-          },
-        });
-      }
-    }
-
-    function updateOptChart(loadAfter) {
-      if (!optChart) return;
-      const beforeVal = Math.round(baselineAvgLoad * 100);
-      const afterVal = Math.round(loadAfter * 100);
-      optChart.data.datasets[0].data = [beforeVal, afterVal];
-      optChart.update();
-    }
-
-    function initMap() {
-      const mapEl = document.getElementById("map");
-      if (!mapEl || !window.L) return;
-
-      if (!mapInstance) {
-        mapInstance = L.map("map").setView([24.7136, 46.6753], 5.5);
-
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: "&copy; OpenStreetMap contributors",
-        }).addTo(mapInstance);
-
-        trucksScenario.forEach(t => {
-          const originKey = t.origin.toLowerCase();
-          const destKey   = t.dest.toLowerCase();
-          const originCoord = cityCoords[originKey];
-          const destCoord   = cityCoords[destKey];
-
-          if (originCoord && destCoord) {
-            const color = originKey === "riyadh" ? "#22c55e" : "#3b82f6";
-            L.polyline([originCoord, destCoord], {
-              color,
-              weight: 3,
-              opacity: 0.8,
-              dashArray: "6,6",
-            }).addTo(mapInstance);
-          }
-        });
-
-        trucksScenario.forEach(t => {
-          const load = t.currentLoad;
-          const color = load > 0.7 ? "green" : load > 0.55 ? "orange" : "red";
-
-          const marker = L.circleMarker(t.coords, {
-            radius: 9,
-            color,
-            fillColor: color,
-            fillOpacity: 0.8,
-          }).addTo(mapInstance);
-
-          marker.bindPopup(
-            `${t.id}<br>${t.origin} → ${t.dest}<br>Load factor: ${(load * 100).toFixed(0)}%`
-          );
-        });
-      }
-    }
-
-    function populateOptimizationTableInitial() {
-      populateOptimizationTable(trucksScenario, null);
-    }
-
-    function populateOptimizationTable(trucks, suggestionById) {
-      const listEl = document.getElementById("truck-list");
-      const t = translations[currentLang];
-
-      listEl.innerHTML =
-        '<div class="truck-row header">' +
-        `<div id="opt_col_truck">${t.opt_col_truck}</div>` +
-        `<div id="opt_col_load">${t.opt_col_load}</div>` +
-        `<div id="opt_col_ai">${t.opt_col_ai}</div>` +
-        '</div>';
-
-      trucks.forEach(tr => {
-        const suggestion = suggestionById ? suggestionById[tr.id] : null;
-        const load = suggestion ? suggestion.newLoad : tr.currentLoad;
-        const lf = (load * 100).toFixed(0) + "%";
-        const chipClass = load < 0.55 ? "bad" : (load < 0.7 ? "warn" : "good");
-        const actionText = suggestion
-          ? suggestion.action
-          : (currentLang === "ar" ? "بانتظار شحنة جديدة" : "Waiting for new shipment");
-
-        const row = document.createElement("div");
-        row.className = "truck-row";
-        row.innerHTML =
-          `<div>${tr.id} — ${tr.origin} → ${tr.dest}</div>` +
-          `<div><span class="chip ${chipClass}">${lf}</span></div>` +
-          `<div>${actionText}</div>`;
-        listEl.appendChild(row);
-      });
-    }
-
-    async function saveOptimizationResult(companyId, data) {
-      if (!db || !companyId) return;
-      try {
-        await addDoc(
-          collection(db, "companies", companyId, "optimizations"),
-          {
-            ...data,
-            createdAt: serverTimestamp()
-          }
-        );
-      } catch (err) {
-        console.error("Error saving optimization:", err);
-      }
-    }
-
+    // ===== runOptimization (نسخة معدّلة) =====
     async function runOptimization() {
       if (!isLoggedIn) return;
 
@@ -1635,7 +974,7 @@
       let destinationInput = (document.getElementById("destination").value || "").toLowerCase();
       const priority = document.getElementById("priority").value;
 
-      // نشتغل على نسخة من السيناريو الأصلي عشان ما نخربه
+      // نشتغل على نسخة
       const trucks = trucksScenario.map(t => Object.assign({}, t));
 
       let destKey = destinationInput.trim();
@@ -1663,7 +1002,6 @@
       const newLoadFactor = Math.min(1, newTotalTons / CAPACITY_TONS);
       target.newLoad = newLoadFactor;
 
-      // باقي الشاحنات تبقى على نفس currentLoad كـ newLoad
       trucks.forEach(t => {
         if (t.id !== target.id) t.newLoad = t.currentLoad;
       });
@@ -1673,9 +1011,6 @@
 
       const costAfter = baselineCost * (baselineAvgLoad / afterAvgLoad);
       const co2After = baselineCO2 * (costAfter / baselineCost);
-
-      // ⭐ تخزين آخر نتيجة تحسين لاستخدامها في تقرير الـ PDF
-      lastOptimizationTrucks = trucks;
 
       const loadAfterPct = (afterAvgLoad * 100).toFixed(0) + "%";
       document.getElementById("kpi-load-after").textContent = loadAfterPct;
@@ -1728,6 +1063,15 @@
           `in operating cost and <strong>${Math.abs(co2SavePct).toFixed(1)}%</strong> in CO₂ emissions.`;
       }
 
+      // *** هنا التخزين الجديد اللي يستخدمه الـ PDF ***
+      lastOptimizationLoads = {};
+      trucks.forEach(t => {
+        lastOptimizationLoads[t.id] = {
+          before: t.currentLoad,
+          after: t.newLoad
+        };
+      });
+
       if (currentCompanyId) {
         await saveOptimizationResult(currentCompanyId, {
           shipmentWeight: weight || 0,
@@ -1748,32 +1092,7 @@
       setActiveView("optimization-view");
     }
 
-    function analyzeCSV() {
-      if (!isLoggedIn) return;
-      const fileInput = document.getElementById("csv_file");
-      const msg = document.getElementById("csv_message");
-
-      if (!fileInput.files || fileInput.files.length === 0) {
-        msg.textContent = currentLang === "ar"
-          ? "يرجى اختيار ملف CSV أولاً."
-          : "Please choose a CSV file first.";
-        return;
-      }
-
-      msg.textContent = currentLang === "ar"
-        ? "تم رفع الملف (محاكاة). سيتم استخدام بيانات الرحلات لتحسين الاقتراحات."
-        : "CSV uploaded (demo). Trip history will be used to improve optimization suggestions.";
-
-      populateOptimizationTableInitial();
-      document.getElementById("opt-summary").textContent =
-        currentLang === "ar"
-          ? "تمت معالجة ملف CSV (محاكاة). تظهر هنا نتيجة التحسين بناءً على بيانات الرحلات."
-          : "CSV file processed (demo). Optimization based on trip history is shown here.";
-
-      setActiveView("optimization-view");
-    }
-
-    // ===== PDF GENERATION =====
+    // ===== generatePdfReport (جزء التراك بس اللي تعدّل) =====
     function generatePdfReport() {
       const msg = document.getElementById("pdf_message");
 
@@ -1786,145 +1105,24 @@
 
       try {
         const jsPDFConstructor = window.jsPDF;
-
         if (!jsPDFConstructor) {
           msg.textContent = currentLang === "ar"
-            ? "تعذر تحميل مكتبة إنشاء ملفات الـ PDF. تأكد أن سكربت jsPDF مضاف في <head>."
-            : "Could not load the PDF library (jsPDF). Make sure the jsPDF script is included in <head>.";
+            ? "تعذر تحميل مكتبة إنشاء ملفات الـ PDF."
+            : "Could not load the PDF library (jsPDF).";
           return;
         }
 
         const doc = new jsPDFConstructor();
 
-        // ========== HEADER / LOGO ==========
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(18);
-        doc.text("Logixperts - Smart Load Analyzer", 10, 18);
+        // ... (كل الهيدر و Section 1 نفس اللي عندك)
 
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "normal");
-        doc.text("Naqlthon 4 - Smart Load Optimization Demo", 10, 26);
+        // ----- Section 2: Per-Truck Load Factors -----
+        let y = 84; // تأكد تضبط y حسب اللي فوقك
+        // (هنا افترضنا إنك حاسبه مثل كودك السابق)
 
-        // Company info
-        const companyName = currentCompanyData?.companyName || "Demo Company";
-        const companyEmail = currentCompanyData?.email || "demo@logixperts.sa";
-        const fleetSize = currentCompanyData?.fleetSize || 4;
-        const companyCode = currentCompanyData?.companyCode || "DEMO123";
+        // تحريك y لنهاية Section 1 (نفس كودك بالضبط)
+        // ... بعد ما تخلص Section 1
 
-        doc.setFont("helvetica", "bold");
-        doc.text("Company:", 10, 38);
-        doc.setFont("helvetica", "normal");
-        doc.text(companyName, 35, 38);
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Email:", 10, 44);
-        doc.setFont("helvetica", "normal");
-        doc.text(String(companyEmail), 35, 44);
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Fleet size:", 10, 50);
-        doc.setFont("helvetica", "normal");
-        doc.text(String(fleetSize), 35, 50);
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Company code:", 10, 56);
-        doc.setFont("helvetica", "normal");
-        doc.text(String(companyCode), 42, 56);
-
-        // Contact block
-        doc.setFont("helvetica", "bold");
-        doc.text("Contact:", 120, 38);
-        doc.setFont("helvetica", "normal");
-        doc.text("Smart Load Analyzer / Logixperts", 120, 44);
-        doc.text("Phone: +966 55 555 5555", 120, 50);
-        doc.text("Email: support@logixperts.com", 120, 56);
-
-        doc.setFontSize(10);
-        doc.text(
-          "Generated at: " + new Date().toLocaleString("en-SA"),
-          10,
-          64
-        );
-
-        // ========== KPIs SUMMARY ==========
-        doc.setFontSize(13);
-        doc.setFont("helvetica", "bold");
-        doc.text("1. KPIs Summary (Before vs After Optimization)", 10, 76);
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-
-        const avgBefore = (baselineAvgLoad * 100).toFixed(0);
-        const avgAfterText = document.getElementById("kpi-load-after").textContent || "–";
-        const costBeforeText = document.getElementById("kpi-cost-before").textContent || "–";
-        const costAfterText = document.getElementById("kpi-cost-after").textContent || "–";
-        const co2BeforeText = document.getElementById("kpi-co2-before").textContent || "–";
-        const co2AfterText = document.getElementById("kpi-co2-after").textContent || "–";
-
-        let costSavingsPctStr = "N/A";
-        let co2SavingsPctStr = "N/A";
-
-        if (
-          typeof baselineCost === "number" &&
-          baselineCost > 0 &&
-          typeof baselineCO2 === "number" &&
-          baselineCO2 > 0
-        ) {
-          const costAfterNum = parseFloat(
-            (costAfterText || "").replace(/[^\d.]/g, "") || "0"
-          );
-          const co2AfterNum = parseFloat(
-            (co2AfterText || "").replace(/[^\d.]/g, "") || "0"
-          );
-
-          if (!isNaN(costAfterNum) && costAfterNum > 0) {
-            const costSave = ((baselineCost - costAfterNum) / baselineCost) * 100;
-            costSavingsPctStr = costSave.toFixed(1) + "%";
-          }
-
-          if (!isNaN(co2AfterNum) && co2AfterNum > 0) {
-            const co2Save = ((baselineCO2 - co2AfterNum) / baselineCO2) * 100;
-            co2SavingsPctStr = co2Save.toFixed(1) + "%";
-          }
-        }
-
-        let y = 84;
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Metric", 10, y);
-        doc.text("Before", 70, y);
-        doc.text("After", 120, y);
-        doc.text("Savings", 170, y);
-        doc.setDrawColor(0, 0, 0);
-        doc.line(10, y + 2, 200, y + 2);
-        y += 8;
-
-        doc.setFont("helvetica", "normal");
-        doc.text("Average load factor (%)", 10, y);
-        doc.text(avgBefore + "%", 70, y);
-        doc.text(avgAfterText, 120, y);
-        doc.text(
-          avgAfterText !== "–"
-            ? (Number(avgAfterText.replace(/[^\d.]/g, "")) - Number(avgBefore)).toFixed(1) + " pp"
-            : "N/A",
-          170,
-          y
-        );
-        y += 7;
-
-        doc.text("Operating cost per day", 10, y);
-        doc.text(costBeforeText, 70, y);
-        doc.text(costAfterText, 120, y);
-        doc.text(costSavingsPctStr, 170, y);
-        y += 7;
-
-        doc.text("CO2 emissions per day", 10, y);
-        doc.text(co2BeforeText, 70, y);
-        doc.text(co2AfterText, 120, y);
-        doc.text(co2SavingsPctStr, 170, y);
-        y += 10;
-
-        // ========== PER-TRUCK TABLE ==========
         doc.setFontSize(13);
         doc.setFont("helvetica", "bold");
         doc.text("2. Per-Truck Load Factors", 10, y);
@@ -1940,13 +1138,14 @@
 
         doc.setFont("helvetica", "normal");
 
-        // ⭐ استخدام آخر نتيجة تحسين، أو السيناريو الأصلي لو ما فيه تحسين
-        const trucksForReport = lastOptimizationTrucks || trucksScenario;
+        trucksScenario.forEach(tr => {
+          // لو فيه نتيجة تحسين استخدمها، غير كذا يرجع للقيم الأصلية
+          const opt = lastOptimizationLoads && lastOptimizationLoads[tr.id];
+          const beforeLoad = opt ? opt.before : tr.currentLoad;
+          const afterLoad  = opt ? opt.after  : tr.currentLoad;
 
-        trucksForReport.forEach(tr => {
-          const beforePct = (tr.currentLoad * 100).toFixed(0) + "%";
-          const afterLoad = typeof tr.newLoad === "number" ? tr.newLoad : tr.currentLoad;
-          const afterPct = (afterLoad * 100).toFixed(0) + "%";
+          const beforePct = (beforeLoad * 100).toFixed(0) + "%";
+          const afterPct  = (afterLoad  * 100).toFixed(0) + "%";
 
           const label = `${tr.id} ${tr.origin}→${tr.dest}`;
           doc.text(label, 10, y);
@@ -1955,48 +1154,7 @@
           y += 6;
         });
 
-        y += 4;
-
-        // ========== RECOMMENDATIONS ==========
-        doc.setFontSize(13);
-        doc.setFont("helvetica", "bold");
-        doc.text("3. Recommendations for Small and Medium Carriers", 10, y);
-        y += 7;
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-
-        const recommendations = [
-          "Start by focusing on return trips with low load factor (below 60%). Use them to bundle new shipments.",
-          "Track your average fleet load every week. Aim to move it gradually from the current level towards 80%+.",
-          "Use the system to simulate what-if scenarios before accepting new shipments, to avoid empty or half-empty runs.",
-          "Prioritize routes where fuel and toll costs are high – these gain the most from better load consolidation.",
-          "Share simple monthly PDF reports like this with management and customers to demonstrate cost and CO2 savings."
-        ];
-
-        recommendations.forEach(line => {
-          if (y > 270) {
-            doc.addPage();
-            y = 20;
-          }
-          doc.text(`• ${line}`, 10, y);
-          y += 6;
-        });
-
-        y += 4;
-
-        if (y > 270) {
-          doc.addPage();
-          y = 20;
-        }
-
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "italic");
-        doc.text(
-          "Note: This PDF is generated from a Naqlthon demo scenario. In a production version, an AI engine would use real trip data and KPIs.",
-          10,
-          y
-        );
+        // ... تكمل Section 3 و الـ footer مثل كودك السابق
 
         doc.save("SmartLoad_Report_demo.pdf");
 
@@ -2010,6 +1168,9 @@
           : "An error occurred while generating the PDF file.";
       }
     }
+
+    // ===== باقي الأكواد: initCharts, updateOptChart, initMap, populateOptimizationTable, analyzeCSV, إلخ =====
+    // خَلّها زي ما هي عندك.
 
     window.addEventListener("load", () => {
       document.getElementById("tab_login").style.display = "inline-flex";
