@@ -395,7 +395,7 @@
     src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
-    defer
+    onload="window.jsPDF = window.jspdf.jsPDF;"
   ></script>
 </head>
 <body>
@@ -1781,10 +1781,8 @@
 
       try {
         // jsPDF UMD استخراج الكونستراكتور من
-        const jsPDFConstructor =
-          (window.jspdf && window.jspdf.jsPDF)
-            ? window.jspdf.jsPDF
-            : (typeof window.jsPDF === "function" ? window.jsPDF : null);
+       const jsPDFConstructor = window.jsPDF;
+
 
         if (!jsPDFConstructor) {
           msg.textContent = currentLang === "ar"
@@ -2038,4 +2036,5 @@
   </script>
 </body>
 </html>
+
 
