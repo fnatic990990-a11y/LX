@@ -1469,8 +1469,8 @@
     }
 
     function initCharts(loadBefore, loadAfter) {
-      const beforeVal = loadBefore * 100;
-      const afterVal = loadAfter * 100;
+ const beforeVal = Math.round(loadBefore * 100);
+  const afterVal = Math.round(loadAfter * 100);
 
       const dbCtx = document.getElementById("dashboardChart");
       if (dbCtx && window.Chart && !dashboardChart) {
@@ -1521,13 +1521,14 @@
       }
     }
 
-    function updateOptChart(loadAfter) {
-      if (!optChart) return;
-      const beforeVal = baselineAvgLoad * 100;
-      const afterVal = loadAfter * 100;
-      optChart.data.datasets[0].data = [beforeVal, afterVal];
-      optChart.update();
-    }
+   function updateOptChart(loadAfter) {
+  if (!optChart) return;
+  const beforeVal = Math.round(baselineAvgLoad * 100);
+  const afterVal = Math.round(loadAfter * 100);
+  optChart.data.datasets[0].data = [beforeVal, afterVal];
+  optChart.update();
+}
+
 
     function initMap() {
       const mapEl = document.getElementById("map");
@@ -2033,6 +2034,7 @@
   </script>
 </body>
 </html>
+
 
 
 
