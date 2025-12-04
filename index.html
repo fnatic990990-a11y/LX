@@ -1,554 +1,14 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Logixperts - Driver Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <style>
-    :root {
-      --card: #111827;
-      --accent: #22c55e;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --border: #1f2937;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0, #020617 55%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .app {
-      max-width: 900px;
-      width: 100%;
-      background: #020617;
-      border-radius: 32px;
-      border: 1px solid #1f2937;
-      padding: 22px 20px 20px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.45);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: calc(100vh - 48px);
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px 8px;
-      border-radius: 26px;
-      background: radial-gradient(circle at left top, #22c55e20, #020617 55%);
-      border: 1px solid #1f2937;
-    }
-
-    main {
-      margin-top: 4px;
-      flex: 1;
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; }
-
-    .badge-logo {
-      width: 40px; height: 40px;
-      border-radius: 16px;
-      border: 1px solid #16a34a;
-      background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a);
-      display: flex; align-items: center; justify-content: center;
-      color: #ecfdf5; font-weight: 800; font-size: 18px;
-      box-shadow: 0 10px 25px rgba(34,197,94,.55);
-    }
-
-    .brand-text h1 {
-      font-size: 18px; font-weight: 800;
-      letter-spacing: .06em; text-transform: uppercase;
-    }
-
-    .brand-text span {
-      display:block; font-size:11px; color:var(--muted);
-      text-transform:uppercase; letter-spacing:.12em; margin-top:1px;
-    }
-
-    .header-right {
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .tag-pill {
-      padding: 5px 10px;
-      border-radius: 999px;
-      border: 1px solid #1f2937;
-      background:#020617b3;
-      font-size:11px;
-      color:var(--muted);
-      white-space:nowrap;
-    }
-
-    .lang-switch {
-      display:inline-flex;
-      border-radius:999px;
-      border:1px solid #1f2937;
-      overflow:hidden;
-      background:#020617;
-    }
-
-    .lang-btn {
-      padding:4px 10px;
-      font-size:11px;
-      border:none;
-      background:transparent;
-      color:var(--muted);
-      cursor:pointer;
-      min-width:36px;
-    }
-
-    .lang-btn.active {
-      background:var(--accent);
-      color:#022c22;
-      font-weight:600;
-    }
-
-    .view { display: none; animation: fade .2s ease-out; }
-    .view.active { display: block; }
-
-    @keyframes fade {
-      from { opacity:0; transform:translateY(3px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 22px;
-      border: 1px solid var(--border);
-      padding: 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.45);
-      margin-bottom: 10px;
-    }
-
-    .card-header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom:12px;
-    }
-
-    .card-title { font-size:17px; font-weight:600; }
-    .card-sub   { font-size:13px; color:var(--muted); }
-
-    .btn {
-      border:none;
-      padding:9px 14px;
-      border-radius:999px;
-      font-size:13px;
-      cursor:pointer;
-      font-weight:600;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-    }
-
-    .btn-primary {
-      background:linear-gradient(to right,#16a34a,#22c55e);
-      color:#ecfdf5;
-      box-shadow:0 10px 20px rgba(34,197,94,.45);
-    }
-
-    .btn-secondary {
-      background:#020617;
-      border:1px solid #374151;
-      color:#e5e7eb;
-    }
-
-    .btn-ghost {
-      background:transparent;
-      border:1px solid #374151;
-      color:#9ca3af;
-    }
-
-    .btn-sm {
-      padding:6px 10px;
-      font-size:11px;
-    }
-
-    .landing-grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-      gap:16px;
-      margin-top:10px;
-    }
-
-    .option-card {
-      border-radius:18px;
-      border:1px solid #1f2937;
-      background:#020617;
-      padding:18px 16px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      gap:10px;
-      min-height:150px;
-    }
-
-    .option-title { font-size:15px; font-weight:600; }
-
-    .option-card .btn {
-      width:100%;
-      margin-top:4px;
-    }
-
-    .form-grid {
-      display:grid;
-      gap:8px;
-      margin-top:6px;
-    }
-
-    label {
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:2px;
-    }
-
-    .field {
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-    }
-
-    input {
-      padding:8px 9px;
-      border-radius:10px;
-      border:1px solid #374151;
-      background:#020617;
-      color:var(--text);
-      font-size:13px;
-    }
-    input:focus {
-      border-color:#22c55e;
-      outline:none;
-    }
-
-    .hint {
-      font-size:11px;
-      color:var(--muted);
-      margin-top:4px;
-    }
-    .hint-error {
-      color:#fecaca;
-    }
-
-    .two-column {
-      display:grid;
-      grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
-      gap:12px;
-    }
-
-    @media (max-width: 768px) {
-      body { padding: 16px; }
-      .two-column {
-        grid-template-columns:minmax(0,1fr);
-      }
-    }
-
-    .status-pill {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:4px 9px;
-      border-radius:999px;
-      font-size:11px;
-    }
-    .status-ok {
-      background:#052e16;
-      border:1px solid #16a34a;
-      color:#bbf7d0;
-    }
-    .status-warn {
-      background:#451a03;
-      border:1px solid #f97316;
-      color:#fed7aa;
-    }
-
-    .timeline {
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-    }
-    .timeline-item {
-      padding:5px 0;
-      border-bottom:1px solid #111827;
-    }
-    .timeline-item:last-child {
-      border-bottom:none;
-    }
-    .timeline-label {
-      font-size:12px;
-      color:#e5e7eb;
-      margin-bottom:1px;
-    }
-
-    footer {
-      margin-top: 8px;
-      font-size: 11px;
-      color: #9ca3af;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .support-box {
-      font-size: 12px;
-      line-height: 1.6;
-      color: #d1d5db;
-    }
-
-    .support-box h3 {
-      font-size: 13px;
-      margin-bottom: 4px;
-      color: #22c55e;
-      font-weight: 700;
-    }
-
-    .footer-brand {
-      font-size: 10px;
-      color: #4b5563;
-    }
-    .footer-brand span {
-      color: #a7f3d0;
-    }
-
-    .footer-left { text-align: left; }
-    .footer-right { text-align: right; }
-  </style>
-</head>
-
-<body>
-  <div class="app">
-    <!-- HEADER -->
-    <header>
-      <div class="brand">
-        <div class="badge-logo">Lx</div>
-        <div class="brand-text">
-          <h1>LOGIXPERTS</h1>
-          <span id="hdr_sub">SMART LOAD – DRIVER PORTAL</span>
-        </div>
-      </div>
-
-      <div class="header-right">
-        <span class="tag-pill" id="hdr_tag">
-          Driver & Admin Access
-        </span>
-
-        <div class="lang-switch">
-          <button class="lang-btn active" id="btnLangEn" onclick="setLanguage('en')">EN</button>
-          <button class="lang-btn" id="btnLangAr" onclick="setLanguage('ar')">عربي</button>
-        </div>
-      </div>
-    </header>
-
-    <!-- MAIN -->
-    <main>
-
-      <!-- LANDING -->
-      <section id="view-landing" class="view active">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title" id="land_title">Who is using this portal?</div>
-              <div class="card-sub" id="land_sub">Choose your role to continue.</div>
-            </div>
-          </div>
-
-          <div class="landing-grid">
-
-            <!-- ADMIN -->
-            <div class="option-card">
-              <div class="option-title" id="land_admin_title">I am an Admin</div>
-              <button class="btn btn-secondary"
-                onclick="goToAdmin()"
-                id="land_admin_btn">
-                Go to Admin Platform
-              </button>
-            </div>
-
-            <!-- DRIVER -->
-            <div class="option-card">
-              <div class="option-title" id="land_driver_title">
-                I am a Driver
-              </div>
-              <button class="btn btn-primary"
-                onclick="switchView('view-driver-login')"
-                id="land_driver_btn">
-                Continue as Driver
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- DRIVER LOGIN -->
-      <section id="view-driver-login" class="view">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title" id="login_title">Driver Login</div>
-              <div class="card-sub" id="login_sub">Enter your Driver ID and Company Code.</div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="switchView('view-landing')" id="login_back">
-              ⬅ Back
-            </button>
-          </div>
-
-          <form class="form-grid" onsubmit="event.preventDefault(); driverLogin();">
-            <div class="field">
-              <label for="driverId" id="login_driverId_label">Driver ID</label>
-              <input id="driverId" type="text" placeholder="e.g. 1023" />
-            </div>
-
-            <div class="field">
-              <label for="companyCode" id="login_company_label">Company Code</label>
-              <input id="companyCode" type="text" placeholder="e.g. LXPRT" />
-            </div>
-
-            <button class="btn btn-primary" type="submit"
-              id="login_btn">
-              Login as Driver
-            </button>
-
-            <p id="driverLoginMsg" class="hint"></p>
-          </form>
-        </div>
-      </section>
-
-      <!-- DRIVER DASHBOARD -->
-      <section id="view-driver-dashboard" class="view">
-        <div class="two-column">
-
-          <!-- Column 1 -->
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title" id="driverWelcome">Welcome, Driver</div>
-                <div class="card-sub" id="driverInfo">—</div>
-              </div>
-
-              <button class="btn btn-ghost btn-sm"
-                onclick="driverLogout()"
-                id="dash_logout">
-                Logout
-              </button>
-            </div>
-
-            <div>
-
-              <div class="status-pill status-ok" id="driverStatusPill">
-                ✅ Status: Ready for assignment
-              </div>
-
-              <div style="margin-top:10px;">
-                <div style="font-size:13px;font-weight:600;margin-bottom:3px;"
-                  id="dash_assign_title">
-                  Current Assignment
-                </div>
-                <div style="font-size:13px;color:var(--muted);" id="currentAssignment">
-                  No active assignment yet. Please wait for dispatch instructions.
-                </div>
-              </div>
-
-              <div style="margin-top:10px;">
-                <button class="btn btn-secondary btn-sm"
-                  onclick="markArrived()"
-                  id="dash_btn_arrived">
-                  Mark as Arrived at Location
-                </button>
-
-                <button class="btn btn-secondary btn-sm"
-                  onclick="markLoaded()"
-                  style="margin-inline-start:6px;"
-                  id="dash_btn_loaded">
-                  Confirm Loading Complete
-                </button>
-              </div>
-
-              <p class="hint" id="driverActionMsg"></p>
-
-            </div>
-          </div>
-
-          <!-- Column 2 -->
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title" id="dash_route_title">
-                  Today's Route & Instructions
-                </div>
-                <div class="card-sub" id="dash_route_sub">
-                  Simple guidance from operations — where to go and what to do.
-                </div>
-              </div>
-            </div>
-
-            <div class="timeline" id="driverTimeline"></div>
-
-            <p class="hint"
-              style="margin-top:6px;"
-              id="dash_note">
-              This driver view is a simple prototype. Operations can update instructions per driver.
-            </p>
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer id="footerBox" class="footer-left">
-      <div class="support-box">
-        <h3 id="sup_title">Customer Support</h3>
-        <p>📞 <span id="sup_phone_label">Phone:</span> +966 55 555 5555</p>
-        <p>📧 <span id="sup_email_label">Email:</span> support@logixperts.com</p>
-        <p>📠 <span id="sup_fax_label">Fax:</span> 011-1234567</p>
-      </div>
-
-      <div class="footer-brand">
-        <span>Logixperts</span> ·
-        <span id="foot_portal">Driver Portal</span> ·
-        Naqlthon 4
-      </div>
-    </footer>
-
-  </div>
-
-<!-- ================= SCRIPT (Firebase + منطق السائق) ================= -->
 <script type="module">
+  // ================== Firebase ==================
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
   import {
     getFirestore,
     collection,
     query,
     where,
-    getDocs,
-    doc as firestoreDoc,
-    onSnapshot
+    getDocs
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-  import {
-    getAuth,
-    signInAnonymously
-  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAjbvQo7NrGZiFbFbdY3a7UtDjlv0SwU3w",
@@ -561,31 +21,10 @@
   };
 
   const app  = initializeApp(firebaseConfig);
-  const db   = getFirestore(app);
   const auth = getAuth(app);
+  const db   = getFirestore(app);
 
-  let authReady   = false;
-  let authPromise = null;
-
-  async function ensureAuth() {
-    if (authReady) return;
-    if (!authPromise) {
-      authPromise = signInAnonymously(auth)
-        .then(() => { authReady = true; })
-        .catch((err) => {
-          console.error("Anonymous auth error:", err);
-          authReady = false;
-          throw err;
-        });
-    }
-    return authPromise;
-  }
-
-  let currentLang        = "en";
-  let currentDriver      = null;
-  let currentCompanyId   = null;
-  let companyUnsubscribe = null;
-
+  // ================== TRANSLATIONS ==================
   const translations = {
     en: {
       hdr_sub: "SMART LOAD – DRIVER PORTAL",
@@ -604,10 +43,10 @@
       login_driverId_label: "Driver ID",
       login_company_label: "Company Code",
       login_btn: "Login as Driver",
-      login_error_missing: "Please enter the company code.",
-      login_company_not_found: "Company not found. Please check the company code.",
-      login_generic: "Logged in. Waiting for dispatch assignment...",
-      login_error: "Login error. Please try again.",
+      login_error_missing: "Please enter both Driver ID and Company Code.",
+      login_error_generic: "Login error. Please try again.",
+      login_error_company_not_found: "Company code not found. Please check with your admin.",
+      login_generic: "Logged in as demo driver.",
 
       dash_logout: "Logout",
       dash_assign_title: "Current Assignment",
@@ -618,18 +57,18 @@
       dash_route_sub: "Simple guidance from operations — where to go and what to do.",
       dash_btn_arrived: "Mark as Arrived at Location",
       dash_btn_loaded: "Confirm Loading Complete",
-      dash_note: "This driver view is a simple prototype. Operations can update instructions per driver.",
+      dash_note: "This driver view is connected to your company's Smart Load Analyzer data.",
       dash_msg_arrived: "Arrival confirmed. Dispatch will see this status.",
       dash_msg_loaded: "Loading confirmed. You are ready to depart.",
       dash_welcome_prefix: "Welcome, ",
       dash_driver_info: "Driver ID: ",
-      dash_company_info: " · Company: ",
+      dash_company_info: " · Company code: ",
       dash_truck_info: " · Truck: ",
       dash_no_assign: "No active assignment yet. Please wait for dispatch instructions.",
-      dash_assign_route_only: "Route: {route}",
+      dash_assign_text: "Next route: {route}. Notes: {note}",
 
       tl1_label: "1. Go to:",
-      tl1_desc: "Drive to the assigned destination.",
+      tl1_desc: "Follow dispatch instructions for this location / route.",
       tl2_label: "2. Confirm arrival",
       tl2_desc: "Use \"Mark as Arrived\" when you reach the location.",
       tl3_label: "3. Confirm loading",
@@ -659,10 +98,10 @@
       login_driverId_label: "رقم السائق",
       login_company_label: "كود الشركة",
       login_btn: "تسجيل الدخول كسائق",
-      login_error_missing: "الرجاء إدخال كود الشركة.",
-      login_company_not_found: "لم يتم العثور على الشركة، تأكد من كود الشركة.",
-      login_generic: "تم تسجيل الدخول، بانتظار توجيه الرحلة من الإدارة...",
-      login_error: "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى.",
+      login_error_missing: "الرجاء إدخال رقم السائق وكود الشركة.",
+      login_error_generic: "حدث خطأ في تسجيل الدخول، حاول مرة أخرى.",
+      login_error_company_not_found: "لم يتم العثور على كود الشركة، تواصل مع الإدارة.",
+      login_generic: "تم تسجيل الدخول كسائق تجريبي.",
 
       dash_logout: "تسجيل خروج",
       dash_assign_title: "الرحلة الحالية",
@@ -670,21 +109,21 @@
       dash_status_arrived: "🟡 الحالة: وصلت إلى الموقع وأنتظر التحميل",
       dash_status_loaded: "✅ الحالة: تم التحميل – جاهز للمغادرة",
       dash_route_title: "مسار اليوم والتعليمات",
-      dash_route_sub: "إرشادات بسيطة من العمليات — إلى أين تذهب وماذا تفعل.",
+      dash_route_sub: "إرشادات بسيطة من قسم العمليات — إلى أين تذهب وماذا تفعل.",
       dash_btn_arrived: "تأكيد الوصول للموقع",
       dash_btn_loaded: "تأكيد إتمام التحميل",
-      dash_note: "هذه واجهة تجريبية بسيطة، ويمكن للإدارة تحديث التعليمات لكل سائق.",
+      dash_note: "هذه الواجهة مرتبطة ببيانات شركتك في نظام Smart Load Analyzer.",
       dash_msg_arrived: "تم تأكيد الوصول، سيتم عرض الحالة لقسم العمليات.",
       dash_msg_loaded: "تم تأكيد التحميل، يمكنك المغادرة الآن.",
       dash_welcome_prefix: "مرحبًا، ",
       dash_driver_info: "رقم السائق: ",
-      dash_company_info: " · الشركة: ",
+      dash_company_info: " · كود الشركة: ",
       dash_truck_info: " · الشاحنة: ",
       dash_no_assign: "لا توجد رحلة مفعّلة حاليًا، يرجى انتظار توجيهات قسم العمليات.",
-      dash_assign_route_only: "المسار: {route}",
+      dash_assign_text: "المسار التالي: {route}. التعليمات: {note}",
 
       tl1_label: "1. التوجّه إلى:",
-      tl1_desc: "توجّه إلى الوجهة المحددة.",
+      tl1_desc: "اتبع تعليمات قسم العمليات لهذا الموقع أو المسار.",
       tl2_label: "2. تأكيد الوصول",
       tl2_desc: "استخدم زر \"تأكيد الوصول\" عند الوصول للموقع.",
       tl3_label: "3. تأكيد التحميل",
@@ -698,12 +137,27 @@
     }
   };
 
+  let currentLang = "en";
+  let currentDriver = null;
+  let currentCompanyDocId = null;
+
+  // ================== HELPERS ==================
+  function getLocalized(driver, key) {
+    if (!driver) return "";
+    if (currentLang === "ar") {
+      return driver[key + "Ar"] || driver[key + "En"] || "";
+    } else {
+      return driver[key + "En"] || driver[key + "Ar"] || "";
+    }
+  }
+
+  // ================== LANGUAGE ==================
   function setLanguage(lang) {
     currentLang = lang;
     const t = translations[lang];
 
     document.documentElement.lang = lang;
-    document.documentElement.dir  = (lang === "ar") ? "rtl" : "ltr";
+    document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
 
     document.getElementById("btnLangEn").classList.toggle("active", lang === "en");
     document.getElementById("btnLangAr").classList.toggle("active", lang === "ar");
@@ -712,32 +166,32 @@
     document.getElementById("hdr_tag").textContent = t.hdr_tag;
 
     document.getElementById("land_title").textContent = t.land_title;
-    document.getElementById("land_sub").textContent   = t.land_sub;
+    document.getElementById("land_sub").textContent = t.land_sub;
     document.getElementById("land_admin_title").textContent = t.land_admin_title;
     document.getElementById("land_driver_title").textContent = t.land_driver_title;
-    document.getElementById("land_admin_btn").textContent    = t.land_admin_btn;
-    document.getElementById("land_driver_btn").textContent   = t.land_driver_btn;
+    document.getElementById("land_admin_btn").textContent = t.land_admin_btn;
+    document.getElementById("land_driver_btn").textContent = t.land_driver_btn;
 
-    document.getElementById("login_title").textContent     = t.login_title;
-    document.getElementById("login_sub").textContent       = t.login_sub;
-    document.getElementById("login_back").textContent      = t.login_back;
+    document.getElementById("login_title").textContent = t.login_title;
+    document.getElementById("login_sub").textContent = t.login_sub;
+    document.getElementById("login_back").textContent = t.login_back;
     document.getElementById("login_driverId_label").textContent = t.login_driverId_label;
-    document.getElementById("login_company_label").textContent  = t.login_company_label;
-    document.getElementById("login_btn").textContent            = t.login_btn;
+    document.getElementById("login_company_label").textContent = t.login_company_label;
+    document.getElementById("login_btn").textContent = t.login_btn;
 
-    document.getElementById("dash_logout").textContent       = t.dash_logout;
+    document.getElementById("dash_logout").textContent = t.dash_logout;
     document.getElementById("dash_assign_title").textContent = t.dash_assign_title;
-    document.getElementById("dash_route_title").textContent  = t.dash_route_title;
-    document.getElementById("dash_route_sub").textContent    = t.dash_route_sub;
-    document.getElementById("dash_btn_arrived").textContent  = t.dash_btn_arrived;
-    document.getElementById("dash_btn_loaded").textContent   = t.dash_btn_loaded;
-    document.getElementById("dash_note").textContent         = t.dash_note;
+    document.getElementById("dash_route_title").textContent = t.dash_route_title;
+    document.getElementById("dash_route_sub").textContent = t.dash_route_sub;
+    document.getElementById("dash_btn_arrived").textContent = t.dash_btn_arrived;
+    document.getElementById("dash_btn_loaded").textContent = t.dash_btn_loaded;
+    document.getElementById("dash_note").textContent = t.dash_note;
 
-    document.getElementById("sup_title").textContent       = t.sup_title;
+    document.getElementById("sup_title").textContent = t.sup_title;
     document.getElementById("sup_phone_label").textContent = t.sup_phone_label;
     document.getElementById("sup_email_label").textContent = t.sup_email_label;
-    document.getElementById("sup_fax_label").textContent   = t.sup_fax_label;
-    document.getElementById("foot_portal").textContent     = t.foot_portal;
+    document.getElementById("sup_fax_label").textContent = t.sup_fax_label;
+    document.getElementById("foot_portal").textContent = t.foot_portal;
 
     const footer = document.getElementById("footerBox");
     footer.className = (lang === "ar") ? "footer-right" : "footer-left";
@@ -745,67 +199,170 @@
     document.getElementById("driverId").placeholder =
       (lang === "en") ? "e.g. 1023" : "مثال: 1023";
     document.getElementById("companyCode").placeholder =
-      (lang === "en") ? "e.g. LXPRT" : "مثال: LXPRT";
+      (lang === "en") ? "e.g. LXPRT" : "مثال: ABC123";
 
     if (currentDriver) {
-      fillDriverDashboard();
+      fillDriverDashboard(currentDriver);
     }
   }
 
+  // ================== VIEWS ==================
   function switchView(id) {
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    const views = document.querySelectorAll(".view");
+    views.forEach(v => v.classList.remove("active"));
     document.getElementById(id).classList.add("active");
   }
 
   function goToAdmin() {
-    // رابط صفحة الأدمن اللي عندك
     window.location.href = "admin.html";
   }
 
-  function fillDriverDashboard() {
-    if (!currentDriver) return;
+  // ================== DRIVER LOGIN ==================
+  async function driverLogin() {
+    const idInput  = document.getElementById("driverId");
+    const codeInput = document.getElementById("companyCode");
+    const msgEl    = document.getElementById("driverLoginMsg");
+    const t        = translations[currentLang];
+
+    const driverId   = (idInput.value || "").trim();
+    const companyRaw = (codeInput.value || "").trim();
+    const company    = companyRaw.toUpperCase();
+
+    if (!driverId || !company) {
+      msgEl.textContent = t.login_error_missing;
+      msgEl.classList.add("hint-error");
+      return;
+    }
+    msgEl.textContent = "";
+    msgEl.classList.remove("hint-error");
+
+    try {
+      // 1) Anonymous Auth (نستخدمه فقط عشان نسمح بالقراءة من Firestore)
+      await signInAnonymously(auth);
+
+      // 2) نبحث عن الشركة بكود الشركة
+      const companiesRef = collection(db, "companies");
+      const q = query(companiesRef, where("companyCode", "==", company));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        msgEl.textContent = t.login_error_company_not_found;
+        msgEl.classList.add("hint-error");
+        return;
+      }
+
+      const companyDoc = snap.docs[0];
+      const companyData = companyDoc.data() || {};
+      currentCompanyDocId = companyDoc.id;
+
+      // 3) نحاول نقرأ آخر توصية من Subcollection اسمها "optimizations"
+      let routeTextEn = "";
+      let routeTextAr = "";
+      let noteEn = "";
+      let noteAr = "";
+
+      try {
+        const optCol = collection(db, "companies", companyDoc.id, "optimizations");
+        const optSnap = await getDocs(optCol);
+        if (!optSnap.empty) {
+          // ناخذ أول وحدة (يكفي للديمو)
+          const firstOpt = optSnap.docs[0].data() || {};
+          const route = firstOpt.assignedRoute || "";
+          const dest  = firstOpt.destination || "";
+
+          routeTextEn = route || dest || "To be assigned";
+          routeTextAr = route || dest || "سيتم التحديد لاحقًا";
+
+          noteEn = `Follow this route as assigned by dispatch.`;
+          noteAr = `اتبع هذا المسار كما حدده قسم العمليات.`;
+        }
+      } catch (e) {
+        // لو فشلنا في قراءة التوصيات، نخليها فاضية ونرجع نص عام
+      }
+
+      if (!routeTextEn) {
+        routeTextEn = companyData.driverNextRouteEn ||
+                      companyData.defaultRouteEn ||
+                      "To be assigned";
+        routeTextAr = companyData.driverNextRouteAr ||
+                      companyData.defaultRouteAr ||
+                      "سيتم التحديد لاحقًا";
+
+        noteEn = companyData.driverNoteEn ||
+                 "Please contact dispatch for your next assignment.";
+        noteAr = companyData.driverNoteAr ||
+                 "يرجى التواصل مع قسم العمليات لمعرفة الرحلة القادمة.";
+      }
+
+      // 4) نبني كائن السائق (Driver ID عشوائي — ما فيه تحقق خاص)
+      currentDriver = {
+        driverId,
+        companyCode: company,
+        nameEn: `Driver ${driverId}`,
+        nameAr: `السائق ${driverId}`,
+        truck: companyData.demoTruckId || "—",
+        nextRouteEn: routeTextEn,
+        nextRouteAr: routeTextAr,
+        noteEn,
+        noteAr
+      };
+
+      msgEl.textContent = "";
+      fillDriverDashboard(currentDriver);
+      switchView("view-driver-dashboard");
+    } catch (err) {
+      console.error("Driver login error:", err);
+      msgEl.textContent = t.login_error_generic;
+      msgEl.classList.add("hint-error");
+    }
+  }
+
+  // ================== DASHBOARD RENDER ==================
+  function fillDriverDashboard(d) {
     const t = translations[currentLang];
 
-    const name = (currentLang === "ar")
-      ? currentDriver.nameAr
-      : currentDriver.nameEn;
+    const name = getLocalized(d, "name");
+    const route = getLocalized(
+      { routeEn: d.nextRouteEn, routeAr: d.nextRouteAr },
+      "route"
+    );
+    const note = getLocalized(
+      { noteEn: d.noteEn, noteAr: d.noteAr },
+      "note"
+    );
 
     document.getElementById("driverWelcome").textContent =
       t.dash_welcome_prefix + name;
 
-    let info = t.dash_driver_info + currentDriver.driverId +
-               t.dash_company_info + currentDriver.companyCode;
-    if (currentDriver.truck && currentDriver.truck !== "—") {
-      info += t.dash_truck_info + currentDriver.truck;
+    let info = t.dash_driver_info + d.driverId +
+               t.dash_company_info + d.companyCode;
+    if (d.truck && d.truck !== "—") {
+      info += t.dash_truck_info + d.truck;
     }
     document.getElementById("driverInfo").textContent = info;
 
     const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_ready;
-    statusEl.className   = "status-pill status-ok";
+    statusEl.className = "status-pill status-ok";
 
     const assignEl = document.getElementById("currentAssignment");
-    if (!currentDriver.routeLabel) {
-      assignEl.textContent = t.dash_no_assign;
-      updateTimeline("");
-    } else {
-      const routeText =
-        t.dash_assign_route_only.replace("{route}", currentDriver.routeLabel);
-      assignEl.textContent = routeText;
-      updateTimeline(currentDriver.routeLabel);
-    }
+    assignEl.textContent =
+      t.dash_assign_text
+        .replace("{route}", route)
+        .replace("{note}", note);
 
+    updateTimeline(route);
     document.getElementById("driverActionMsg").textContent = "";
   }
 
-  function updateTimeline(routeLabel) {
+  function updateTimeline(route) {
     const t = translations[currentLang];
     const tl = document.getElementById("driverTimeline");
-    const cityDisplay = routeLabel || "";
+    const routeText = route || "";
 
     tl.innerHTML =
       '<div class="timeline-item">' +
-        '<div class="timeline-label">' + t.tl1_label + ' ' + cityDisplay + '</div>' +
+        '<div class="timeline-label">' + t.tl1_label + ' ' + routeText + '</div>' +
         '<div>' + t.tl1_desc + '</div>' +
       '</div>' +
       '<div class="timeline-item">' +
@@ -818,94 +375,12 @@
       '</div>';
   }
 
-  function applyDispatchToDriver(data) {
-    if (!currentDriver) return;
-
-    const origin      = data.origin      || "?";
-    const destination = data.destination || "?";
-    const routeLabel  = `${origin} → ${destination}`;
-    const assignedTruckId = data.assignedTruckId || "—";
-
-    currentDriver.routeLabel = routeLabel;
-    currentDriver.truck      = assignedTruckId;
-
-    fillDriverDashboard();
-  }
-
-  async function driverLogin() {
-    let id  = document.getElementById("driverId").value.trim();
-    const companyCodeInput = document.getElementById("companyCode").value.trim().toUpperCase();
-    const msg = document.getElementById("driverLoginMsg");
-    const t   = translations[currentLang];
-
-    // Driver ID اختياري
-    if (!id) id = "N/A";
-
-    if (!companyCodeInput) {
-      msg.textContent = t.login_error_missing;
-      msg.classList.add("hint-error");
-      return;
-    }
-    msg.classList.remove("hint-error");
-
-    if (companyUnsubscribe) {
-      companyUnsubscribe();
-      companyUnsubscribe = null;
-    }
-    currentCompanyId = null;
-
-    try {
-      await ensureAuth();
-
-      const companiesRef = collection(db, "companies");
-      const q  = query(companiesRef, where("companyCode", "==", companyCodeInput));
-      const qs = await getDocs(q);
-
-      if (qs.empty) {
-        msg.textContent = t.login_company_not_found;
-        msg.classList.add("hint-error");
-        return;
-      }
-
-      const companyDoc = qs.docs[0];
-      currentCompanyId = companyDoc.id;
-
-      currentDriver = {
-        driverId: id,
-        companyCode: companyCodeInput,
-        nameEn: "Driver " + id,
-        nameAr: "السائق " + id,
-        truck: "—",
-        routeLabel: null
-      };
-
-      msg.textContent = t.login_generic;
-      fillDriverDashboard();
-      switchView("view-driver-dashboard");
-
-      const dispatchRef = firestoreDoc(db, "companies", currentCompanyId, "driver", "current");
-      companyUnsubscribe = onSnapshot(dispatchRef, (snap) => {
-        if (!snap.exists()) {
-          currentDriver.routeLabel = null;
-          currentDriver.truck      = "—";
-          fillDriverDashboard();
-          return;
-        }
-        applyDispatchToDriver(snap.data());
-      });
-
-    } catch (err) {
-      console.error(err);
-      msg.textContent = t.login_error;
-      msg.classList.add("hint-error");
-    }
-  }
-
+  // ================== BUTTON ACTIONS ==================
   function markArrived() {
     const t = translations[currentLang];
     const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_arrived;
-    statusEl.className   = "status-pill status-warn";
+    statusEl.className = "status-pill status-warn";
     document.getElementById("driverActionMsg").textContent = t.dash_msg_arrived;
   }
 
@@ -913,30 +388,20 @@
     const t = translations[currentLang];
     const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_loaded;
-    statusEl.className   = "status-pill status-ok";
+    statusEl.className = "status-pill status-ok";
     document.getElementById("driverActionMsg").textContent = t.dash_msg_loaded;
   }
 
   function driverLogout() {
-    if (companyUnsubscribe) {
-      companyUnsubscribe();
-      companyUnsubscribe = null;
-    }
-    currentCompanyId = null;
-    currentDriver    = null;
-
-    document.getElementById("driverId").value       = "";
-    document.getElementById("companyCode").value    = "";
+    currentDriver = null;
+    currentCompanyDocId = null;
+    document.getElementById("driverId").value = "";
+    document.getElementById("companyCode").value = "";
     document.getElementById("driverLoginMsg").textContent = "";
-
-    const t = translations[currentLang];
-    document.getElementById("currentAssignment").textContent = t.dash_no_assign;
-    updateTimeline("");
-
     switchView("view-driver-login");
   }
 
-  // ربط الدوال مع الـ window عشان الـ HTML يقدر يستدعيها
+  // ================== EXPOSE TO WINDOW ==================
   window.setLanguage  = setLanguage;
   window.switchView   = switchView;
   window.goToAdmin    = goToAdmin;
@@ -945,10 +410,8 @@
   window.markLoaded   = markLoaded;
   window.driverLogout = driverLogout;
 
+  // ================== INIT ==================
   window.addEventListener("DOMContentLoaded", () => {
     setLanguage("en");
   });
 </script>
-
-</body>
-</html>
