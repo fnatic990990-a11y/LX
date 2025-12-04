@@ -533,9 +533,40 @@
 
   </div>
 
-<script>
+<script type="module">
+  // ===== Firebase imports (نفس مشروع الأدمن) =====
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    doc,
+    getDocs,
+    query,
+    where,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAjbvQo7NrGZiFbFbdY3a7UtDjlv0SwU3w",
+    authDomain: "smart-load-analyzer-56cb2.firebaseapp.com",
+    projectId: "smart-load-analyzer-56cb2",
+    storageBucket: "smart-load-analyzer-56cb2.firebasestorage.app",
+    messagingSenderId: "253721588070",
+    appId: "1:253721588070:web:c24bc2fbc27c2fba9e18a7",
+    measurementId: "G-60RF97SGWN"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ===== متغيرات حالة السائق =====
+  let currentLang = "en";
+  let currentDriver = null;
+  let currentCompanyId = null;
+  let companyListenerUnsub = null;
+
   // ================= DATA =================
-  var translations = {
+  const translations = {
     en: {
       hdr_sub: "SMART LOAD – DRIVER PORTAL",
       hdr_tag: "Driver & Admin Access",
@@ -554,7 +585,9 @@
       login_company_label: "Company Code",
       login_btn: "Login as Driver",
       login_error_missing: "Please enter both Driver ID and Company Code.",
-      login_generic: "Logged in as generic driver (demo).",
+      login_generic: "Logged in. Waiting for dispatch assignment...",
+      login_company_not_found: "Company not found. Please check the company code.",
+      login_error: "Login error. Please try again.",
 
       dash_logout: "Logout",
       dash_assign_title: "Current Assignment",
@@ -573,10 +606,10 @@
       dash_company_info: " · Company: ",
       dash_truck_info: " · Truck: ",
       dash_no_assign: "No active assignment yet. Please wait for dispatch instructions.",
-      dash_assign_text: "Next location: {city}. Instructions: {note}",
+      dash_assign_route_only: "Route: {route}",
 
       tl1_label: "1. Go to:",
-      tl1_desc: "Follow dispatch instructions for this location.",
+      tl1_desc: "Drive to the assigned destination.",
       tl2_label: "2. Confirm arrival",
       tl2_desc: "Use \"Mark as Arrived\" when you reach the location.",
       tl3_label: "3. Confirm loading",
@@ -607,7 +640,9 @@
       login_company_label: "كود الشركة",
       login_btn: "تسجيل الدخول كسائق",
       login_error_missing: "الرجاء إدخال رقم السائق وكود الشركة.",
-      login_generic: "تم تسجيل الدخول كسائق تجريبي.",
+      login_generic: "تم تسجيل الدخول، بانتظار توجيه الرحلة من الإدارة...",
+      login_company_not_found: "لم يتم العثور على الشركة، تأكد من كود الشركة.",
+      login_error: "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى.",
 
       dash_logout: "تسجيل خروج",
       dash_assign_title: "الرحلة الحالية",
@@ -626,10 +661,10 @@
       dash_company_info: " · الشركة: ",
       dash_truck_info: " · الشاحنة: ",
       dash_no_assign: "لا توجد رحلة مفعّلة حاليًا، يرجى انتظار توجيهات قسم العمليات.",
-      dash_assign_text: "الوجهة التالية: {city}. التعليمات: {note}",
+      dash_assign_route_only: "المسار: {route}",
 
       tl1_label: "1. التوجّه إلى:",
-      tl1_desc: "اتبع تعليمات قسم العمليات لهذا الموقع.",
+      tl1_desc: "توجّه إلى الوجهة المحددة.",
       tl2_label: "2. تأكيد الوصول",
       tl2_desc: "استخدم زر \"تأكيد الوصول\" عند الوصول للموقع.",
       tl3_label: "3. تأكيد التحميل",
@@ -643,48 +678,10 @@
     }
   };
 
-  var currentLang = "en";
-
-  var demoDrivers = [
-    {
-      driverId: "1023",
-      companyCode: "LXPRT",
-      nameEn: "Ahmed",
-      nameAr: "أحمد",
-      truck: "TRK-12",
-      nextCityEn: "Riyadh DC",
-      nextCityAr: "مستودع الرياض",
-      noteEn: "Pickup return load to Jeddah before 16:00.",
-      noteAr: "استلام حمولة راجعة إلى جدة قبل الساعة 16:00."
-    },
-    {
-      driverId: "2045",
-      companyCode: "LXPRT",
-      nameEn: "Omar",
-      nameAr: "عمر",
-      truck: "TRK-21",
-      nextCityEn: "Dammam Hub",
-      nextCityAr: "مركز الدمام",
-      noteEn: "Proceed empty to Dammam hub, wait for backhaul load.",
-      noteAr: "توجّه فارغًا إلى مركز الدمام ثم انتظر حمولة العودة."
-    }
-  ];
-
-  var currentDriver = null;
-
-  function getLocalized(driver, key) {
-    if (!driver) return "";
-    if (currentLang === "ar") {
-      return driver[key + "Ar"] || driver[key + "En"] || "";
-    } else {
-      return driver[key + "En"] || driver[key + "Ar"] || "";
-    }
-  }
-
   // ============ LANGUAGE ============
   function setLanguage(lang) {
     currentLang = lang;
-    var t = translations[lang];
+    const t = translations[lang];
 
     document.documentElement.lang = lang;
     document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
@@ -723,7 +720,7 @@
     document.getElementById("sup_fax_label").textContent = t.sup_fax_label;
     document.getElementById("foot_portal").textContent = t.foot_portal;
 
-    var footer = document.getElementById("footerBox");
+    const footer = document.getElementById("footerBox");
     footer.className = (lang === "ar") ? "footer-right" : "footer-left";
 
     document.getElementById("driverId").placeholder =
@@ -732,16 +729,14 @@
       (lang === "en") ? "e.g. LXPRT" : "مثال: LXPRT";
 
     if (currentDriver) {
-      fillDriverDashboard(currentDriver);
+      fillDriverDashboard();
     }
   }
 
   // ============ VIEWS ============
   function switchView(id) {
-    var views = document.querySelectorAll(".view");
-    for (var i = 0; i < views.length; i++) {
-      views[i].classList.remove("active");
-    }
+    const views = document.querySelectorAll(".view");
+    views.forEach(v => v.classList.remove("active"));
     document.getElementById(id).classList.add("active");
   }
 
@@ -749,92 +744,52 @@
     window.location.href = "admin.html";
   }
 
-  // ============ LOGIN ============
-  function driverLogin() {
-    var id = document.getElementById("driverId").value.trim();
-    var company = document.getElementById("companyCode").value.trim().toUpperCase();
-    var msg = document.getElementById("driverLoginMsg");
-    var t = translations[currentLang];
-
-    if (!id || !company) {
-      msg.textContent = t.login_error_missing;
-      msg.classList.add("hint-error");
-      return;
-    }
-    msg.classList.remove("hint-error");
-
-    var found = null;
-    for (var i = 0; i < demoDrivers.length; i++) {
-      var d = demoDrivers[i];
-      if (d.driverId === id && d.companyCode === company) {
-        found = d;
-        break;
-      }
-    }
-
-    if (found) {
-      currentDriver = found;
-      msg.textContent = "";
-      fillDriverDashboard(found);
-      switchView("view-driver-dashboard");
-    } else {
-      currentDriver = {
-        driverId: id,
-        companyCode: company,
-        nameEn: "Driver " + id,
-        nameAr: "السائق " + id,
-        truck: "—",
-        nextCityEn: "To be assigned",
-        nextCityAr: "سيتم التحديد لاحقًا",
-        noteEn: "Please contact dispatch for your next assignment.",
-        noteAr: "يرجى التواصل مع قسم العمليات لمعرفة الرحلة القادمة."
-      };
-      msg.textContent = t.login_generic;
-      fillDriverDashboard(currentDriver);
-      switchView("view-driver-dashboard");
-    }
-  }
-
   // ============ DASHBOARD ============
-  function fillDriverDashboard(d) {
-    var t = translations[currentLang];
 
-    var name = getLocalized(d, "name");
-    var city = getLocalized(d, "nextCity");
-    var note = getLocalized(d, "note");
+  function fillDriverDashboard() {
+    const t = translations[currentLang];
+    if (!currentDriver) return;
+
+    const name = (currentLang === "ar")
+      ? currentDriver.nameAr
+      : currentDriver.nameEn;
 
     document.getElementById("driverWelcome").textContent =
       t.dash_welcome_prefix + name;
 
-    var info = t.dash_driver_info + d.driverId +
-               t.dash_company_info + d.companyCode;
-    if (d.truck !== "—") {
-      info += t.dash_truck_info + d.truck;
+    let info = t.dash_driver_info + currentDriver.driverId +
+               t.dash_company_info + currentDriver.companyCode;
+    if (currentDriver.truck && currentDriver.truck !== "—") {
+      info += t.dash_truck_info + currentDriver.truck;
     }
     document.getElementById("driverInfo").textContent = info;
 
-    var statusEl = document.getElementById("driverStatusPill");
+    const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_ready;
     statusEl.className = "status-pill status-ok";
 
-    var assignEl = document.getElementById("currentAssignment");
-    if (!city || !note) {
+    const assignEl = document.getElementById("currentAssignment");
+    if (!currentDriver.routeLabel) {
       assignEl.textContent = t.dash_no_assign;
+      updateTimeline("");
     } else {
-      assignEl.textContent =
-        t.dash_assign_text.replace("{city}", city).replace("{note}", note);
+      const routeText = (t.dash_assign_route_only)
+        .replace("{route}", currentDriver.routeLabel);
+      assignEl.textContent = routeText;
+      updateTimeline(currentDriver.routeLabel);
     }
 
-    updateTimeline(city);
     document.getElementById("driverActionMsg").textContent = "";
   }
 
-  function updateTimeline(city) {
-    var t = translations[currentLang];
-    var tl = document.getElementById("driverTimeline");
+  function updateTimeline(routeLabel) {
+    const t = translations[currentLang];
+    const tl = document.getElementById("driverTimeline");
+    const cityDisplay = routeLabel || "";
+
     tl.innerHTML =
       '<div class="timeline-item">' +
-        '<div class="timeline-label">' + t.tl1_label + ' ' + (city || "") + '</div>' +
+        '<div class="timeline-label">' + t.tl1_label + ' ' + cityDisplay + '</div>' +
         '<div>' + t.tl1_desc + '</div>' +
       '</div>' +
       '<div class="timeline-item">' +
@@ -847,29 +802,130 @@
       '</div>';
   }
 
+  function applyDispatchToDriver(data) {
+    if (!currentDriver) return;
+
+    const origin = data.origin || "?";
+    const destination = data.destination || "?";
+    const routeLabel = `${origin} → ${destination}`;
+    const assignedTruckId = data.assignedTruckId || "—";
+
+    currentDriver.routeLabel = routeLabel;
+    currentDriver.truck = assignedTruckId;
+
+    fillDriverDashboard();
+  }
+
+  // ============ LOGIN ============
+
+  async function driverLogin() {
+    const id = document.getElementById("driverId").value.trim();
+    const companyCodeInput = document.getElementById("companyCode").value.trim().toUpperCase();
+    const msg = document.getElementById("driverLoginMsg");
+    const t = translations[currentLang];
+
+    if (!id || !companyCodeInput) {
+      msg.textContent = t.login_error_missing;
+      msg.classList.add("hint-error");
+      return;
+    }
+    msg.classList.remove("hint-error");
+
+    // نفصل أي listener قديم
+    if (companyListenerUnsub) {
+      companyListenerUnsub();
+      companyListenerUnsub = null;
+    }
+    currentCompanyId = null;
+
+    try {
+      // نبحث عن الشركة بناءً على companyCode
+      const companiesRef = collection(db, "companies");
+      const q = query(companiesRef, where("companyCode", "==", companyCodeInput));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        msg.textContent = t.login_company_not_found;
+        msg.classList.add("hint-error");
+        return;
+      }
+
+      const docSnap = snap.docs[0];
+      currentCompanyId = docSnap.id;
+
+      // نضبط بيانات السائق الأساسية (الاسم يعتمِد على الـ ID)
+      currentDriver = {
+        driverId: id,
+        companyCode: companyCodeInput,
+        nameEn: "Driver " + id,
+        nameAr: "السائق " + id,
+        truck: "—",
+        routeLabel: null
+      };
+
+      msg.textContent = t.login_generic;
+      fillDriverDashboard();
+      switchView("view-driver-dashboard");
+
+      // نسمع لتوجيه الشركة للسائق: /companies/{companyId}/driver/current
+      const dispatchRef = doc(db, "companies", currentCompanyId, "driver", "current");
+      companyListenerUnsub = onSnapshot(dispatchRef, (dispatchSnap) => {
+        if (!dispatchSnap.exists()) {
+          // لا توجد رحلة بعد
+          currentDriver.routeLabel = null;
+          fillDriverDashboard();
+          return;
+        }
+        const data = dispatchSnap.data();
+        applyDispatchToDriver(data);
+      });
+
+    } catch (err) {
+      console.error(err);
+      msg.textContent = t.login_error;
+      msg.classList.add("hint-error");
+    }
+  }
+
   // ============ BUTTON ACTIONS ============
+
   function markArrived() {
-    var t = translations[currentLang];
-    var statusEl = document.getElementById("driverStatusPill");
+    const t = translations[currentLang];
+    const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_arrived;
     statusEl.className = "status-pill status-warn";
     document.getElementById("driverActionMsg").textContent = t.dash_msg_arrived;
+    // مبدئياً: الحالة فقط في واجهة السائق، ما نرفعها للأدمن
   }
 
   function markLoaded() {
-    var t = translations[currentLang];
-    var statusEl = document.getElementById("driverStatusPill");
+    const t = translations[currentLang];
+    const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_loaded;
     statusEl.className = "status-pill status-ok";
     document.getElementById("driverActionMsg").textContent = t.dash_msg_loaded;
+    // نفس الشيء: محلي على واجهة السائق فقط
   }
 
   // ============ LOGOUT ============
+
   function driverLogout() {
+    if (companyListenerUnsub) {
+      companyListenerUnsub();
+      companyListenerUnsub = null;
+    }
+    currentCompanyId = null;
     currentDriver = null;
+
     document.getElementById("driverId").value = "";
     document.getElementById("companyCode").value = "";
     document.getElementById("driverLoginMsg").textContent = "";
+
+    // نرجّع نصوص الحالة الافتراضية
+    const t = translations[currentLang];
+    document.getElementById("currentAssignment").textContent = t.dash_no_assign;
+    updateTimeline("");
+
     switchView("view-driver-login");
   }
 
