@@ -217,8 +217,8 @@
     window.location.href = "admin.html";
   }
 
-  // ================== DRIVER LOGIN ==================
-  async function driverLogin() {
+  // ================== DRIVER LOGIN (بدون أي تحقق من كود الشركة / Firebase) ==================
+  function driverLogin() {
     const idInput  = document.getElementById("driverId");
     const codeInput = document.getElementById("companyCode");
     const msgEl    = document.getElementById("driverLoginMsg");
@@ -228,93 +228,31 @@
     const companyRaw = (codeInput.value || "").trim();
     const company    = companyRaw.toUpperCase();
 
+    // نكتفي بأنه يكتب أي شيء في الخانتين
     if (!driverId || !company) {
       msgEl.textContent = t.login_error_missing;
       msgEl.classList.add("hint-error");
       return;
     }
+
     msgEl.textContent = "";
     msgEl.classList.remove("hint-error");
 
-    try {
-      // 1) Anonymous Auth (نستخدمه فقط عشان نسمح بالقراءة من Firestore)
-      await signInAnonymously(auth);
+    // نبني سائق تجريبي بدون أي ربط حقيقي بقاعدة البيانات
+    currentDriver = {
+      driverId,
+      companyCode: company,
+      nameEn: `Driver ${driverId}`,
+      nameAr: `السائق ${driverId}`,
+      truck: "—",
+      nextRouteEn: "To be assigned",
+      nextRouteAr: "سيتم التحديد لاحقًا",
+      noteEn: "Please contact dispatch for your next assignment.",
+      noteAr: "يرجى التواصل مع قسم العمليات لمعرفة الرحلة القادمة."
+    };
 
-      // 2) نبحث عن الشركة بكود الشركة
-      const companiesRef = collection(db, "companies");
-      const q = query(companiesRef, where("companyCode", "==", company));
-      const snap = await getDocs(q);
-
-      if (snap.empty) {
-        msgEl.textContent = t.login_error_company_not_found;
-        msgEl.classList.add("hint-error");
-        return;
-      }
-
-      const companyDoc = snap.docs[0];
-      const companyData = companyDoc.data() || {};
-      currentCompanyDocId = companyDoc.id;
-
-      // 3) نحاول نقرأ آخر توصية من Subcollection اسمها "optimizations"
-      let routeTextEn = "";
-      let routeTextAr = "";
-      let noteEn = "";
-      let noteAr = "";
-
-      try {
-        const optCol = collection(db, "companies", companyDoc.id, "optimizations");
-        const optSnap = await getDocs(optCol);
-        if (!optSnap.empty) {
-          // ناخذ أول وحدة (يكفي للديمو)
-          const firstOpt = optSnap.docs[0].data() || {};
-          const route = firstOpt.assignedRoute || "";
-          const dest  = firstOpt.destination || "";
-
-          routeTextEn = route || dest || "To be assigned";
-          routeTextAr = route || dest || "سيتم التحديد لاحقًا";
-
-          noteEn = `Follow this route as assigned by dispatch.`;
-          noteAr = `اتبع هذا المسار كما حدده قسم العمليات.`;
-        }
-      } catch (e) {
-        // لو فشلنا في قراءة التوصيات، نخليها فاضية ونرجع نص عام
-      }
-
-      if (!routeTextEn) {
-        routeTextEn = companyData.driverNextRouteEn ||
-                      companyData.defaultRouteEn ||
-                      "To be assigned";
-        routeTextAr = companyData.driverNextRouteAr ||
-                      companyData.defaultRouteAr ||
-                      "سيتم التحديد لاحقًا";
-
-        noteEn = companyData.driverNoteEn ||
-                 "Please contact dispatch for your next assignment.";
-        noteAr = companyData.driverNoteAr ||
-                 "يرجى التواصل مع قسم العمليات لمعرفة الرحلة القادمة.";
-      }
-
-      // 4) نبني كائن السائق (Driver ID عشوائي — ما فيه تحقق خاص)
-      currentDriver = {
-        driverId,
-        companyCode: company,
-        nameEn: `Driver ${driverId}`,
-        nameAr: `السائق ${driverId}`,
-        truck: companyData.demoTruckId || "—",
-        nextRouteEn: routeTextEn,
-        nextRouteAr: routeTextAr,
-        noteEn,
-        noteAr
-      };
-
-      msgEl.textContent = "";
-      fillDriverDashboard(currentDriver);
-      switchView("view-driver-dashboard");
-    } catch (err) {
-      console.error("Driver login error:", err);
-      msgEl.textContent = t.login_error_generic;
-      msgEl.classList.add("hint-error");
-    }
+    fillDriverDashboard(currentDriver);
+    switchView("view-driver-dashboard");
   }
 
   // ================== DASHBOARD RENDER ==================
