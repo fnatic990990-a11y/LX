@@ -8,7 +8,7 @@
   <style>
     :root {
       --bg: #020617;
-      --card: #0b1120;
+      --card: #020617;
       --card-soft: #020617;
       --accent: #22c55e;
       --accent-soft: rgba(34, 197, 94, 0.15);
@@ -33,14 +33,14 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: stretch;
+      align-items: center;
     }
 
     .page {
       width: 100%;
       max-width: 1100px;
       margin: 24px;
-      padding: 24px;
+      padding: 24px 24px 18px;
       background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
       border-radius: 24px;
       border: 1px solid rgba(148, 163, 184, 0.25);
@@ -49,7 +49,7 @@
         0 0 0 1px rgba(15, 23, 42, 0.8);
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
     .top-bar {
@@ -71,11 +71,6 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #f9fafb;
-    }
-
-    .logo-sub {
-      font-size: 13px;
-      color: var(--muted);
     }
 
     .hdr-sub {
@@ -119,8 +114,9 @@
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      grid-template-columns: minmax(0, 3fr) minmax(0, auto);
       gap: 18px;
+      align-items: flex-start;
     }
 
     .card {
@@ -173,22 +169,23 @@
     .role-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      gap: 14px;
+      margin-top: 14px;
     }
 
     .role-card {
       background: rgba(15, 23, 42, 0.9);
-      border-radius: 14px;
-      padding: 10px 11px;
+      border-radius: 16px;
+      padding: 12px 14px 12px;
       border: 1px solid rgba(55, 65, 81, 0.9);
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.8);
     }
 
     .role-title {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
     }
 
@@ -201,7 +198,7 @@
     .btn-secondary,
     .btn-ghost {
       border-radius: 999px;
-      padding: 7px 12px;
+      padding: 8px 16px;
       font-size: 12px;
       border: none;
       cursor: pointer;
@@ -303,15 +300,6 @@
       color: #fecaca;
     }
 
-    .pill {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px dashed rgba(75, 85, 99, 0.9);
-      color: var(--muted);
-    }
-
     .status-pill {
       display: inline-flex;
       align-items: center;
@@ -405,49 +393,50 @@
       min-height: 14px;
     }
 
-    .support-card {
-      background: radial-gradient(circle at top left, #020617, #020617 45%, #020617);
-      border-radius: 18px;
-      padding: 14px 16px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      box-shadow:
-        0 16px 40px rgba(15, 23, 42, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
+    /* ============ SUPPORT (مثل صفحة الأدمن) ============ */
+    .support-wrapper {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
+      justify-content: flex-start;
+      margin-top: 6px;
     }
 
-    .support-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.09), transparent 65%);
-      pointer-events: none;
+    .support-card {
+      background: #020617;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.85);
+      max-width: 320px;
     }
 
     .support-title {
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .support-sub {
       font-size: 11px;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .support-row {
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
       font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .support-icon {
+      width: 18px;
+      text-align: center;
     }
 
     .support-label {
       color: var(--muted);
+      min-width: 52px;
     }
 
     .support-value {
@@ -457,25 +446,20 @@
     .footer-box {
       font-size: 11px;
       color: var(--muted);
-      margin-top: auto;
-    }
-
-    .footer-left {
+      margin-top: 8px;
       text-align: left;
-    }
-
-    .footer-right {
-      text-align: right;
     }
 
     @media (max-width: 900px) {
       .page {
         margin: 12px;
-        padding: 16px;
+        padding: 16px 16px 12px;
       }
-
       .layout {
         grid-template-columns: minmax(0, 1fr);
+      }
+      .support-wrapper {
+        justify-content: flex-start;
       }
     }
 
@@ -483,16 +467,13 @@
       .role-grid {
         grid-template-columns: minmax(0, 1fr);
       }
-
       .form-grid {
         grid-template-columns: minmax(0, 1fr);
       }
-
       .top-bar {
         flex-direction: column;
         align-items: flex-start;
       }
-
       .lang-toggle {
         align-self: flex-end;
       }
@@ -617,37 +598,42 @@
         </div>
       </section>
 
-      <!-- RIGHT: support / info card -->
-      <aside class="support-card">
-        <div style="position:relative;z-index:1;">
-          <h3 class="support-title" id="sup_title">Customer Support</h3>
-          <p class="support-sub">
-            For any problems with routes, codes, or access, contact your operations team.
-          </p>
+      <!-- RIGHT: نستخدمه فقط لتوازن الجريد، لكن نخلي كرت الدعم تحت -->
+      <div></div>
+    </section>
 
-          <div class="support-row">
-            <span class="support-label" id="sup_phone_label">Phone:</span>
-            <span class="support-value">+966-500-000-000</span>
-          </div>
-          <div class="support-row">
-            <span class="support-label" id="sup_email_label">Email:</span>
-            <span class="support-value">support@logixperts.com</span>
-          </div>
-          <div class="support-row">
-            <span class="support-label" id="sup_fax_label">Fax:</span>
-            <span class="support-value">+966-11-000-0000</span>
-          </div>
-
-          <div class="footer-box footer-left" id="footerBox" style="margin-top:10px;">
-            <span id="foot_portal">Driver Portal</span> · Logixperts Smart Load Analyzer
-          </div>
+    <!-- Customer Support نفس صفحة الأدمن -->
+    <section class="support-wrapper">
+      <div class="support-card">
+        <div class="support-title" id="sup_title">Customer Support</div>
+        <div class="support-sub">
+          For any problems with routes, codes, or access, contact your operations team.
         </div>
-      </aside>
+
+        <div class="support-row">
+          <span class="support-icon">📞</span>
+          <span class="support-label" id="sup_phone_label">Phone:</span>
+          <span class="support-value">+966 55 555 5555</span>
+        </div>
+        <div class="support-row">
+          <span class="support-icon">📧</span>
+          <span class="support-label" id="sup_email_label">Email:</span>
+          <span class="support-value">support@logixperts.com</span>
+        </div>
+        <div class="support-row">
+          <span class="support-icon">📠</span>
+          <span class="support-label" id="sup_fax_label">Fax:</span>
+          <span class="support-value">011-1234567</span>
+        </div>
+
+        <div class="footer-box" id="footerBox">
+          <span id="foot_portal">Driver Portal</span> · Logixperts Smart Load Analyzer
+        </div>
+      </div>
     </section>
   </main>
 
   <script>
-    // ================== TRANSLATIONS ==================
     const translations = {
       en: {
         hdr_sub: "SMART LOAD – DRIVER PORTAL",
@@ -676,8 +662,6 @@
         dash_status_ready: "✅ Status: Ready for assignment",
         dash_status_arrived: "🟡 Status: Arrived at location, waiting for loading",
         dash_status_loaded: "✅ Status: Loaded – ready to depart",
-        dash_route_title: "Today's Route & Instructions",
-        dash_route_sub: "Simple guidance from operations — where to go and what to do.",
         dash_btn_arrived: "Mark as Arrived at Location",
         dash_btn_loaded: "Confirm Loading Complete",
         dash_note: "This driver view is connected to your company's Smart Load Analyzer data.",
@@ -687,7 +671,6 @@
         dash_driver_info: "Driver ID: ",
         dash_company_info: " · Company code: ",
         dash_truck_info: " · Truck: ",
-        dash_no_assign: "No active assignment yet. Please wait for dispatch instructions.",
         dash_assign_text: "Next route: {route}. Notes: {note}",
 
         tl1_label: "1. Go to:",
@@ -731,8 +714,6 @@
         dash_status_ready: "✅ الحالة: جاهز لاستلام رحلة",
         dash_status_arrived: "🟡 الحالة: وصلت إلى الموقع وأنتظر التحميل",
         dash_status_loaded: "✅ الحالة: تم التحميل – جاهز للمغادرة",
-        dash_route_title: "مسار اليوم والتعليمات",
-        dash_route_sub: "إرشادات بسيطة من قسم العمليات — إلى أين تذهب وماذا تفعل.",
         dash_btn_arrived: "تأكيد الوصول للموقع",
         dash_btn_loaded: "تأكيد إتمام التحميل",
         dash_note: "هذه الواجهة مرتبطة ببيانات شركتك في نظام Smart Load Analyzer.",
@@ -742,7 +723,6 @@
         dash_driver_info: "رقم السائق: ",
         dash_company_info: " · كود الشركة: ",
         dash_truck_info: " · الشاحنة: ",
-        dash_no_assign: "لا توجد رحلة مفعّلة حاليًا، يرجى انتظار توجيهات قسم العمليات.",
         dash_assign_text: "المسار التالي: {route}. التعليمات: {note}",
 
         tl1_label: "1. التوجّه إلى:",
@@ -811,9 +791,6 @@
       document.getElementById("sup_fax_label").textContent = t.sup_fax_label;
       document.getElementById("foot_portal").textContent = t.foot_portal;
 
-      const footer = document.getElementById("footerBox");
-      footer.className = (lang === "ar") ? "footer-box footer-right" : "footer-box footer-left";
-
       document.getElementById("driverId").placeholder =
         (lang === "en") ? "e.g. 1023" : "مثال: 1023";
       document.getElementById("companyCode").placeholder =
@@ -833,7 +810,7 @@
       window.location.href = "admin.html";
     }
 
-    // ======== DRIVER LOGIN (no Firebase / no company-code validation) ========
+    // دخول السائق بدون أي تحقق من كود الشركة / Firebase
     function driverLogin() {
       const idInput = document.getElementById("driverId");
       const codeInput = document.getElementById("companyCode");
@@ -941,7 +918,6 @@
       switchView("view-driver-login");
     }
 
-    // expose
     window.setLanguage = setLanguage;
     window.switchView = switchView;
     window.goToAdmin = goToAdmin;
