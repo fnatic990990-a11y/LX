@@ -539,10 +539,10 @@
   import {
     getFirestore,
     collection,
-    doc,
-    getDocs,
     query,
     where,
+    getDocs,
+    doc as firestoreDoc,
     onSnapshot
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
   import {
@@ -564,7 +564,7 @@
   const db   = getFirestore(app);
   const auth = getAuth(app);
 
-  let authReady = false;
+  let authReady   = false;
   let authPromise = null;
 
   async function ensureAuth() {
@@ -581,10 +581,10 @@
     return authPromise;
   }
 
-  let currentLang = "en";
-  let currentDriver = null;
-  let currentCompanyId = null;
-  let companyListenerUnsub = null;
+  let currentLang        = "en";
+  let currentDriver      = null;
+  let currentCompanyId   = null;
+  let companyUnsubscribe = null;
 
   const translations = {
     en: {
@@ -604,9 +604,9 @@
       login_driverId_label: "Driver ID",
       login_company_label: "Company Code",
       login_btn: "Login as Driver",
-      login_error_missing: "Please enter both Driver ID and Company Code.",
-      login_generic: "Logged in. Waiting for dispatch assignment...",
+      login_error_missing: "Please enter the company code.",
       login_company_not_found: "Company not found. Please check the company code.",
+      login_generic: "Logged in. Waiting for dispatch assignment...",
       login_error: "Login error. Please try again.",
 
       dash_logout: "Logout",
@@ -659,9 +659,9 @@
       login_driverId_label: "رقم السائق",
       login_company_label: "كود الشركة",
       login_btn: "تسجيل الدخول كسائق",
-      login_error_missing: "الرجاء إدخال رقم السائق وكود الشركة.",
-      login_generic: "تم تسجيل الدخول، بانتظار توجيه الرحلة من الإدارة...",
+      login_error_missing: "الرجاء إدخال كود الشركة.",
       login_company_not_found: "لم يتم العثور على الشركة، تأكد من كود الشركة.",
+      login_generic: "تم تسجيل الدخول، بانتظار توجيه الرحلة من الإدارة...",
       login_error: "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى.",
 
       dash_logout: "تسجيل خروج",
@@ -703,7 +703,7 @@
     const t = translations[lang];
 
     document.documentElement.lang = lang;
-    document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
+    document.documentElement.dir  = (lang === "ar") ? "rtl" : "ltr";
 
     document.getElementById("btnLangEn").classList.toggle("active", lang === "en");
     document.getElementById("btnLangAr").classList.toggle("active", lang === "ar");
@@ -712,32 +712,32 @@
     document.getElementById("hdr_tag").textContent = t.hdr_tag;
 
     document.getElementById("land_title").textContent = t.land_title;
-    document.getElementById("land_sub").textContent = t.land_sub;
+    document.getElementById("land_sub").textContent   = t.land_sub;
     document.getElementById("land_admin_title").textContent = t.land_admin_title;
     document.getElementById("land_driver_title").textContent = t.land_driver_title;
-    document.getElementById("land_admin_btn").textContent = t.land_admin_btn;
-    document.getElementById("land_driver_btn").textContent = t.land_driver_btn;
+    document.getElementById("land_admin_btn").textContent    = t.land_admin_btn;
+    document.getElementById("land_driver_btn").textContent   = t.land_driver_btn;
 
-    document.getElementById("login_title").textContent = t.login_title;
-    document.getElementById("login_sub").textContent = t.login_sub;
-    document.getElementById("login_back").textContent = t.login_back;
+    document.getElementById("login_title").textContent     = t.login_title;
+    document.getElementById("login_sub").textContent       = t.login_sub;
+    document.getElementById("login_back").textContent      = t.login_back;
     document.getElementById("login_driverId_label").textContent = t.login_driverId_label;
-    document.getElementById("login_company_label").textContent = t.login_company_label;
-    document.getElementById("login_btn").textContent = t.login_btn;
+    document.getElementById("login_company_label").textContent  = t.login_company_label;
+    document.getElementById("login_btn").textContent            = t.login_btn;
 
-    document.getElementById("dash_logout").textContent = t.dash_logout;
+    document.getElementById("dash_logout").textContent       = t.dash_logout;
     document.getElementById("dash_assign_title").textContent = t.dash_assign_title;
-    document.getElementById("dash_route_title").textContent = t.dash_route_title;
-    document.getElementById("dash_route_sub").textContent = t.dash_route_sub;
-    document.getElementById("dash_btn_arrived").textContent = t.dash_btn_arrived;
-    document.getElementById("dash_btn_loaded").textContent = t.dash_btn_loaded;
-    document.getElementById("dash_note").textContent = t.dash_note;
+    document.getElementById("dash_route_title").textContent  = t.dash_route_title;
+    document.getElementById("dash_route_sub").textContent    = t.dash_route_sub;
+    document.getElementById("dash_btn_arrived").textContent  = t.dash_btn_arrived;
+    document.getElementById("dash_btn_loaded").textContent   = t.dash_btn_loaded;
+    document.getElementById("dash_note").textContent         = t.dash_note;
 
-    document.getElementById("sup_title").textContent = t.sup_title;
+    document.getElementById("sup_title").textContent       = t.sup_title;
     document.getElementById("sup_phone_label").textContent = t.sup_phone_label;
     document.getElementById("sup_email_label").textContent = t.sup_email_label;
-    document.getElementById("sup_fax_label").textContent = t.sup_fax_label;
-    document.getElementById("foot_portal").textContent = t.foot_portal;
+    document.getElementById("sup_fax_label").textContent   = t.sup_fax_label;
+    document.getElementById("foot_portal").textContent     = t.foot_portal;
 
     const footer = document.getElementById("footerBox");
     footer.className = (lang === "ar") ? "footer-right" : "footer-left";
@@ -753,12 +753,12 @@
   }
 
   function switchView(id) {
-    const views = document.querySelectorAll(".view");
-    views.forEach(v => v.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     document.getElementById(id).classList.add("active");
   }
 
   function goToAdmin() {
+    // رابط صفحة الأدمن اللي عندك
     window.location.href = "admin.html";
   }
 
@@ -782,7 +782,7 @@
 
     const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_ready;
-    statusEl.className = "status-pill status-ok";
+    statusEl.className   = "status-pill status-ok";
 
     const assignEl = document.getElementById("currentAssignment");
     if (!currentDriver.routeLabel) {
@@ -821,33 +821,36 @@
   function applyDispatchToDriver(data) {
     if (!currentDriver) return;
 
-    const origin = data.origin || "?";
+    const origin      = data.origin      || "?";
     const destination = data.destination || "?";
-    const routeLabel = `${origin} → ${destination}`;
+    const routeLabel  = `${origin} → ${destination}`;
     const assignedTruckId = data.assignedTruckId || "—";
 
     currentDriver.routeLabel = routeLabel;
-    currentDriver.truck = assignedTruckId;
+    currentDriver.truck      = assignedTruckId;
 
     fillDriverDashboard();
   }
 
   async function driverLogin() {
-    const id = document.getElementById("driverId").value.trim();
+    let id  = document.getElementById("driverId").value.trim();
     const companyCodeInput = document.getElementById("companyCode").value.trim().toUpperCase();
     const msg = document.getElementById("driverLoginMsg");
-    const t = translations[currentLang];
+    const t   = translations[currentLang];
 
-    if (!id || !companyCodeInput) {
+    // Driver ID اختياري
+    if (!id) id = "N/A";
+
+    if (!companyCodeInput) {
       msg.textContent = t.login_error_missing;
       msg.classList.add("hint-error");
       return;
     }
     msg.classList.remove("hint-error");
 
-    if (companyListenerUnsub) {
-      companyListenerUnsub();
-      companyListenerUnsub = null;
+    if (companyUnsubscribe) {
+      companyUnsubscribe();
+      companyUnsubscribe = null;
     }
     currentCompanyId = null;
 
@@ -855,17 +858,17 @@
       await ensureAuth();
 
       const companiesRef = collection(db, "companies");
-      const q = query(companiesRef, where("companyCode", "==", companyCodeInput));
-      const snap = await getDocs(q);
+      const q  = query(companiesRef, where("companyCode", "==", companyCodeInput));
+      const qs = await getDocs(q);
 
-      if (snap.empty) {
+      if (qs.empty) {
         msg.textContent = t.login_company_not_found;
         msg.classList.add("hint-error");
         return;
       }
 
-      const docSnap = snap.docs[0];
-      currentCompanyId = docSnap.id;
+      const companyDoc = qs.docs[0];
+      currentCompanyId = companyDoc.id;
 
       currentDriver = {
         driverId: id,
@@ -880,16 +883,15 @@
       fillDriverDashboard();
       switchView("view-driver-dashboard");
 
-      const dispatchRef = doc(db, "companies", currentCompanyId, "driver", "current");
-      companyListenerUnsub = onSnapshot(dispatchRef, (dispatchSnap) => {
-        if (!dispatchSnap.exists()) {
+      const dispatchRef = firestoreDoc(db, "companies", currentCompanyId, "driver", "current");
+      companyUnsubscribe = onSnapshot(dispatchRef, (snap) => {
+        if (!snap.exists()) {
           currentDriver.routeLabel = null;
-          currentDriver.truck = "—";
+          currentDriver.truck      = "—";
           fillDriverDashboard();
           return;
         }
-        const data = dispatchSnap.data();
-        applyDispatchToDriver(data);
+        applyDispatchToDriver(snap.data());
       });
 
     } catch (err) {
@@ -903,7 +905,7 @@
     const t = translations[currentLang];
     const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_arrived;
-    statusEl.className = "status-pill status-warn";
+    statusEl.className   = "status-pill status-warn";
     document.getElementById("driverActionMsg").textContent = t.dash_msg_arrived;
   }
 
@@ -911,20 +913,20 @@
     const t = translations[currentLang];
     const statusEl = document.getElementById("driverStatusPill");
     statusEl.textContent = t.dash_status_loaded;
-    statusEl.className = "status-pill status-ok";
+    statusEl.className   = "status-pill status-ok";
     document.getElementById("driverActionMsg").textContent = t.dash_msg_loaded;
   }
 
   function driverLogout() {
-    if (companyListenerUnsub) {
-      companyListenerUnsub();
-      companyListenerUnsub = null;
+    if (companyUnsubscribe) {
+      companyUnsubscribe();
+      companyUnsubscribe = null;
     }
     currentCompanyId = null;
-    currentDriver = null;
+    currentDriver    = null;
 
-    document.getElementById("driverId").value = "";
-    document.getElementById("companyCode").value = "";
+    document.getElementById("driverId").value       = "";
+    document.getElementById("companyCode").value    = "";
     document.getElementById("driverLoginMsg").textContent = "";
 
     const t = translations[currentLang];
@@ -934,6 +936,7 @@
     switchView("view-driver-login");
   }
 
+  // ربط الدوال مع الـ window عشان الـ HTML يقدر يستدعيها
   window.setLanguage  = setLanguage;
   window.switchView   = switchView;
   window.goToAdmin    = goToAdmin;
