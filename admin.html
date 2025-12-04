@@ -211,20 +211,31 @@
       display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,0.9fr);gap:14px;
     }
 
-    /* ثلاثة كروت متساوية في صفحة Analyze */
-    .three-column{
+    /* شبكة 3 كروت لصفحة Analyze */
+    .analyze-grid{
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
       gap:14px;
     }
 
+    @media(max-width:1100px){
+      .analyze-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
     @media(max-width:900px){
       .two-column{grid-template-columns:minmax(0,1fr);}
-      .three-column{grid-template-columns:minmax(0,1fr);}
       header{flex-direction:column;align-items:flex-start;}
       .hero{flex-direction:column;}
       .hero-metric{width:100%;}
       .header-right{margin-left:0;}
+    }
+
+    @media(max-width:700px){
+      .analyze-grid{
+        grid-template-columns:minmax(0,1fr);
+      }
     }
 
     .kpi-grid{
@@ -680,7 +691,7 @@
 
       <!-- ANALYZE -->
       <section id="analyze-view" class="view">
-        <div class="three-column">
+        <div class="analyze-grid">
           <!-- MANUAL -->
           <div class="card">
             <div class="card-header">
@@ -730,13 +741,13 @@
             </form>
           </div>
 
-          <!-- CSV UPLOAD / AI TRIP ANALYZER -->
+          <!-- CSV UPLOAD -->
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="csv_title">Upload AI Trip Analyzer (CSV)</div>
+                <div class="card-title" id="csv_title">Upload Your Trips CSV</div>
                 <div class="card-sub" id="csv_sub">
-                  Upload trip history as CSV to feed the AI Trip Analyzer.
+                  Upload trip history to improve optimization accuracy.
                 </div>
               </div>
             </div>
@@ -759,20 +770,23 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="pdf_title">PDF AI Report (Demo)</div>
+                <div class="card-title" id="pdf_title">PDF AI Report</div>
                 <div class="card-sub" id="pdf_sub">
-                  Generate an AI-based PDF summary of your latest optimization.
+                  Generate an AI-powered summary report (demo).
                 </div>
               </div>
             </div>
 
-            <form class="signup-form" onsubmit="event.preventDefault(); generatePdfReportDemo();">
-              <p class="hint" id="pdf_message">
-                Demo only: in the final version this will generate a downloadable AI PDF report.
+            <form class="signup-form" onsubmit="event.preventDefault(); generatePdfReport();">
+              <p class="hint" id="pdf_hint">
+                In this demo, we simulate generating a PDF report based on your latest optimization.
               </p>
-              <button class="btn btn-secondary" id="btn_pdf" type="submit">
+
+              <button class="btn btn-secondary" id="pdf_btn" type="submit">
                 Generate PDF Report
               </button>
+
+              <p id="pdf_message" class="hint"></p>
             </form>
           </div>
         </div>
@@ -948,15 +962,15 @@
         label_priority: "Priority",
         btn_manual_analyze: "Run Manual Optimization",
 
-        csv_title: "Upload AI Trip Analyzer (CSV)",
-        csv_sub: "Upload trip history as CSV to feed the AI Trip Analyzer.",
+        csv_title: "Upload Your Trips CSV",
+        csv_sub: "Upload trip history to improve optimization accuracy.",
         csv_label: "Choose CSV file",
         btn_csv: "Analyze CSV",
 
-        pdf_title: "PDF AI Report (Demo)",
-        pdf_sub: "Generate an AI-based PDF summary of your latest optimization.",
-        btn_pdf: "Generate PDF Report",
-        pdf_hint_default: "Demo only: in the final version this will generate a downloadable AI PDF report.",
+        pdf_title: "PDF AI Report",
+        pdf_sub: "Generate an AI-powered summary report (demo).",
+        pdf_btn: "Generate PDF Report",
+        pdf_hint: "In this demo, we simulate generating a PDF report based on your latest optimization.",
 
         opt_title: "Optimization Result",
         opt_sub: "Recommended load distribution.",
@@ -1045,15 +1059,15 @@
         label_priority: "الأولوية",
         btn_manual_analyze: "تشغيل التحسين اليدوي",
 
-        csv_title: "رفع ملف رحلات AI (CSV)",
-        csv_sub: "ارفع سجل الرحلات (CSV) لاستخدامه في محلل الرحلات الذكي.",
+        csv_title: "رفع ملف الرحلات (CSV)",
+        csv_sub: "ارفع سجل الرحلات لتحسين دقة التحسين.",
         csv_label: "اختر ملف CSV",
         btn_csv: "تحليل الملف",
 
-        pdf_title: "تقرير PDF بالذكاء الاصطناعي (تجريبي)",
-        pdf_sub: "إنشاء ملخص بتنسيق PDF يعتمد على آخر عملية تحسين.",
-        btn_pdf: "إنشاء تقرير PDF",
-        pdf_hint_default: "وضع تجريبي: في النسخة النهائية سيتم تحميل تقرير PDF فعلي.",
+        pdf_title: "تقرير PDF بالذكاء الاصطناعي",
+        pdf_sub: "إنشاء تقرير مختصر بالذكاء الاصطناعي (تجريبي).",
+        pdf_btn: "إنشاء تقرير PDF",
+        pdf_hint: "في هذا النموذج، نقوم بمحاكاة إنشاء تقرير PDF مبني على آخر عملية تحسين.",
 
         opt_title: "نتيجة التحسين",
         opt_sub: "التوزيع المقترح للأحمال.",
@@ -1153,8 +1167,8 @@
 
       document.getElementById("pdf_title").innerText = t.pdf_title;
       document.getElementById("pdf_sub").innerText = t.pdf_sub;
-      document.getElementById("btn_pdf").innerText = t.btn_pdf;
-      document.getElementById("pdf_message").innerText = t.pdf_hint_default;
+      document.getElementById("pdf_btn").innerText = t.pdf_btn;
+      document.getElementById("pdf_hint").innerText = t.pdf_hint;
 
       document.getElementById("opt_title").innerText = t.opt_title;
       document.getElementById("opt_sub").innerText = t.opt_sub;
@@ -1758,35 +1772,18 @@
       setActiveView("optimization-view");
     }
 
-    function generatePdfReportDemo() {
-      const msgEl = document.getElementById("pdf_message");
+    function generatePdfReport() {
+      const msg = document.getElementById("pdf_message");
       if (!isLoggedIn) {
-        msgEl.textContent = currentLang === "ar"
-          ? "يرجى تسجيل الدخول أولاً قبل إنشاء التقرير."
-          : "Please log in first before generating the report.";
+        msg.textContent = currentLang === "ar"
+          ? "يرجى تسجيل الدخول أولاً لإنشاء تقرير."
+          : "Please log in first to generate a report.";
         return;
       }
 
-      const loadBeforeText = (baselineAvgLoad * 100).toFixed(0) + "%";
-      const loadAfterText = document.getElementById("kpi-load-after").textContent || "–";
-      const costBeforeText = document.getElementById("kpi-cost-before").textContent || "";
-      const costAfterText = document.getElementById("kpi-cost-after").textContent || "";
-      const co2BeforeText = document.getElementById("kpi-co2-before").textContent || "";
-      const co2AfterText = document.getElementById("kpi-co2-after").textContent || "";
-
-      if (currentLang === "ar") {
-        msgEl.textContent =
-          `تم إنشاء ملخص تقريبي للتقرير: متوسط الحمولة قبل التحسين ${loadBeforeText} وبعده ${loadAfterText}. ` +
-          `التكلفة اليومية قبل ${costBeforeText} وبعد ${costAfterText}. ` +
-          `وانبعاثات CO₂ قبل ${co2BeforeText} وبعد ${co2AfterText}. (تجريبي بدون ملف PDF حقيقي حتى الآن)`;
-      } else {
-        msgEl.textContent =
-          `Demo summary generated: average load before optimization ${loadBeforeText} and after ${loadAfterText}. ` +
-          `Daily operating cost before ${costBeforeText} and after ${costAfterText}. ` +
-          `CO₂ emissions before ${co2BeforeText} and after ${co2AfterText}. (Demo only, no real PDF file yet)`;
-      }
-
-      setActiveView("analyze-view");
+      msg.textContent = currentLang === "ar"
+        ? "تم إنشاء تقرير PDF (محاكاة). في النسخة الكاملة سيتم إنشاء تقرير ذكي بناءً على بيانات رحلاتك والتحسينات."
+        : "PDF report generated (demo). In the full version, an AI engine will build a smart PDF based on your trips and optimizations.";
     }
 
     window.addEventListener("load", () => {
@@ -1805,13 +1802,13 @@
     });
 
     // expose to window
-    window.toggleLanguage          = toggleLanguage;
-    window.togglePassword          = togglePassword;
-    window.demoLogin               = demoLogin;
-    window.signUp                  = signUp;
-    window.runOptimization         = runOptimization;
-    window.analyzeCSV              = analyzeCSV;
-    window.generatePdfReportDemo   = generatePdfReportDemo;
+    window.toggleLanguage  = toggleLanguage;
+    window.togglePassword  = togglePassword;
+    window.demoLogin       = demoLogin;
+    window.signUp          = signUp;
+    window.runOptimization = runOptimization;
+    window.analyzeCSV      = analyzeCSV;
+    window.generatePdfReport = generatePdfReport;
   </script>
 </body>
 </html>
