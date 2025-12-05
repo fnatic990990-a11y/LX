@@ -368,6 +368,47 @@
 
     footer{margin-top:4px;font-size:10px;color:#4b5563;text-align:right;}
     footer span{color:#a7f3d0;}
+
+    /* FIX: Chart container with fixed height */
+    .chart-container {
+      position: relative;
+      height: 250px;
+      width: 100%;
+    }
+
+    /* NEW: Charts grid for 3 separate charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    .mini-chart-container {
+      background: #020617;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 12px;
+      height: 180px;
+      position: relative;
+    }
+    
+    .mini-chart-title {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .mini-chart-container canvas {
+      max-height: 140px;
+    }
+
+    @media(max-width: 700px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 
   <!-- Chart.js -->
@@ -486,30 +527,20 @@
             <form class="login-form" onsubmit="event.preventDefault(); demoLogin();">
               <div class="field">
                 <label id="label_email">Company email</label>
-                <input id="company" type="text" placeholder="demo@logixperts.sa" required />
+                <input id="company" type="text" placeholder="rahmone17990@gmail.com" required />
               </div>
 
               <div class="field">
                 <label id="label_password">Password</label>
                 <div class="password-input">
                   <input id="password" type="password" placeholder="••••••••" required />
-                  <button
-                    type="button"
-                    class="password-toggle"
-                    onclick="togglePassword('password', this)"
-                  >
-                    Show
-                  </button>
+                  <button type="button" class="password-toggle" onclick="togglePassword('password', this)">Show</button>
                 </div>
               </div>
 
-              <button class="btn btn-primary" type="submit" id="login_btn">
-                Login
-              </button>
+              <button class="btn btn-primary" type="submit" id="login_btn">Login</button>
 
-              <p class="hint" id="login_hint">
-                Demo credentials: <strong>demo@logixperts.sa</strong> / <strong>Naqlthon4!</strong>
-              </p>
+              <p class="hint" id="login_hint">Demo credentials: <strong>demo@logixperts.sa</strong> / <strong>Naqlthon4!</strong></p>
               <p id="login-error" class="hint hint-error"></p>
             </form>
           </div>
@@ -519,9 +550,7 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="signup_title">Create Company Account</div>
-                <div class="card-sub" id="signup_sub">
-                  Create your company account to access the system.
-                </div>
+                <div class="card-sub" id="signup_sub">Create your company account to access the system.</div>
               </div>
             </div>
 
@@ -540,13 +569,7 @@
                 <label id="signup_label_pass">Password</label>
                 <div class="password-input">
                   <input id="signup-password" type="password" placeholder="Choose a strong password" required />
-                  <button
-                    type="button"
-                    class="password-toggle"
-                    onclick="togglePassword('signup-password', this)"
-                  >
-                    Show
-                  </button>
+                  <button type="button" class="password-toggle" onclick="togglePassword('signup-password', this)">Show</button>
                 </div>
               </div>
 
@@ -564,9 +587,7 @@
                 </select>
               </div>
 
-              <button class="btn btn-secondary" id="signup_btn" type="submit">
-                Sign up
-              </button>
+              <button class="btn btn-secondary" id="signup_btn" type="submit">Sign up</button>
               <p id="signup-message" class="hint"></p>
             </form>
           </div>
@@ -580,9 +601,7 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="dash_title">Fleet Overview Dashboard</div>
-                <div class="card-sub" id="dash_sub">
-                  4 demo trucks on main corridors.
-                </div>
+                <div class="card-sub" id="dash_sub">4 demo trucks on main corridors.</div>
               </div>
               <span class="pill"><span class="pill-dot"></span> Demo scenario</span>
             </div>
@@ -648,9 +667,7 @@
                 </div>
                 <div class="field small-field">
                   <label>&nbsp;</label>
-                  <button class="btn btn-secondary" type="button" id="stats-save-btn">
-                    Save metrics
-                  </button>
+                  <button class="btn btn-secondary" type="button" id="stats-save-btn">Save metrics</button>
                 </div>
               </div>
               <p class="hint" id="stats_hint"></p>
@@ -661,9 +678,7 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="map_title">Truck Positions & Routes</div>
-                <div class="card-sub" id="map_sub">
-                  Best routes + load factor markers.
-                </div>
+                <div class="card-sub" id="map_sub">Best routes + load factor markers.</div>
               </div>
             </div>
             <div id="map"></div>
@@ -678,12 +693,8 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="analyze_title">
-                  Analyze New Shipment (Manual)
-                </div>
-                <div class="card-sub" id="analyze_sub">
-                  Enter shipment details manually.
-                </div>
+                <div class="card-title" id="analyze_title">Analyze New Shipment (Manual)</div>
+                <div class="card-sub" id="analyze_sub">Enter shipment details manually.</div>
               </div>
             </div>
 
@@ -717,9 +728,7 @@
                 </select>
               </div>
 
-              <button class="btn btn-primary" id="btn_manual_analyze" type="submit">
-                Run Manual Optimization
-              </button>
+              <button class="btn btn-primary" id="btn_manual_analyze" type="submit">Run Manual Optimization</button>
             </form>
           </div>
 
@@ -728,9 +737,7 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="csv_title">Upload Your Trips CSV</div>
-                <div class="card-sub" id="csv_sub">
-                  Upload trip history to improve optimization accuracy.
-                </div>
+                <div class="card-sub" id="csv_sub">Upload trip history to improve optimization accuracy.</div>
               </div>
             </div>
 
@@ -740,10 +747,7 @@
                 <input id="csv_file" type="file" accept=".csv" />
               </div>
 
-              <button class="btn btn-secondary" id="btn_csv">
-                Analyze CSV
-              </button>
-
+              <button class="btn btn-secondary" id="btn_csv">Analyze CSV</button>
               <p id="csv_message" class="hint"></p>
             </form>
           </div>
@@ -753,77 +757,31 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="pdf_title">PDF AI Report</div>
-                <div class="card-sub" id="pdf_sub">
-                  Generate a printable KPI report for your company based on the current demo optimization.
-                </div>
+                <div class="card-sub" id="pdf_sub">Generate a printable KPI report for your company based on the current demo optimization.</div>
               </div>
             </div>
 
-            <p class="hint" id="pdf_hint">
-              This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.
-            </p>
+            <p class="hint" id="pdf_hint">This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.</p>
 
-            <button
-              class="btn btn-secondary"
-              type="button"
-              id="pdf_btn"
-              onclick="generatePdfReport()"
-            >
-              Generate PDF Report
-            </button>
-
+            <button class="btn btn-secondary" type="button" id="pdf_btn" onclick="generatePdfReport()">Generate PDF Report</button>
             <p id="pdf_message" class="hint"></p>
           </div>
         </div>
 
-        <!-- AI CHAT ASSISTANT (كرت مستقل تحت الكروت الثلاثة) -->
+        <!-- AI CHAT ASSISTANT -->
         <div class="card" style="margin-top: 16px;">
           <div class="card-header">
             <div>
               <div class="card-title" id="ai_chat_title">AI Chat Assistant</div>
-              <div class="card-sub" id="ai_chat_sub">
-                Ask AI about loads, trips, cost and CO₂ optimization for this company.
-              </div>
+              <div class="card-sub" id="ai_chat_sub">Ask AI about loads, trips, cost and CO₂ optimization for this company.</div>
             </div>
           </div>
 
-          <div
-            id="chat-log"
-            style="
-              max-height: 220px;
-              overflow-y: auto;
-              font-size: 13px;
-              margin-bottom: 10px;
-              padding: 8px;
-              background: #020617;
-              border-radius: 16px;
-              border: 1px solid #1f2937;
-            "
-          ></div>
+          <div id="chat-log" style="max-height: 220px; overflow-y: auto; font-size: 13px; margin-bottom: 10px; padding: 8px; background: #020617; border-radius: 16px; border: 1px solid #1f2937;"></div>
 
-          <textarea
-            id="chat-input"
-            rows="3"
-            placeholder="اكتب سؤالك عن الرحلات، دمج الشحنات، التكلفة أو الكربون..."
-            style="
-              width: 100%;
-              margin-bottom: 8px;
-              padding: 8px;
-              border-radius: 12px;
-              border: 1px solid #374151;
-              background: #020617;
-              color: #e5e7eb;
-              font-size: 13px;
-            "
-          ></textarea>
+          <textarea id="chat-input" rows="3" placeholder="اكتب سؤالك عن الرحلات، دمج الشحنات، التكلفة أو الكربون..." style="width: 100%; margin-bottom: 8px; padding: 8px; border-radius: 12px; border: 1px solid #374151; background: #020617; color: #e5e7eb; font-size: 13px;"></textarea>
 
-          <button
-            class="btn btn-primary"
-            type="button"
-            onclick="sendAIMessage()"
-          >
-            إرسال للذكاء الاصطناعي 🤖
-          </button>
+          <button class="btn btn-primary" type="button" onclick="sendAIMessage()">إرسال للذكاء الاصطناعي 🤖</button>
         </div>
       </section>
 
@@ -846,9 +804,7 @@
               </div>
             </div>
 
-            <p class="opt-summary" id="opt-summary">
-              Run manual or CSV analysis to see results.
-            </p>
+            <p class="opt-summary" id="opt-summary">Run manual or CSV analysis to see results.</p>
           </div>
 
           <div class="card">
@@ -858,7 +814,21 @@
                 <div class="card-sub" id="chart_sub">Avg Load, Cost, CO₂ comparison</div>
               </div>
             </div>
-            <canvas id="optChart"></canvas>
+            <!-- FIX: 3 separate charts for better visualization -->
+            <div class="charts-grid">
+              <div class="mini-chart-container">
+                <div class="mini-chart-title">Load Factor (%)</div>
+                <canvas id="loadChart"></canvas>
+              </div>
+              <div class="mini-chart-container">
+                <div class="mini-chart-title">Cost / Day (SAR)</div>
+                <canvas id="costChart"></canvas>
+              </div>
+              <div class="mini-chart-container">
+                <div class="mini-chart-title">CO₂ / Day (kg)</div>
+                <canvas id="co2Chart"></canvas>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -883,9 +853,7 @@
       </div>
     </div>
 
-    <footer>
-      Logixperts · Smart Load Analyzer · Naqlthon 4
-    </footer>
+    <footer>Logixperts · Smart Load Analyzer · Naqlthon 4</footer>
   </div>
 
   <!-- ================= FIREBASE + LOGIC ================= -->
@@ -931,7 +899,6 @@
         company_code_label: "Company code:",
         team_label: "Team:",
         team_event: "Naqlthon 4",
-
         hero_title: "Reduce Empty Trips. Boost Load Factor. Go Greener.",
         hero_sub: "Smart Load Analyzer helps freight companies analyze and optimize loads to reduce cost and emissions.",
         tag_fuel: "fuel reduction (simulated)",
@@ -940,19 +907,16 @@
         hero_avg_before_title: "Avg load (baseline)",
         hero_cost_title: "Op. cost / day",
         hero_co2_title: "CO₂ / day",
-
         tab_login: "Login / Sign up",
         tab_dashboard: "Dashboard",
         tab_analyze: "Analyze Load",
         tab_opt: "Optimization Result",
-
         login_title: "Company Login",
         login_sub: "Access your Smart Load Analyzer workspace.",
         label_email: "Company email",
         label_password: "Password",
         login_btn: "Login",
-        login_hint: "Demo credentials: demo@logixperts.sa / Naqlthon4!",
-
+        login_hint: "Demo credentials: rahmone17990@gmail.com / fnatic990",
         signup_title: "Create Company Account",
         signup_sub: "Create your company account to access the system.",
         signup_label_name: "Company name",
@@ -961,7 +925,6 @@
         signup_label_fleet: "Fleet size (trucks)",
         signup_label_plan: "Subscription plan",
         signup_btn: "Sign up",
-
         dash_title: "Fleet Overview Dashboard",
         dash_sub: "4 demo trucks on main corridors.",
         kpi_trucks_label: "Trucks in scenario",
@@ -975,14 +938,11 @@
         kpi_co2_before_label: "CO₂ / day",
         kpi_co2_before_note: "kg CO₂",
         kpi_co2_after_label: "CO₂ / day (after)",
-
         stats_label_load: "Company avg load (%)",
         stats_label_cost: "Company op. cost / day (SAR)",
         stats_label_co2: "Company CO₂ / day (kg)",
-
         map_title: "Truck Positions & Routes",
         map_sub: "Best routes + load factor markers.",
-
         analyze_title: "Analyze New Shipment (Manual)",
         analyze_sub: "Enter shipment details manually.",
         label_weight: "Weight (tons)",
@@ -991,31 +951,25 @@
         label_delivery: "Delivery window",
         label_priority: "Priority",
         btn_manual_analyze: "Run Manual Optimization",
-
         csv_title: "Upload Your Trips CSV",
         csv_sub: "Upload trip history to improve optimization accuracy.",
         csv_label: "Choose CSV file",
         btn_csv: "Analyze CSV",
-
         pdf_title: "PDF AI Report",
         pdf_sub: "Generate a printable KPI report for your company based on the current demo optimization.",
         pdf_hint: "This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.",
         pdf_btn: "Generate PDF Report",
-
         opt_title: "Optimization Result",
         opt_sub: "Recommended load distribution.",
         opt_col_truck: "Truck & Route",
         opt_col_load: "Load Factor",
         opt_col_ai: "AI Suggestion",
-
         chart_title: "KPIs Before vs After",
         chart_sub: "Avg Load, Cost, CO₂ comparison",
-
         support_title: "Customer Support",
         support_phone_label: "Phone:",
         support_email_label: "Email:",
         support_fax_label: "Fax:",
-
         ai_chat_title: "AI Chat Assistant",
         ai_chat_sub: "Ask AI about loads, trips, cost and CO₂ optimization for this company."
       },
@@ -1026,7 +980,6 @@
         company_code_label: "كود الشركة:",
         team_label: "الفريق:",
         team_event: "نقلثون 4",
-
         hero_title: "قلل الرحلات الفارغة. ارفع نسبة التحميل. وكن أكثر استدامة.",
         hero_sub: "نظام التحميل الذكي يساعد شركات النقل على تحليل الرحلات وتحسين استغلال الحمولة لتقليل التكلفة والانبعاثات.",
         tag_fuel: "تخفيض استهلاك الوقود (محاكاة)",
@@ -1035,19 +988,16 @@
         hero_avg_before_title: "متوسط التحميل (الأساس)",
         hero_cost_title: "تكلفة التشغيل / اليوم",
         hero_co2_title: "انبعاثات CO₂ / اليوم",
-
         tab_login: "تسجيل الدخول / إنشاء حساب",
         tab_dashboard: "لوحة المؤشرات",
         tab_analyze: "تحليل التحميل",
         tab_opt: "نتيجة التحسين",
-
         login_title: "تسجيل دخول الشركة",
         login_sub: "ادخل إلى مساحة العمل الخاصة بنظام التحميل الذكي.",
         label_email: "إيميل الشركة",
         label_password: "كلمة المرور",
         login_btn: "تسجيل الدخول",
-        login_hint: "بيانات العرض: demo@logixperts.sa / Naqlthon4!",
-
+        login_hint: "بيانات العرض: rahmone17990@gmail.com / fnatic990",
         signup_title: "إنشاء حساب شركة",
         signup_sub: "أنشئ حساب شركتك للوصول إلى النظام.",
         signup_label_name: "اسم الشركة",
@@ -1056,7 +1006,6 @@
         signup_label_fleet: "عدد الشاحنات في الأسطول",
         signup_label_plan: "خطة الاشتراك",
         signup_btn: "إنشاء حساب",
-
         dash_title: "لوحة مؤشرات الأسطول",
         dash_sub: "4 شاحنات تجريبية على المسارات الرئيسية.",
         kpi_trucks_label: "الشاحنات في السيناريو",
@@ -1070,14 +1019,11 @@
         kpi_co2_before_label: "انبعاثات CO₂ / اليوم",
         kpi_co2_before_note: "كجم CO₂",
         kpi_co2_after_label: "انبعاثات CO₂ / اليوم (بعد)",
-
         stats_label_load: "متوسط التحميل في الشركة (%)",
         stats_label_cost: "تكلفة التشغيل اليومية (ريال)",
         stats_label_co2: "انبعاثات CO₂ اليومية (كجم)",
-
         map_title: "مواقع ومسارات الشاحنات",
         map_sub: "أفضل المسارات + مؤشرات نسب التحميل.",
-
         analyze_title: "تحليل شحنة جديدة (يدوي)",
         analyze_sub: "أدخل بيانات الشحنة يدويًا.",
         label_weight: "الوزن (طن)",
@@ -1086,31 +1032,25 @@
         label_delivery: "نافذة التسليم",
         label_priority: "الأولوية",
         btn_manual_analyze: "تشغيل التحسين اليدوي",
-
         csv_title: "رفع ملف CSV للرحلات",
         csv_sub: "ارفع سجل الرحلات لتحسين دقة التحليل.",
         csv_label: "اختر ملف CSV",
         btn_csv: "تحليل ملف CSV",
-
         pdf_title: "تقرير PDF بالذكاء الاصطناعي",
         pdf_sub: "إنشاء تقرير مؤشرات قابل للطباعة بناءً على آخر عملية تحسين.",
         pdf_hint: "هذا تقرير تجريبي لنقلثون يوضح مؤشرات الأداء، نسب التحميل لكل شاحنة وتوصيات للشركات الصغيرة.",
         pdf_btn: "إنشاء تقرير PDF",
-
         opt_title: "نتيجة التحسين",
         opt_sub: "توزيع الحمولة الموصى به.",
         opt_col_truck: "الشاحنة والمسار",
         opt_col_load: "نسبة التحميل",
         opt_col_ai: "اقتراح الذكاء الاصطناعي",
-
         chart_title: "المؤشرات قبل وبعد",
         chart_sub: "متوسط التحميل، التكلفة، وانبعاثات CO₂",
-
         support_title: "دعم العملاء",
         support_phone_label: "الهاتف:",
         support_email_label: "الإيميل:",
         support_fax_label: "فاكس:",
-
         ai_chat_title: "مساعد الذكاء الاصطناعي",
         ai_chat_sub: "اسأل الذكاء الاصطناعي عن التحميل، الرحلات، التكلفة وانبعاثات CO₂ لشركتك."
       }
@@ -1122,10 +1062,8 @@
         const el = document.getElementById(key);
         if (el) el.textContent = t[key];
       }
-
       const langBtn = document.getElementById("langSwitcher");
       if (langBtn) langBtn.textContent = currentLang === "en" ? "AR" : "EN";
-
       document.documentElement.lang = currentLang === "ar" ? "ar" : "en";
       document.documentElement.dir  = currentLang === "ar" ? "rtl" : "ltr";
     }
@@ -1147,23 +1085,21 @@
       { id: "Truck #4", origin: "Dammam", dest: "Riyadh", currentLoad: 0.50, coords: [26.4207, 50.0888] },
     ];
 
-    let baselineAvgLoad =
-      trucksScenario.reduce((sum, t) => sum + t.currentLoad, 0) / trucksScenario.length;
-    let baselineCost = trucksScenario.length * BASE_TRIP_COST;
-    let baselineCO2  = baselineCost * EMISSION_FACTOR;
+    // FIX: Initialize baseline values to 0 (will be set after login)
+    let baselineAvgLoad = 0;
+    let baselineCost = 0;
+    let baselineCO2 = 0;
 
     let isLoggedIn = false;
     let currentCompanyId = null;
     let currentCompanyData = null;
     let companyStats = null;
 
-    // آخر نتيجة تحسين (عشان جدول الشاحنات + PDF + الرسم)
     let lastOptimizationLoads = null;
     let lastAfterAvgLoad = null;
     let lastCostAfter = null;
     let lastCO2After = null;
 
-    let optChart = null;
     let mapInstance = null;
 
     // ========== UI HELPERS ==========
@@ -1179,7 +1115,6 @@
         else tab.classList.remove("active");
       });
 
-      // إصلاح الخريطة كل ما ندخل على الداشبورد
       if (viewId === "dashboard-view" && mapInstance) {
         setTimeout(() => mapInstance.invalidateSize(), 200);
       }
@@ -1197,7 +1132,27 @@
       }
     }
 
+    // FIX: Function to show/hide hero metrics based on login status
+    function updateHeroVisibility() {
+      const heroLoad = document.getElementById("hero-load-before");
+      const heroCost = document.getElementById("hero-cost-before");
+      const heroCO2  = document.getElementById("hero-co2-before");
+
+      if (!isLoggedIn) {
+        if (heroLoad) heroLoad.textContent = "–";
+        if (heroCost) heroCost.textContent = "–";
+        if (heroCO2)  heroCO2.textContent  = "–";
+      } else {
+        updateHeroAndKpisFromStats();
+      }
+    }
+
     function updateHeroAndKpisFromStats() {
+      if (!isLoggedIn) {
+        updateHeroVisibility();
+        return;
+      }
+
       const heroLoad = document.getElementById("hero-load-before");
       const heroCost = document.getElementById("hero-cost-before");
       const heroCO2  = document.getElementById("hero-co2-before");
@@ -1221,18 +1176,29 @@
     async function loadCompanyData(uid) {
       const ref = doc(db, "companies", uid);
       const snap = await getDoc(ref);
+      
+      const defaultAvgLoad = trucksScenario.reduce((sum, t) => sum + t.currentLoad, 0) / trucksScenario.length;
+      const defaultCost = trucksScenario.length * BASE_TRIP_COST;
+      const defaultCO2 = defaultCost * EMISSION_FACTOR;
+      
       if (snap.exists()) {
         currentCompanyData = snap.data();
         if (currentCompanyData.stats) {
           companyStats = currentCompanyData.stats;
           const { loadPct, costPerDay, co2PerDay } = companyStats;
-
-          if (loadPct && !isNaN(loadPct)) baselineAvgLoad = loadPct / 100;
-          if (costPerDay && !isNaN(costPerDay)) baselineCost = costPerDay;
-          if (co2PerDay && !isNaN(co2PerDay)) baselineCO2 = co2PerDay;
+          baselineAvgLoad = (loadPct && !isNaN(loadPct)) ? loadPct / 100 : defaultAvgLoad;
+          baselineCost = (costPerDay && !isNaN(costPerDay)) ? costPerDay : defaultCost;
+          baselineCO2 = (co2PerDay && !isNaN(co2PerDay)) ? co2PerDay : defaultCO2;
+        } else {
+          baselineAvgLoad = defaultAvgLoad;
+          baselineCost = defaultCost;
+          baselineCO2 = defaultCO2;
         }
       } else {
         currentCompanyData = { name: "Logixperts", email: "demo@logixperts.sa" };
+        baselineAvgLoad = defaultAvgLoad;
+        baselineCost = defaultCost;
+        baselineCO2 = defaultCO2;
       }
 
       updateHeroAndKpisFromStats();
@@ -1274,10 +1240,9 @@
       } catch (e) {
         console.error(e);
         if (error) {
-          error.textContent =
-            currentLang === "ar"
-              ? "تعذر تسجيل الدخول. تأكد من الإيميل وكلمة المرور."
-              : "Login failed. Please check your email and password.";
+          error.textContent = currentLang === "ar"
+            ? "تعذر تسجيل الدخول. تأكد من الإيميل وكلمة المرور."
+            : "Login failed. Please check your email and password.";
         }
       }
     }
@@ -1307,18 +1272,16 @@
         await handleAuthSuccess(cred.user);
 
         if (msg) {
-          msg.textContent =
-            currentLang === "ar"
-              ? "تم إنشاء الحساب بنجاح وتم تسجيل الدخول."
-              : "Account created and logged in successfully.";
+          msg.textContent = currentLang === "ar"
+            ? "تم إنشاء الحساب بنجاح وتم تسجيل الدخول."
+            : "Account created and logged in successfully.";
         }
       } catch (e) {
         console.error(e);
         if (msg) {
-          msg.textContent =
-            currentLang === "ar"
-              ? "تعذر إنشاء الحساب. تأكد من الإيميل وقوة كلمة المرور."
-              : "Could not create account. Please check email and password strength.";
+          msg.textContent = currentLang === "ar"
+            ? "تعذر إنشاء الحساب. تأكد من الإيميل وقوة كلمة المرور."
+            : "Could not create account. Please check email and password strength.";
         }
       }
     }
@@ -1335,19 +1298,16 @@
       const costPerDay = parseFloat(costInput.value || "0");
       const co2PerDay  = parseFloat(co2Input.value || "0");
 
-      if (isNaN(loadPct) || isNaN(costPerDay) || isNaN(co2PerDay) ||
-          loadPct < 0 || loadPct > 100) {
+      if (isNaN(loadPct) || isNaN(costPerDay) || isNaN(co2PerDay) || loadPct < 0 || loadPct > 100) {
         if (hint) {
-          hint.textContent =
-            currentLang === "ar"
-              ? "يرجى إدخال قيم صحيحة (نسبة التحميل بين 0 و 100)."
-              : "Please enter valid values (load between 0 and 100).";
+          hint.textContent = currentLang === "ar"
+            ? "يرجى إدخال قيم صحيحة (نسبة التحميل بين 0 و 100)."
+            : "Please enter valid values (load between 0 and 100).";
         }
         return;
       }
 
       companyStats = { loadPct, costPerDay, co2PerDay };
-
       baselineAvgLoad = loadPct / 100;
       baselineCost = costPerDay;
       baselineCO2  = co2PerDay;
@@ -1358,10 +1318,9 @@
       await setDoc(ref, { stats: companyStats }, { merge: true });
 
       if (hint) {
-        hint.textContent =
-          currentLang === "ar"
-            ? "تم حفظ مؤشرات الشركة بنجاح."
-            : "Company metrics saved successfully.";
+        hint.textContent = currentLang === "ar"
+          ? "تم حفظ مؤشرات الشركة بنجاح."
+          : "Company metrics saved successfully.";
       }
 
       if (lastAfterAvgLoad != null) {
@@ -1372,77 +1331,80 @@
     async function saveOptimizationResult(companyId, data) {
       try {
         const ref = collection(db, "companies", companyId, "optimizations");
-        await addDoc(ref, {
-          ...data,
-          createdAt: serverTimestamp()
-        });
+        await addDoc(ref, { ...data, createdAt: serverTimestamp() });
       } catch (e) {
         console.error("Error saving optimization result:", e);
       }
     }
 
     // ========== CHARTS ==========
-    function initChart(afterAvgLoad, costAfter, co2After) {
-      const canvas = document.getElementById("optChart");
-      if (!canvas) return;
-      const ctxOpt  = canvas.getContext("2d");
+    let loadChart = null;
+    let costChart = null;
+    let co2Chart = null;
 
-      const beforeLoadPct = baselineAvgLoad * 100;
-      const afterLoadPct  = afterAvgLoad * 100;
+    function createMiniChart(canvasId, label, beforeVal, afterVal, color1, color2) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      const ctx = canvas.getContext("2d");
 
-      optChart = new Chart(ctxOpt, {
+      return new Chart(ctx, {
         type: "bar",
         data: {
-          labels: ["Avg Load (%)", "Cost / day", "CO₂ / day"],
-          datasets: [
-            {
-              label: "Before",
-              data: [beforeLoadPct, baselineCost, baselineCO2]
-            },
-            {
-              label: "After",
-              data: [afterLoadPct, costAfter, co2After]
-            }
-          ]
+          labels: ["Before", "After"],
+          datasets: [{
+            data: [beforeVal, afterVal],
+            backgroundColor: [color1, color2],
+            borderRadius: 6,
+            barThickness: 40
+          }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              position: "top",
-              labels: {
-                color: "#e5e7eb",
-                font: { size: 11 }
-              }
-            }
+            legend: { display: false }
           },
           scales: {
-            x: {
-              ticks: { color: "#9ca3af" },
-              grid: { display: false }
+            x: { 
+              ticks: { color: "#9ca3af", font: { size: 10 } }, 
+              grid: { display: false } 
             },
-            y: {
-              ticks: { color: "#9ca3af" },
-              grid: { color: "#1f2937" }
+            y: { 
+              ticks: { color: "#9ca3af", font: { size: 10 } }, 
+              grid: { color: "#1f2937" },
+              beginAtZero: true
             }
           }
         }
       });
     }
 
+    function initCharts(afterAvgLoad, costAfter, co2After) {
+      const beforeLoadPct = baselineAvgLoad * 100;
+      const afterLoadPct = afterAvgLoad * 100;
+
+      loadChart = createMiniChart("loadChart", "Load", beforeLoadPct, afterLoadPct, "#3b82f6", "#22c55e");
+      costChart = createMiniChart("costChart", "Cost", baselineCost, costAfter, "#3b82f6", "#22c55e");
+      co2Chart = createMiniChart("co2Chart", "CO2", baselineCO2, co2After, "#3b82f6", "#22c55e");
+    }
+
     function updateCharts(afterAvgLoad, costAfter, co2After) {
-      if (!optChart) {
-        initChart(afterAvgLoad, costAfter, co2After);
+      const beforeLoadPct = baselineAvgLoad * 100;
+      const afterLoadPct = afterAvgLoad * 100;
+
+      if (!loadChart) {
+        initCharts(afterAvgLoad, costAfter, co2After);
         return;
       }
 
-      const beforeLoadPct = baselineAvgLoad * 100;
-      const afterLoadPct  = afterAvgLoad * 100;
+      loadChart.data.datasets[0].data = [beforeLoadPct, afterLoadPct];
+      loadChart.update();
 
-      optChart.data.datasets[0].data = [beforeLoadPct, baselineCost, baselineCO2];
-      optChart.data.datasets[1].data = [afterLoadPct, costAfter, co2After];
-      optChart.update();
+      costChart.data.datasets[0].data = [baselineCost, costAfter];
+      costChart.update();
+
+      co2Chart.data.datasets[0].data = [baselineCO2, co2After];
+      co2Chart.update();
     }
 
     // ========== MAP ==========
@@ -1451,9 +1413,7 @@
       const center = [23.8859, 45.0792];
       mapInstance = L.map("map").setView(center, 6);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 18
-      }).addTo(mapInstance);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(mapInstance);
 
       const cityCoords = {
         Riyadh: [24.7136, 46.6753],
@@ -1473,17 +1433,10 @@
       addCityMarker("Jeddah",  cityCoords.Jeddah,  "#fbbf24");
       addCityMarker("Dammam",  cityCoords.Dammam,  "#3b82f6");
 
-      const riyadh = cityCoords.Riyadh;
-      const jeddah = cityCoords.Jeddah;
-      const dammam = cityCoords.Dammam;
+      L.polyline([cityCoords.Riyadh, cityCoords.Jeddah], { weight: 2 }).addTo(mapInstance);
+      L.polyline([cityCoords.Riyadh, cityCoords.Dammam], { weight: 2 }).addTo(mapInstance);
 
-      L.polyline([riyadh, jeddah], { weight: 2 }).addTo(mapInstance);
-      L.polyline([riyadh, dammam], { weight: 2 }).addTo(mapInstance);
-
-      // إصلاح حجم الخريطة بعد الإنشاء
-      setTimeout(() => {
-        if (mapInstance) mapInstance.invalidateSize();
-      }, 200);
+      setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
     }
 
     // ========== OPTIMIZATION TABLE ==========
@@ -1491,9 +1444,7 @@
       const list = document.getElementById("truck-list");
       if (!list) return;
       const rows = Array.from(list.querySelectorAll(".truck-row"));
-      rows.forEach(row => {
-        if (!row.classList.contains("header")) list.removeChild(row);
-      });
+      rows.forEach(row => { if (!row.classList.contains("header")) list.removeChild(row); });
     }
 
     function addTruckRow(truck, loadText, chipText, chipClass) {
@@ -1504,7 +1455,7 @@
       row.className = "truck-row";
 
       const col1 = document.createElement("div");
-      col1.textContent = `${truck.id} ${truck.origin} → ${truck.dest}`;
+      col1.textContent = truck.id + " " + truck.origin + " → " + truck.dest;
 
       const col2 = document.createElement("div");
       col2.textContent = loadText;
@@ -1518,7 +1469,6 @@
       row.appendChild(col1);
       row.appendChild(col2);
       row.appendChild(col3);
-
       list.appendChild(row);
     }
 
@@ -1526,8 +1476,7 @@
       clearTruckRows();
       trucksScenario.forEach(tr => {
         const loadPct = (tr.currentLoad * 100).toFixed(0) + "%";
-        const chipText =
-          tr.currentLoad < 0.6
+        const chipText = tr.currentLoad < 0.6
             ? (currentLang === "ar" ? "تحميل منخفض (فرصة دمج)" : "Low load (merge opportunity)")
             : (currentLang === "ar" ? "تحميل جيد" : "Healthy load");
         const chipClass = tr.currentLoad < 0.6 ? "warn" : "good";
@@ -1540,21 +1489,15 @@
       trucks.forEach(tr => {
         const loads = suggestionById[tr.id];
         const loadPct = ((loads?.newLoad ?? tr.currentLoad) * 100).toFixed(0) + "%";
-
-        let chipText;
-        let chipClass;
+        let chipText, chipClass;
 
         if (loads && loads.action) {
           chipText = loads.action;
           chipClass = "good";
         } else {
-          chipText =
-            currentLang === "ar"
-              ? "بدون تغيير في الخطة"
-              : "Keep current plan";
+          chipText = currentLang === "ar" ? "بدون تغيير في الخطة" : "Keep current plan";
           chipClass = "warn";
         }
-
         addTruckRow(tr, loadPct, chipText, chipClass);
       });
     }
@@ -1564,10 +1507,9 @@
       if (!isLoggedIn) {
         const msg = document.getElementById("opt-summary");
         if (msg) {
-          msg.textContent =
-            currentLang === "ar"
-              ? "يرجى تسجيل الدخول أولاً ثم تشغيل التحسين."
-              : "Please log in first, then run optimization.";
+          msg.textContent = currentLang === "ar"
+            ? "يرجى تسجيل الدخول أولاً ثم تشغيل التحسين."
+            : "Please log in first, then run optimization.";
         }
         setActiveView("login-view");
         return;
@@ -1605,13 +1547,9 @@
       const newLoadFactor = Math.min(1, newTotalTons / CAPACITY_TONS);
       target.newLoad = newLoadFactor;
 
-      trucks.forEach(t => {
-        if (t.id !== target.id) t.newLoad = t.currentLoad;
-      });
+      trucks.forEach(t => { if (t.id !== target.id) t.newLoad = t.currentLoad; });
 
-      const afterAvgLoad =
-        trucks.reduce((sum, t) => sum + t.newLoad, 0) / trucks.length;
-
+      const afterAvgLoad = trucks.reduce((sum, t) => sum + t.newLoad, 0) / trucks.length;
       const costAfter = baselineCost * (baselineAvgLoad / afterAvgLoad);
       const co2After = baselineCO2 * (costAfter / baselineCost);
 
@@ -1624,17 +1562,15 @@
 
       document.getElementById("kpi-cost-after").textContent = "~" + costAfter.toFixed(0) + " SAR";
       const costSavePct = ((baselineCost - costAfter) / baselineCost) * 100;
-      document.getElementById("kpi-cost-savings").textContent =
-        costSavePct > 0
-          ? `-${costSavePct.toFixed(1)}% vs baseline`
-          : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
+      document.getElementById("kpi-cost-savings").textContent = costSavePct > 0
+        ? "-" + costSavePct.toFixed(1) + "% vs baseline"
+        : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
 
       document.getElementById("kpi-co2-after").textContent = "~" + co2After.toFixed(0) + " kg";
       const co2SavePct = ((baselineCO2 - co2After) / baselineCO2) * 100;
-      document.getElementById("kpi-co2-savings").textContent =
-        co2SavePct > 0
-          ? `-${co2SavePct.toFixed(1)}% vs baseline`
-          : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
+      document.getElementById("kpi-co2-savings").textContent = co2SavePct > 0
+        ? "-" + co2SavePct.toFixed(1) + "% vs baseline"
+        : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
 
       updateCharts(afterAvgLoad, costAfter, co2After);
 
@@ -1651,32 +1587,26 @@
       const summary = document.getElementById("opt-summary");
       if (currentLang === "ar") {
         summary.innerHTML =
-          `تم إسناد شحنة وزن <strong>${weight || 0} طن</strong> ` +
-          `وحجم <strong>${volume || 0} م³</strong> إلى ` +
-          `<strong>${target.id} (${target.origin} → ${target.dest})</strong>، ` +
-          `مما يرفع متوسط الحمولة من <strong>${(baselineAvgLoad * 100).toFixed(0)}%</strong> ` +
-          `إلى <strong>${(afterAvgLoad * 100).toFixed(0)}%</strong>، ` +
-          `مع تقليل تقريبي في تكلفة التشغيل بنسبة <strong>${Math.abs(costSavePct).toFixed(1)}%</strong> ` +
-          `وانبعاثات CO₂ بنسبة <strong>${Math.abs(co2SavePct).toFixed(1)}%</strong>.`;
+          "تم إسناد شحنة وزن <strong>" + (weight || 0) + " طن</strong> " +
+          "وحجم <strong>" + (volume || 0) + " م³</strong> إلى " +
+          "<strong>" + target.id + " (" + target.origin + " → " + target.dest + ")</strong>، " +
+          "مما يرفع متوسط الحمولة من <strong>" + (baselineAvgLoad * 100).toFixed(0) + "%</strong> " +
+          "إلى <strong>" + (afterAvgLoad * 100).toFixed(0) + "%</strong>، " +
+          "مع تقليل تقريبي في تكلفة التشغيل بنسبة <strong>" + Math.abs(costSavePct).toFixed(1) + "%</strong> " +
+          "وانبعاثات CO₂ بنسبة <strong>" + Math.abs(co2SavePct).toFixed(1) + "%</strong>.";
       } else {
         summary.innerHTML =
-          `The new shipment of <strong>${weight || 0} tons</strong> / ` +
-          `<strong>${volume || 0} m³</strong> is assigned to ` +
-          `<strong>${target.id} (${target.origin} → ${target.dest})</strong>, ` +
-          `raising average fleet load from <strong>${(baselineAvgLoad * 100).toFixed(0)}%</strong> ` +
-          `to <strong>${(afterAvgLoad * 100).toFixed(0)}%</strong>, ` +
-          `with an estimated reduction of <strong>${Math.abs(costSavePct).toFixed(1)}%</strong> ` +
-          `in operating cost and <strong>${Math.abs(co2SavePct).toFixed(1)}%</strong> in CO₂ emissions.`;
+          "The new shipment of <strong>" + (weight || 0) + " tons</strong> / " +
+          "<strong>" + (volume || 0) + " m³</strong> is assigned to " +
+          "<strong>" + target.id + " (" + target.origin + " → " + target.dest + ")</strong>, " +
+          "raising average fleet load from <strong>" + (baselineAvgLoad * 100).toFixed(0) + "%</strong> " +
+          "to <strong>" + (afterAvgLoad * 100).toFixed(0) + "%</strong>, " +
+          "with an estimated reduction of <strong>" + Math.abs(costSavePct).toFixed(1) + "%</strong> " +
+          "in operating cost and <strong>" + Math.abs(co2SavePct).toFixed(1) + "%</strong> in CO₂ emissions.";
       }
 
-      // تخزين القيم لكل شاحنة لاستخدامها في تقرير PDF
       lastOptimizationLoads = {};
-      trucks.forEach(t => {
-        lastOptimizationLoads[t.id] = {
-          before: t.currentLoad,
-          after: t.newLoad
-        };
-      });
+      trucks.forEach(t => { lastOptimizationLoads[t.id] = { before: t.currentLoad, after: t.newLoad }; });
 
       if (currentCompanyId) {
         await saveOptimizationResult(currentCompanyId, {
@@ -1685,7 +1615,7 @@
           destination: destinationInput || "",
           priority,
           assignedTruckId: target.id,
-          assignedRoute: `${target.origin} → ${target.dest}`,
+          assignedRoute: target.origin + " → " + target.dest,
           baselineAvgLoad,
           afterAvgLoad,
           baselineCost,
@@ -1698,25 +1628,22 @@
       setActiveView("optimization-view");
     }
 
-    // ========== CSV (بسيط تجريبي) ==========
+    // ========== CSV ==========
     function analyzeCSV() {
       const fileInput = document.getElementById("csv_file");
       const msg = document.getElementById("csv_message");
       if (!fileInput.files || fileInput.files.length === 0) {
         if (msg) {
-          msg.textContent =
-            currentLang === "ar"
-              ? "يرجى اختيار ملف CSV أولاً."
-              : "Please select a CSV file first.";
+          msg.textContent = currentLang === "ar"
+            ? "يرجى اختيار ملف CSV أولاً."
+            : "Please select a CSV file first.";
         }
         return;
       }
-
       if (msg) {
-        msg.textContent =
-          currentLang === "ar"
-            ? "تم رفع الملف بنجاح (تحليل تجريبي للعرض فقط)."
-            : "CSV file uploaded successfully (demo analysis only).";
+        msg.textContent = currentLang === "ar"
+          ? "تم رفع الملف بنجاح (تحليل تجريبي للعرض فقط)."
+          : "CSV file uploaded successfully (demo analysis only).";
       }
     }
 
@@ -1732,12 +1659,12 @@
       const youLabel = currentLang === "ar" ? "أنت" : "You";
       const aiLabel  = "AI";
 
-      logEl.innerHTML += `<div style="margin-bottom: 6px;"><strong>${youLabel}:</strong> ${text}</div>`;
+      logEl.innerHTML += '<div style="margin-bottom: 6px;"><strong>' + youLabel + ':</strong> ' + text + '</div>';
       inputEl.value = "";
 
       const loadingId = "ai-loading-" + Date.now();
       const thinkingText = currentLang === "ar" ? "المساعد يفكر..." : "Assistant is thinking...";
-      logEl.innerHTML += `<div id="${loadingId}" style="margin-bottom: 6px; color: #9ca3af;">${thinkingText}</div>`;
+      logEl.innerHTML += '<div id="' + loadingId + '" style="margin-bottom: 6px; color: #9ca3af;">' + thinkingText + '</div>';
       logEl.scrollTop = logEl.scrollHeight;
 
       try {
@@ -1757,7 +1684,7 @@
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
 
-        logEl.innerHTML += `<div style="margin-bottom: 8px;"><strong>${aiLabel}:</strong> ${replyText}</div>`;
+        logEl.innerHTML += '<div style="margin-bottom: 8px;"><strong>' + aiLabel + ':</strong> ' + replyText + '</div>';
         logEl.scrollTop = logEl.scrollHeight;
       } catch (err) {
         console.error(err);
@@ -1766,7 +1693,7 @@
         const errorText = currentLang === "ar"
           ? "تعذر الاتصال بخادم الذكاء الاصطناعي. تأكد أن السيرفر شغال على جهازك."
           : "Could not connect to the AI server. Make sure the server is running on your machine.";
-        logEl.innerHTML += `<div style="margin-bottom: 8px; color: #f97373;">${errorText}</div>`;
+        logEl.innerHTML += '<div style="margin-bottom: 8px; color: #f97373;">' + errorText + '</div>';
         logEl.scrollTop = logEl.scrollHeight;
       }
     }
@@ -1793,193 +1720,182 @@
 
         const docPDF = new jsPDFConstructor();
 
-        // HEADER
+        // Header
         docPDF.setFont("helvetica", "bold");
-        docPDF.setFontSize(18);
-        docPDF.text("Logixperts - Smart Load Analyzer", 10, 15);
+        docPDF.setFontSize(20);
+        docPDF.text("Logixperts - Smart Load Analyzer", 10, 20);
 
-        docPDF.setFontSize(11);
+        docPDF.setFontSize(12);
         docPDF.setFont("helvetica", "normal");
-        docPDF.text("Naqlthon 4 - Smart Load Optimization Demo", 10, 22);
+        docPDF.text("Naqlthon 4 - Smart Load Optimization Demo", 10, 28);
 
-        const companyName  = (currentCompanyData && currentCompanyData.name)  || "Logixperts";
+        // Company Info
+        const companyName = (currentCompanyData && currentCompanyData.name) || "Logixperts";
         const companyEmail = (currentCompanyData && currentCompanyData.email) || "demo@logixperts.sa";
-        const fleetSize    = (currentCompanyData && currentCompanyData.fleetSize) || 25;
-        const companyCode  = currentCompanyId || "LOGI693";
-
+        const fleetSize = (currentCompanyData && currentCompanyData.fleetSize) || 25;
+        
+        // Format date properly
         const now = new Date();
-        const generatedAt = now.toLocaleString();
-
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Company:", 10, 32);
-        docPDF.text("Contact:", 110, 32);
-
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(companyName, 35, 32);
-        docPDF.text("Smart Load Analyzer / Logixperts", 135, 32);
-
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Email:", 10, 38);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(companyEmail, 35, 38);
-
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Fleet size:", 10, 44);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(String(fleetSize), 35, 44);
-
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Company code:", 10, 50);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(companyCode, 40, 50);
-
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Phone:", 110, 38);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text("+966 55 555 5555", 135, 38);
-
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Email:", 110, 44);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text("support@logixperts.com", 135, 44);
-
-        docPDF.setFontSize(9);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text("Generated at: " + generatedAt, 10, 58);
-
-        // SECTION 1: KPIs SUMMARY
-        let y = 70;
-
-        docPDF.setFontSize(13);
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("1. KPIs Summary (Before vs After Optimization)", 10, y);
-        y += 8;
+        const dateStr = now.getFullYear() + "/" + String(now.getMonth() + 1).padStart(2, "0") + "/" + String(now.getDate()).padStart(2, "0");
+        const timeStr = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
 
         docPDF.setFontSize(10);
+        let y = 42;
+        
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("Company:", 10, y);
+        docPDF.setFont("helvetica", "normal");
+        docPDF.text(companyName, 45, y);
+        
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("Contact:", 110, y);
+        docPDF.setFont("helvetica", "normal");
+        docPDF.text("Smart Load Analyzer", 135, y);
+        
+        y += 7;
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("Email:", 10, y);
+        docPDF.setFont("helvetica", "normal");
+        docPDF.text(companyEmail, 45, y);
+        
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("Phone:", 110, y);
+        docPDF.setFont("helvetica", "normal");
+        docPDF.text("+966 55 555 5555", 135, y);
+        
+        y += 7;
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("Fleet size:", 10, y);
+        docPDF.setFont("helvetica", "normal");
+        docPDF.text(String(fleetSize) + " trucks", 45, y);
+        
+        y += 7;
+        docPDF.setFont("helvetica", "normal");
+        docPDF.setFontSize(9);
+        docPDF.text("Generated: " + dateStr + " at " + timeStr, 10, y);
+
+        // Section 1: KPIs Summary
+        y += 15;
+        docPDF.setFontSize(14);
+        docPDF.setFont("helvetica", "bold");
+        docPDF.text("1. KPIs Summary (Before vs After Optimization)", 10, y);
+        
+        y += 10;
+        docPDF.setFontSize(10);
+        
+        // Table header
         docPDF.setFont("helvetica", "bold");
         docPDF.text("Metric", 10, y);
         docPDF.text("Before", 80, y);
         docPDF.text("After", 120, y);
-        docPDF.text("Savings", 160, y);
+        docPDF.text("Change", 160, y);
+        
         docPDF.line(10, y + 2, 200, y + 2);
-        y += 7;
-
+        y += 8;
+        
         docPDF.setFont("helvetica", "normal");
-
+        
         const avgBeforePct = (baselineAvgLoad * 100).toFixed(0);
-        const avgAfterPct = (lastAfterAvgLoad != null
-          ? (lastAfterAvgLoad * 100).toFixed(0)
-          : avgBeforePct);
-
-        const loadDeltaPP = (parseFloat(avgAfterPct) - parseFloat(avgBeforePct));
-
-        const costBefore = baselineCost;
-        const costAfter  = lastCostAfter != null ? lastCostAfter : costBefore;
-        const costSavingsPct =
-          costAfter < costBefore
-            ? ((costBefore - costAfter) / costBefore) * 100
-            : 0;
-
-        const co2Before = baselineCO2;
-        const co2After  = lastCO2After != null ? lastCO2After : co2Before;
-        const co2SavingsPct =
-          co2After < co2Before
-            ? ((co2Before - co2After) / co2Before) * 100
-            : 0;
-
-        // Row 1: Average load
-        docPDF.text("Average load factor (%)", 10, y);
+        const avgAfterPct = lastAfterAvgLoad != null ? (lastAfterAvgLoad * 100).toFixed(0) : avgBeforePct;
+        const loadChange = (parseFloat(avgAfterPct) - parseFloat(avgBeforePct)).toFixed(0);
+        
+        const costBefore = baselineCost.toFixed(0);
+        const costAfter = lastCostAfter != null ? lastCostAfter.toFixed(0) : costBefore;
+        const costChange = lastCostAfter != null ? ((baselineCost - lastCostAfter) / baselineCost * 100).toFixed(1) : "0";
+        
+        const co2Before = baselineCO2.toFixed(0);
+        const co2After = lastCO2After != null ? lastCO2After.toFixed(0) : co2Before;
+        const co2Change = lastCO2After != null ? ((baselineCO2 - lastCO2After) / baselineCO2 * 100).toFixed(1) : "0";
+        
+        // Row 1
+        docPDF.text("Average Load Factor", 10, y);
         docPDF.text(avgBeforePct + "%", 80, y);
         docPDF.text(avgAfterPct + "%", 120, y);
-        docPDF.text(loadDeltaPP.toFixed(1) + " pp", 160, y);
-        y += 6;
-
-        // Row 2: Operating cost per day
-        docPDF.text("Operating cost per day", 10, y);
-        docPDF.text("~" + costBefore.toFixed(0) + " SAR", 80, y);
-        docPDF.text("~" + costAfter.toFixed(0) + " SAR", 120, y);
-        docPDF.text(costSavingsPct.toFixed(1) + "%", 160, y);
-        y += 6;
-
-        // Row 3: CO2 per day
-        docPDF.text("CO2 emissions per day", 10, y);
-        docPDF.text("~" + co2Before.toFixed(0) + " kg", 80, y);
-        docPDF.text("~" + co2After.toFixed(0) + " kg", 120, y);
-        docPDF.text(co2SavingsPct.toFixed(1) + "%", 160, y);
-        y += 10;
-
-        // SECTION 2: PER-TRUCK LOAD FACTORS
-        docPDF.setFontSize(13);
+        docPDF.text("+" + loadChange + " pp", 160, y);
+        y += 7;
+        
+        // Row 2
+        docPDF.text("Operating Cost/Day", 10, y);
+        docPDF.text(costBefore + " SAR", 80, y);
+        docPDF.text(costAfter + " SAR", 120, y);
+        docPDF.text("-" + costChange + "%", 160, y);
+        y += 7;
+        
+        // Row 3
+        docPDF.text("CO2 Emissions/Day", 10, y);
+        docPDF.text(co2Before + " kg", 80, y);
+        docPDF.text(co2After + " kg", 120, y);
+        docPDF.text("-" + co2Change + "%", 160, y);
+        
+        // Section 2: Per-Truck Load Factors
+        y += 15;
+        docPDF.setFontSize(14);
         docPDF.setFont("helvetica", "bold");
         docPDF.text("2. Per-Truck Load Factors", 10, y);
-        y += 7;
-
+        
+        y += 10;
         docPDF.setFontSize(10);
+        
+        // Table header
         docPDF.setFont("helvetica", "bold");
         docPDF.text("Truck / Route", 10, y);
-        docPDF.text("Load Before", 80, y);
+        docPDF.text("Load Before", 90, y);
         docPDF.text("Load After", 140, y);
+        
         docPDF.line(10, y + 2, 200, y + 2);
-        y += 7;
-
+        y += 8;
+        
         docPDF.setFont("helvetica", "normal");
-
-        trucksScenario.forEach(tr => {
+        
+        trucksScenario.forEach(function(tr) {
           const opt = lastOptimizationLoads && lastOptimizationLoads[tr.id];
           const beforeLoad = opt ? opt.before : tr.currentLoad;
-          const afterLoad  = opt ? opt.after  : tr.currentLoad;
-
+          const afterLoad = opt ? opt.after : tr.currentLoad;
+          
           const beforePct = (beforeLoad * 100).toFixed(0) + "%";
-          const afterPct  = (afterLoad  * 100).toFixed(0) + "%";
-
-          const label = `${tr.id} ${tr.origin}→${tr.dest}`;
-          docPDF.text(label, 10, y);
-          docPDF.text(beforePct, 80, y);
+          const afterPct = (afterLoad * 100).toFixed(0) + "%";
+          
+          const route = tr.id + " " + tr.origin + " -> " + tr.dest;
+          docPDF.text(route, 10, y);
+          docPDF.text(beforePct, 90, y);
           docPDF.text(afterPct, 140, y);
-          y += 6;
+          y += 7;
         });
-
-        y += 8;
-
-        // SECTION 3: RECOMMENDATIONS
-        docPDF.setFontSize(13);
+        
+        // Section 3: Recommendations
+        y += 10;
+        docPDF.setFontSize(14);
         docPDF.setFont("helvetica", "bold");
-        docPDF.text("3. Recommendations for Small and Medium Carriers", 10, y);
-        y += 7;
-
+        docPDF.text("3. Recommendations", 10, y);
+        
+        y += 10;
         docPDF.setFontSize(10);
         docPDF.setFont("helvetica", "normal");
-
+        
         const recommendations = [
-          "Start by focusing on return trips with low load factor (below 60%). Use them to bundle new shipments.",
-          "Track your average fleet load every week. Aim to move it gradually from the current level towards 80%+.",
-          "Use the system to simulate what-if scenarios before accepting new shipments, to avoid empty or half-empty runs.",
-          "Prioritize routes where fuel and toll costs are high – these gain the most from better load consolidation.",
-          "Share simple monthly PDF reports like this with management and customers to demonstrate cost and CO2 savings."
+          "Focus on return trips with low load factor (below 60%).",
+          "Track your average fleet load weekly - aim for 80%+.",
+          "Use the system to simulate scenarios before accepting shipments.",
+          "Prioritize high fuel-cost routes for load consolidation.",
+          "Share monthly reports with management to show savings."
         ];
-
-        recommendations.forEach(line => {
-          if (y > 270) {
-            docPDF.addPage();
-            y = 20;
-          }
-          docPDF.text("- " + line, 10, y);
-          y += 5;
+        
+        recommendations.forEach(function(rec) {
+          docPDF.text("- " + rec, 10, y);
+          y += 6;
         });
-
-        y += 6;
+        
+        // Footer
+        y += 10;
         docPDF.setFontSize(8);
-        docPDF.text(
-          "Note: This PDF is generated from a Naqlthon demo scenario. In a production version, an AI engine would use real trip data and KPIs.",
-          10,
-          y
-        );
+        docPDF.setTextColor(128, 128, 128);
+        docPDF.text("This report was generated by Smart Load Analyzer - Naqlthon 4 Demo", 10, y);
 
-        docPDF.save("SmartLoad_Report_demo.pdf");
+        docPDF.save("SmartLoad_Report.pdf");
 
         msg.textContent = currentLang === "ar"
-          ? "تم إنشاء وتحميل تقرير PDF تجريبي باللغة الإنجليزية بنجاح."
-          : "Demo PDF report generated and downloaded successfully.";
+          ? "تم إنشاء وتحميل تقرير PDF بنجاح."
+          : "PDF report generated and downloaded successfully.";
       } catch (e) {
         console.error(e);
         msg.textContent = currentLang === "ar"
@@ -1995,6 +1911,9 @@
       document.getElementById("tab_analyze").style.display = "none";
       document.getElementById("tab_opt").style.display = "none";
 
+      // FIX: Initialize hero metrics as hidden (dash) before login
+      updateHeroVisibility();
+
       const statsSaveBtn = document.getElementById("stats-save-btn");
       if (statsSaveBtn) {
         statsSaveBtn.addEventListener("click", saveCompanyStats);
@@ -2008,10 +1927,9 @@
             setActiveView("login-view");
             const err = document.getElementById("login-error");
             if (err) {
-              err.textContent =
-                currentLang === "ar"
-                  ? "يرجى تسجيل الدخول للوصول إلى لوحة التحكم."
-                  : "Please log in to access the dashboard.";
+              err.textContent = currentLang === "ar"
+                ? "يرجى تسجيل الدخول للوصول إلى لوحة التحكم."
+                : "Please log in to access the dashboard.";
             }
             return;
           }
@@ -2020,7 +1938,6 @@
       });
 
       applyLanguage();
-      updateHeroAndKpisFromStats();
       populateOptimizationTableInitial();
       initMap();
     });
