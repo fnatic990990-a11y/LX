@@ -236,7 +236,7 @@
     .kpi-value{font-size:18px;font-weight:700;margin-bottom:2px;}
     .kpi-footnote{font-size:11px;color:#4ade80;}
 
-    #dashboardChart,#optChart{
+    #dashboardChart{
       width:100% !important;
       height:220px !important;
       max-height:220px !important;
@@ -662,8 +662,6 @@
               </div>
               <p class="hint" id="stats_hint"></p>
             </div>
-
-            <canvas id="dashboardChart"></canvas>
           </div>
 
           <div class="card">
@@ -783,6 +781,17 @@
 
             <p id="pdf_message" class="hint"></p>
           </div>
+
+          <!-- ANALYZE CHART (moved from dashboard + replaces old chart) -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title" id="chart_title">Before vs After Optimization</div>
+                <div class="card-sub" id="chart_sub">Average load improvement</div>
+              </div>
+            </div>
+            <canvas id="dashboardChart"></canvas>
+          </div>
         </div>
       </section>
 
@@ -808,16 +817,6 @@
             <p class="opt-summary" id="opt-summary">
               Run manual or CSV analysis to see results.
             </p>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title" id="chart_title">Before vs After Optimization</div>
-                <div class="card-sub" id="chart_sub">Average load improvement</div>
-              </div>
-            </div>
-            <canvas id="optChart"></canvas>
           </div>
         </div>
       </section>
@@ -879,7 +878,6 @@
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    // ========== LANG ==========
     let currentLang = "en";
 
     const translations = {
@@ -1088,7 +1086,6 @@
       applyLanguage();
     }
 
-    // ========== SCENARIO & GLOBAL STATE ==========
     const CAPACITY_TONS = 20;
     const BASE_TRIP_COST = 1000;
     const EMISSION_FACTOR = 2.7;
@@ -1110,41 +1107,13 @@
     let currentCompanyData = null;
     let companyStats = null;
 
-    // آخر نتيجة تحسين (عشان جدول الشاحنات + PDF)
-    let lastOptimizationLoads = null; // { "Truck #1": {before, after}, ... }
+    let lastOptimizationLoads = null;
     let lastAfterAvgLoad = null;
     let lastCostAfter = null;
     let lastCO2After = null;
 
     let dashboardChart = null;
-    let optChart = null;
     let mapInstance = null;
-
-    // ========== UI HELPERS ==========
-    function setActiveView(viewId) {
-      const views = document.querySelectorAll(".view");
-      views.forEach(v => v.classList.remove("active"));
-      const target = document.getElementById(viewId);
-      if (target) target.classList.add("active");
-
-      const tabs = document.querySelectorAll(".nav-tab");
-      tabs.forEach(tab => {
-        if (tab.dataset.view === viewId) tab.classList.add("active");
-        else tab.classList.remove("active");
-      });
-    }
-
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (!input) return;
-      if (input.type === "password") {
-        input.type = "text";
-        btn.textContent = currentLang === "ar" ? "إخفاء" : "Hide";
-      } else {
-        input.type = "password";
-        btn.textContent = currentLang === "ar" ? "إظهار" : "Show";
-      }
-    }
 
     function updateHeroAndKpisFromStats() {
       const heroLoad = document.getElementById("hero-load-before");
@@ -1166,25 +1135,51 @@
       if (kpiCO2Before)  kpiCO2Before.textContent  = "~" + baselineCO2.toFixed(0) + " kg";
     }
 
-    // ========== FIREBASE: AUTH & COMPANY ==========
     async function loadCompanyData(uid) {
       const ref = doc(db, "companies", uid);
       const snap = await getDoc(ref);
+      companyStats = null;
+
       if (snap.exists()) {
         currentCompanyData = snap.data();
         if (currentCompanyData.stats) {
           companyStats = currentCompanyData.stats;
           const { loadPct, costPerDay, co2PerDay } = companyStats;
 
-          if (loadPct && !isNaN(loadPct)) baselineAvgLoad = loadPct / 100;
-          if (costPerDay && !isNaN(costPerDay)) baselineCost = costPerDay;
-          if (co2PerDay && !isNaN(co2PerDay)) baselineCO2 = co2PerDay;
+          if (loadPct != null && !isNaN(loadPct)) baselineAvgLoad = loadPct / 100;
+          if (costPerDay != null && !isNaN(costPerDay)) baselineCost = costPerDay;
+          if (co2PerDay != null && !isNaN(co2PerDay)) baselineCO2 = co2PerDay;
+
+          const loadInput = document.getElementById("stats-load");
+          const costInput = document.getElementById("stats-cost");
+          const co2Input  = document.getElementById("stats-co2");
+          if (loadInput) loadInput.value = loadPct;
+          if (costInput) costInput.value = costPerDay;
+          if (co2Input)  co2Input.value  = co2PerDay;
         }
       } else {
         currentCompanyData = { name: "Logixperts", email: "demo@logixperts.sa" };
       }
 
-      updateHeroAndKpisFromStats();
+      if (companyStats) {
+        updateHeroAndKpisFromStats();
+      } else {
+        const heroLoad = document.getElementById("hero-load-before");
+        const heroCost = document.getElementById("hero-cost-before");
+        const heroCO2  = document.getElementById("hero-co2-before");
+
+        const kpiLoadBefore = document.getElementById("kpi-load-before");
+        const kpiCostBefore = document.getElementById("kpi-cost-before");
+        const kpiCO2Before  = document.getElementById("kpi-co2-before");
+
+        if (heroLoad) heroLoad.textContent = "–";
+        if (heroCost) heroCost.textContent = "–";
+        if (heroCO2)  heroCO2.textContent  = "–";
+
+        if (kpiLoadBefore) kpiLoadBefore.textContent = "–";
+        if (kpiCostBefore) kpiCostBefore.textContent = "–";
+        if (kpiCO2Before)  kpiCO2Before.textContent  = "–";
+      }
 
       const badge = document.getElementById("company_code_badge");
       const codeValue = document.getElementById("company_code_value");
@@ -1210,6 +1205,11 @@
       await loadCompanyData(user.uid);
       enableTabsAfterLogin();
       setActiveView("dashboard-view");
+      if (mapInstance) {
+        setTimeout(() => {
+          mapInstance.invalidateSize();
+        }, 150);
+      }
     }
 
     async function demoLogin() {
@@ -1280,7 +1280,7 @@
       const co2Input  = document.getElementById("stats-co2");
       const hint      = document.getElementById("stats_hint");
 
-      const loadPct   = parseFloat(loadInput.value || "0");
+      const loadPct    = parseFloat(loadInput.value || "0");
       const costPerDay = parseFloat(costInput.value || "0");
       const co2PerDay  = parseFloat(co2Input.value || "0");
 
@@ -1330,13 +1330,42 @@
       }
     }
 
-    // ========== CHARTS ==========
+    function setActiveView(viewId) {
+      const views = document.querySelectorAll(".view");
+      views.forEach(v => v.classList.remove("active"));
+      const target = document.getElementById(viewId);
+      if (target) target.classList.add("active");
+
+      const tabs = document.querySelectorAll(".nav-tab");
+      tabs.forEach(tab => {
+        if (tab.dataset.view === viewId) tab.classList.add("active");
+        else tab.classList.remove("active");
+      });
+    }
+
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === "password") {
+        input.type = "text";
+        btn.textContent = currentLang === "ar" ? "إخفاء" : "Hide";
+      } else {
+        input.type = "password";
+        btn.textContent = currentLang === "ar" ? "إظهار" : "Show";
+      }
+    }
+
     function initCharts(afterAvgLoad) {
-      const ctxDash = document.getElementById("dashboardChart").getContext("2d");
-      const ctxOpt  = document.getElementById("optChart").getContext("2d");
+      const canvas = document.getElementById("dashboardChart");
+      if (!canvas || !window.Chart) return;
+
+      const ctxDash = canvas.getContext("2d");
 
       const beforeLoadPct = baselineAvgLoad * 100;
       const afterLoadPct  = afterAvgLoad * 100;
+
+      const costAfter  = lastCostAfter ?? baselineCost;
+      const co2After   = lastCO2After ?? baselineCO2;
 
       dashboardChart = new Chart(ctxDash, {
         type: "bar",
@@ -1349,20 +1378,7 @@
             },
             {
               label: "After",
-              data: [afterLoadPct, lastCostAfter ?? baselineCost, lastCO2After ?? baselineCO2]
-            }
-          ]
-        }
-      });
-
-      optChart = new Chart(ctxOpt, {
-        type: "bar",
-        data: {
-          labels: ["Before", "After"],
-          datasets: [
-            {
-              label: "Avg Load (%)",
-              data: [beforeLoadPct, afterLoadPct]
+              data: [afterLoadPct, costAfter, co2After]
             }
           ]
         }
@@ -1370,7 +1386,7 @@
     }
 
     function updateCharts(afterAvgLoad, costAfter, co2After) {
-      if (!dashboardChart || !optChart) {
+      if (!dashboardChart) {
         initCharts(afterAvgLoad);
         return;
       }
@@ -1381,15 +1397,11 @@
       dashboardChart.data.datasets[0].data = [beforeLoadPct, baselineCost, baselineCO2];
       dashboardChart.data.datasets[1].data = [afterLoadPct, costAfter, co2After];
       dashboardChart.update();
-
-      optChart.data.datasets[0].data = [beforeLoadPct, afterLoadPct];
-      optChart.update();
     }
 
-    // ========== MAP ==========
     function initMap() {
       if (mapInstance || !window.L) return;
-      const center = [23.8859, 45.0792]; // KSA center-ish
+      const center = [23.8859, 45.0792];
       mapInstance = L.map("map").setView(center, 6);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -1424,7 +1436,6 @@
       L.polyline([riyadh, dammam], { weight: 2 }).addTo(mapInstance);
     }
 
-    // ========== OPTIMIZATION TABLE ==========
     function clearTruckRows() {
       const list = document.getElementById("truck-list");
       if (!list) return;
@@ -1497,7 +1508,6 @@
       });
     }
 
-    // ========== RUN OPTIMIZATION ==========
     async function runOptimization() {
       if (!isLoggedIn) {
         const msg = document.getElementById("opt-summary");
@@ -1607,7 +1617,6 @@
           `in operating cost and <strong>${Math.abs(co2SavePct).toFixed(1)}%</strong> in CO₂ emissions.`;
       }
 
-      // تخزين القيم لكل شاحنة لاستخدامها في تقرير PDF
       lastOptimizationLoads = {};
       trucks.forEach(t => {
         lastOptimizationLoads[t.id] = {
@@ -1636,7 +1645,6 @@
       setActiveView("optimization-view");
     }
 
-    // ========== CSV (بسيط تجريبي) ==========
     function analyzeCSV() {
       const fileInput = document.getElementById("csv_file");
       const msg = document.getElementById("csv_message");
@@ -1658,7 +1666,6 @@
       }
     }
 
-    // ========== PDF REPORT ==========
     function generatePdfReport() {
       const msg = document.getElementById("pdf_message");
 
@@ -1680,7 +1687,6 @@
 
         const docPDF = new jsPDFConstructor();
 
-        // HEADER
         docPDF.setFont("helvetica", "bold");
         docPDF.setFontSize(18);
         docPDF.text("Logixperts - Smart Load Analyzer", 10, 15);
@@ -1734,7 +1740,6 @@
         docPDF.setFont("helvetica", "normal");
         docPDF.text("Generated at: " + generatedAt, 10, 58);
 
-        // SECTION 1: KPIs SUMMARY
         let y = 70;
 
         docPDF.setFontSize(13);
@@ -1774,28 +1779,24 @@
             ? ((co2Before - co2After) / co2Before) * 100
             : 0;
 
-        // Row 1: Average load
         docPDF.text("Average load factor (%)", 10, y);
         docPDF.text(avgBeforePct + "%", 80, y);
         docPDF.text(avgAfterPct + "%", 120, y);
         docPDF.text(loadDeltaPP.toFixed(1) + " pp", 160, y);
         y += 6;
 
-        // Row 2: Operating cost per day
         docPDF.text("Operating cost per day", 10, y);
         docPDF.text("~" + costBefore.toFixed(0) + " SAR", 80, y);
         docPDF.text("~" + costAfter.toFixed(0) + " SAR", 120, y);
         docPDF.text(costSavingsPct.toFixed(1) + "%", 160, y);
         y += 6;
 
-        // Row 3: CO2 per day
         docPDF.text("CO2 emissions per day", 10, y);
         docPDF.text("~" + co2Before.toFixed(0) + " kg", 80, y);
         docPDF.text("~" + co2After.toFixed(0) + " kg", 120, y);
         docPDF.text(co2SavingsPct.toFixed(1) + "%", 160, y);
         y += 10;
 
-        // SECTION 2: PER-TRUCK LOAD FACTORS
         docPDF.setFontSize(13);
         docPDF.setFont("helvetica", "bold");
         docPDF.text("2. Per-Truck Load Factors", 10, y);
@@ -1828,7 +1829,6 @@
 
         y += 8;
 
-        // SECTION 3: RECOMMENDATIONS
         docPDF.setFontSize(13);
         docPDF.setFont("helvetica", "bold");
         docPDF.text("3. Recommendations for Small and Medium Carriers", 10, y);
@@ -1875,7 +1875,6 @@
       }
     }
 
-    // ========== INIT ==========
     window.addEventListener("load", () => {
       document.getElementById("tab_login").style.display = "inline-flex";
       document.getElementById("tab_dashboard").style.display = "none";
@@ -1903,16 +1902,20 @@
             return;
           }
           setActiveView(view);
+
+          if (view === "dashboard-view" && mapInstance) {
+            setTimeout(() => {
+              mapInstance.invalidateSize();
+            }, 150);
+          }
         });
       });
 
       applyLanguage();
-      updateHeroAndKpisFromStats();
       populateOptimizationTableInitial();
       initMap();
     });
 
-    // expose for HTML
     window.toggleLanguage = toggleLanguage;
     window.togglePassword = togglePassword;
     window.demoLogin = demoLogin;
