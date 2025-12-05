@@ -409,98 +409,6 @@
         grid-template-columns: 1fr;
       }
     }
-
-    /* Driver Monitoring Styles */
-    .driver-card {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 16px;
-      padding: 16px;
-      transition: all 0.2s;
-    }
-    .driver-card:hover {
-      border-color: #22c55e;
-    }
-    .driver-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .driver-name {
-      font-weight: 700;
-      font-size: 16px;
-    }
-    .driver-id {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .driver-status {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .status-ready { background: #14532d; color: #86efac; }
-    .status-arrived { background: #713f12; color: #fde047; }
-    .status-loaded { background: #1e3a5f; color: #7dd3fc; }
-    .status-transit { background: #581c87; color: #d8b4fe; }
-    .status-done { background: #14532d; color: #86efac; }
-    .status-offline { background: #374151; color: #9ca3af; }
-
-    .driver-info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 10px;
-      background: #0f172a;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      font-size: 12px;
-    }
-    .driver-info-label { color: var(--muted); }
-    .driver-info-value { font-weight: 500; }
-
-    .driver-chat-box {
-      background: #0f172a;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 10px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .driver-chat-bubble {
-      padding: 6px 10px;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      font-size: 12px;
-      max-width: 85%;
-    }
-    .chat-from-driver { background: #22c55e; color: #0f172a; margin-right: auto; }
-    .chat-from-admin { background: #334155; margin-left: auto; }
-    .driver-chat-input {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .driver-chat-input input {
-      flex: 1;
-      padding: 8px 12px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      color: #e5e7eb;
-      font-size: 12px;
-    }
-    .driver-chat-input button {
-      padding: 8px 14px;
-      background: #22c55e;
-      color: #0f172a;
-      border: none;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
   </style>
 
   <!-- Chart.js -->
@@ -572,7 +480,7 @@
         </div>
 
         <div class="hero-highlight" id="hero_highlight">
-          This scenario shows how merging a new shipment with a low-load return trip improves load factor.
+          This demo scenario shows how merging a new shipment with a low-load return trip improves load factor.
         </div>
       </div>
 
@@ -600,7 +508,6 @@
       <button class="nav-tab" data-view="dashboard-view" id="tab_dashboard">Dashboard</button>
       <button class="nav-tab" data-view="analyze-view" id="tab_analyze">Analyze Load</button>
       <button class="nav-tab" data-view="optimization-view" id="tab_opt">Optimization Result</button>
-      <button class="nav-tab" data-view="drivers-view" id="tab_drivers">👥 Drivers</button>
     </nav>
 
     <main>
@@ -633,7 +540,7 @@
 
               <button class="btn btn-primary" type="submit" id="login_btn">Login</button>
 
-              <p class="hint" id="login_hint"></p>
+              <p class="hint" id="login_hint">Demo credentials: <strong>demo@logixperts.sa</strong> / <strong>Naqlthon4!</strong></p>
               <p id="login-error" class="hint hint-error"></p>
             </form>
           </div>
@@ -694,9 +601,9 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="dash_title">Fleet Overview Dashboard</div>
-                <div class="card-sub" id="dash_sub">4 trucks on main corridors.</div>
+                <div class="card-sub" id="dash_sub">4 demo trucks on main corridors.</div>
               </div>
-              <span class="pill"><span class="pill-dot"></span> Live scenario</span>
+              <span class="pill"><span class="pill-dot"></span> Demo scenario</span>
             </div>
 
             <div class="kpi-grid">
@@ -850,11 +757,11 @@
             <div class="card-header">
               <div>
                 <div class="card-title" id="pdf_title">PDF AI Report</div>
-                <div class="card-sub" id="pdf_sub">Generate a printable KPI report for your company based on the current optimization.</div>
+                <div class="card-sub" id="pdf_sub">Generate a printable KPI report for your company based on the current demo optimization.</div>
               </div>
             </div>
 
-            <p class="hint" id="pdf_hint">This PDF report shows KPIs, per-truck loads and recommendations for your fleet.</p>
+            <p class="hint" id="pdf_hint">This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.</p>
 
             <button class="btn btn-secondary" type="button" id="pdf_btn" onclick="generatePdfReport()">Generate PDF Report</button>
             <p id="pdf_message" class="hint"></p>
@@ -925,38 +832,6 @@
           </div>
         </div>
       </section>
-
-      <!-- DRIVERS MONITORING VIEW -->
-      <section id="drivers-view" class="view">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">👥 Driver Monitoring</div>
-              <div class="card-sub">Real-time tracking of all drivers - location, status, and chat</div>
-            </div>
-          </div>
-
-          <!-- Drivers Grid -->
-          <div id="driversGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; margin-top: 16px;">
-            <div style="text-align: center; padding: 40px; color: var(--muted);">
-              <div style="font-size: 48px; margin-bottom: 12px;">📡</div>
-              <div>No active drivers</div>
-              <div style="font-size: 12px; margin-top: 4px;">Drivers will appear here when they log in</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Driver Map -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-header">
-            <div>
-              <div class="card-title">🗺️ Drivers Location Map</div>
-              <div class="card-sub">Live GPS tracking of all drivers</div>
-            </div>
-          </div>
-          <div id="driversMap" style="height: 350px; border-radius: 12px; margin-top: 12px; background: #1e293b;"></div>
-        </div>
-      </section>
     </main>
 
     <!-- SUPPORT -->
@@ -969,7 +844,7 @@
         </div>
         <div class="support-row">
           <span class="support-icon">📧</span>
-          <span id="support_email_label">Email:</span>&nbsp;<span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="84f7f1f4f4ebf6f0c4e8ebe3edfcf4e1f6f0f7aae7ebe9">[email&#160;protected]</a></span>
+          <span id="support_email_label">Email:</span>&nbsp;<span>support@logixperts.com</span>
         </div>
         <div class="support-row">
           <span class="support-icon">📠</span>
@@ -982,7 +857,7 @@
   </div>
 
   <!-- ================= FIREBASE + LOGIC ================= -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import {
       getAuth,
@@ -996,10 +871,6 @@
       setDoc,
       addDoc,
       getDoc,
-      query,
-      where,
-      orderBy,
-      onSnapshot,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
@@ -1032,7 +903,7 @@
         hero_sub: "Smart Load Analyzer helps freight companies analyze and optimize loads to reduce cost and emissions.",
         tag_fuel: "fuel reduction (simulated)",
         tag_ai: "load & route suggestions",
-        hero_highlight: "This scenario shows how merging a new shipment with a low-load return trip improves load factor.",
+        hero_highlight: "This demo scenario shows how merging a new shipment with a low-load return trip improves load factor.",
         hero_avg_before_title: "Avg load (baseline)",
         hero_cost_title: "Op. cost / day",
         hero_co2_title: "CO₂ / day",
@@ -1045,7 +916,7 @@
         label_email: "Company email",
         label_password: "Password",
         login_btn: "Login",
-        login_hint: "",
+        login_hint: "Demo credentials: rahmone17990@gmail.com / fnatic990",
         signup_title: "Create Company Account",
         signup_sub: "Create your company account to access the system.",
         signup_label_name: "Company name",
@@ -1055,7 +926,7 @@
         signup_label_plan: "Subscription plan",
         signup_btn: "Sign up",
         dash_title: "Fleet Overview Dashboard",
-        dash_sub: "4 trucks on main corridors.",
+        dash_sub: "4 demo trucks on main corridors.",
         kpi_trucks_label: "Trucks in scenario",
         kpi_baseline_label: "Avg load (baseline)",
         kpi_baseline_note: "Before optimization",
@@ -1085,8 +956,8 @@
         csv_label: "Choose CSV file",
         btn_csv: "Analyze CSV",
         pdf_title: "PDF AI Report",
-        pdf_sub: "Generate a printable KPI report for your company based on the current optimization.",
-        pdf_hint: "This PDF report shows KPIs, per-truck loads and recommendations for your fleet.",
+        pdf_sub: "Generate a printable KPI report for your company based on the current demo optimization.",
+        pdf_hint: "This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.",
         pdf_btn: "Generate PDF Report",
         opt_title: "Optimization Result",
         opt_sub: "Recommended load distribution.",
@@ -1363,28 +1234,15 @@
       const pass  = document.getElementById("password").value.trim();
       const error = document.getElementById("login-error");
 
-      if (!email || !pass) {
-        if (error) error.textContent = currentLang === "ar" ? "أدخل الإيميل وكلمة المرور" : "Please enter email and password";
-        return;
-      }
-
       try {
         const cred = await signInWithEmailAndPassword(auth, email, pass);
         await handleAuthSuccess(cred.user);
       } catch (e) {
-        console.error("Login error:", e.code, e.message);
+        console.error(e);
         if (error) {
-          if (e.code === 'auth/user-not-found') {
-            error.textContent = currentLang === "ar" ? "الحساب غير موجود. قم بإنشاء حساب جديد." : "Account not found. Please sign up first.";
-          } else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-            error.textContent = currentLang === "ar" ? "كلمة المرور خاطئة." : "Incorrect password.";
-          } else if (e.code === 'auth/invalid-email') {
-            error.textContent = currentLang === "ar" ? "الإيميل غير صحيح." : "Invalid email format.";
-          } else {
-            error.textContent = currentLang === "ar"
-              ? "تعذر تسجيل الدخول. تأكد من الإيميل وكلمة المرور."
-              : "Login failed. Please check your email and password.";
-          }
+          error.textContent = currentLang === "ar"
+            ? "تعذر تسجيل الدخول. تأكد من الإيميل وكلمة المرور."
+            : "Login failed. Please check your email and password.";
         }
       }
     }
@@ -1476,71 +1334,6 @@
         await addDoc(ref, { ...data, createdAt: serverTimestamp() });
       } catch (e) {
         console.error("Error saving optimization result:", e);
-      }
-    }
-
-    // ========== DRIVER ASSIGNMENT ==========
-    // Send assignment to driver page - REAL-TIME via Firebase
-    async function assignToDriver(truckId, assignment) {
-      try {
-        // Extract driver number from truck ID (e.g., "Truck #2" -> "2")
-        const driverNum = truckId.replace(/\D/g, '');
-        const companyCode = currentCompanyId ? currentCompanyId.slice(-6).toUpperCase() : 'LXPRT';
-        const driverId = `${companyCode}_driver${driverNum}`;
-        
-        const driverRef = doc(db, 'drivers', driverId);
-        
-        // Update driver document with new assignment
-        await setDoc(driverRef, {
-          currentAssignment: {
-            destination: assignment.destination,
-            origin: assignment.origin || 'Riyadh',
-            weight: assignment.weight,
-            volume: assignment.volume,
-            deliveryTime: assignment.deliveryTime,
-            notes: assignment.notes || '',
-            route: assignment.route,
-            assignedAt: serverTimestamp(),
-            truckId: truckId
-          },
-          status: 'ready', // Reset status for new assignment
-          lastAssignmentUpdate: serverTimestamp()
-        }, { merge: true });
-        
-        console.log('✅ Assignment sent to driver:', driverId);
-        
-        // Show confirmation
-        const confirmMsg = currentLang === 'ar' 
-          ? `تم إرسال المهمة للسائق ${driverNum}` 
-          : `Assignment sent to Driver ${driverNum}`;
-        
-        // Brief notification (optional)
-        if (document.getElementById('opt-summary')) {
-          const summary = document.getElementById('opt-summary');
-          summary.innerHTML += `<div style="margin-top: 10px; padding: 8px; background: rgba(59,130,246,0.1); border-radius: 8px; border: 1px solid rgba(59,130,246,0.3); font-size: 12px;">📱 ${confirmMsg}</div>`;
-        }
-        
-        return true;
-      } catch (e) {
-        console.error('Error assigning to driver:', e);
-        return false;
-      }
-    }
-
-    // Send chat message to driver
-    async function sendMessageToDriver(driverId, message) {
-      try {
-        const chatRef = collection(db, 'drivers', driverId, 'chat');
-        await addDoc(chatRef, {
-          text: message,
-          sender: 'admin',
-          timestamp: serverTimestamp(),
-          read: false
-        });
-        return true;
-      } catch (e) {
-        console.error('Error sending message:', e);
-        return false;
       }
     }
 
@@ -1709,175 +1502,6 @@
       });
     }
 
-    // ========== AI-POWERED OPTIMIZATION ALGORITHM ==========
-    /*
-     * Smart Load Optimization Algorithm
-     * Uses multiple factors to find the best truck assignment:
-     * 1. Load Factor Optimization - maximize truck utilization
-     * 2. Distance Minimization - reduce total travel distance
-     * 3. CO2 Reduction - environmental optimization
-     * 4. Cost Efficiency - minimize operational costs
-     * 5. Time Window Compliance - respect delivery deadlines
-     */
-
-    // Route distances in KM (approximate)
-    const ROUTE_DISTANCES = {
-      'Riyadh-Jeddah': 950,
-      'Jeddah-Riyadh': 950,
-      'Riyadh-Dammam': 400,
-      'Dammam-Riyadh': 400,
-      'Jeddah-Dammam': 1350,
-      'Dammam-Jeddah': 1350
-    };
-
-    // Fuel cost per KM (SAR)
-    const FUEL_COST_PER_KM = 0.8;
-    // CO2 emission per KM (kg) - varies by load
-    const BASE_CO2_PER_KM = 0.9;
-    // Driver cost per hour (SAR)
-    const DRIVER_COST_PER_HOUR = 50;
-    // Average speed KM/H
-    const AVG_SPEED = 80;
-
-    // Calculate route distance
-    function getRouteDistance(origin, dest) {
-      const key = `${origin}-${dest}`;
-      return ROUTE_DISTANCES[key] || 500; // Default 500km
-    }
-
-    // Calculate CO2 based on load factor (heavier = more CO2)
-    function calculateCO2(distance, loadFactor) {
-      // CO2 increases with load: base + (loadFactor * 0.5 * base)
-      const co2PerKm = BASE_CO2_PER_KM * (1 + loadFactor * 0.5);
-      return distance * co2PerKm;
-    }
-
-    // Calculate trip cost
-    function calculateTripCost(distance, loadFactor) {
-      const fuelCost = distance * FUEL_COST_PER_KM * (1 + loadFactor * 0.3);
-      const timeCost = (distance / AVG_SPEED) * DRIVER_COST_PER_HOUR;
-      return fuelCost + timeCost;
-    }
-
-    // AI Scoring Function - calculates optimization score for each truck
-    function calculateOptimizationScore(truck, shipment, priority) {
-      let score = 0;
-      const distance = getRouteDistance(truck.origin, truck.dest);
-      
-      // 1. Load Factor Score (0-30 points)
-      // Prefer trucks with low load that can accommodate the shipment
-      const potentialLoad = truck.currentLoad + (shipment.weight / CAPACITY_TONS);
-      if (potentialLoad <= 1.0) {
-        // Ideal load is 75-90%
-        if (potentialLoad >= 0.75 && potentialLoad <= 0.9) {
-          score += 30;
-        } else if (potentialLoad >= 0.6 && potentialLoad < 0.75) {
-          score += 25;
-        } else if (potentialLoad > 0.9) {
-          score += 20;
-        } else {
-          score += 15;
-        }
-      } else {
-        score -= 50; // Overload penalty
-      }
-
-      // 2. Empty Trip Avoidance Score (0-25 points)
-      // Prefer trucks on return trips with low load
-      if (truck.currentLoad < 0.5) {
-        score += 25; // Great opportunity for consolidation
-      } else if (truck.currentLoad < 0.7) {
-        score += 15;
-      }
-
-      // 3. Destination Match Score (0-20 points)
-      if (truck.dest.toLowerCase().includes(shipment.destination.toLowerCase())) {
-        score += 20; // Perfect match
-      } else if (truck.origin.toLowerCase().includes(shipment.destination.toLowerCase())) {
-        score += 10; // Can pick up on the way back
-      }
-
-      // 4. Distance Efficiency Score (0-15 points)
-      // Shorter routes are more efficient
-      if (distance < 500) {
-        score += 15;
-      } else if (distance < 800) {
-        score += 10;
-      } else {
-        score += 5;
-      }
-
-      // 5. Priority Adjustment
-      if (priority === 'high') {
-        // For high priority, prefer less loaded trucks (faster loading)
-        if (truck.currentLoad < 0.5) score += 10;
-      } else if (priority === 'low') {
-        // For low priority/backhaul, prefer return trips
-        if (truck.dest.toLowerCase() === 'riyadh') score += 10;
-      }
-
-      // 6. CO2 Optimization Bonus
-      const co2Impact = calculateCO2(distance, potentialLoad);
-      if (co2Impact < 500) score += 10;
-
-      return {
-        truck,
-        score,
-        potentialLoad,
-        distance,
-        estimatedCO2: co2Impact,
-        estimatedCost: calculateTripCost(distance, potentialLoad)
-      };
-    }
-
-    // Main AI Optimization Function
-    function runAIOptimization(shipment, trucks, priority) {
-      // Score all trucks
-      const scoredTrucks = trucks.map(truck => 
-        calculateOptimizationScore(truck, shipment, priority)
-      );
-
-      // Sort by score (highest first)
-      scoredTrucks.sort((a, b) => b.score - a.score);
-
-      // Get best option
-      const best = scoredTrucks[0];
-      
-      // Calculate alternatives
-      const alternatives = scoredTrucks.slice(1, 3);
-
-      // Generate AI recommendation
-      const recommendation = generateAIRecommendation(best, alternatives, shipment);
-
-      return {
-        bestOption: best,
-        alternatives,
-        recommendation,
-        allScores: scoredTrucks
-      };
-    }
-
-    // Generate human-readable AI recommendation
-    function generateAIRecommendation(best, alternatives, shipment) {
-      const lang = currentLang;
-      
-      if (lang === 'ar') {
-        return `تم تحليل ${trucksScenario.length} شاحنات باستخدام الذكاء الاصطناعي. ` +
-          `الخيار الأفضل هو ${best.truck.id} (${best.truck.origin} → ${best.truck.dest}) ` +
-          `بنسبة تحميل ${(best.potentialLoad * 100).toFixed(0)}% ` +
-          `ومسافة ${best.distance} كم. ` +
-          `التوفير المتوقع: ${best.estimatedCost.toFixed(0)} ريال، ` +
-          `انبعاثات CO₂: ${best.estimatedCO2.toFixed(0)} كجم.`;
-      } else {
-        return `AI analyzed ${trucksScenario.length} trucks. ` +
-          `Best option: ${best.truck.id} (${best.truck.origin} → ${best.truck.dest}) ` +
-          `with ${(best.potentialLoad * 100).toFixed(0)}% load factor, ` +
-          `${best.distance} km distance. ` +
-          `Estimated savings: ${best.estimatedCost.toFixed(0)} SAR, ` +
-          `CO₂ impact: ${best.estimatedCO2.toFixed(0)} kg.`;
-      }
-    }
-
     // ========== RUN OPTIMIZATION ==========
     async function runOptimization() {
       if (!isLoggedIn) {
@@ -1893,119 +1517,94 @@
 
       const weight = parseFloat(document.getElementById("weight").value || "0");
       const volume = parseFloat(document.getElementById("volume").value || "0");
-      let destinationInput = (document.getElementById("destination").value || "").trim();
+      let destinationInput = (document.getElementById("destination").value || "").toLowerCase();
       const priority = document.getElementById("priority").value;
-      const deliveryTime = document.getElementById("deliveryTime").value || "Within 24 hours";
 
-      // Create shipment object
-      const shipment = {
-        weight: weight,
-        volume: volume,
-        destination: destinationInput || "Riyadh",
-        priority: priority,
-        deliveryTime: deliveryTime
-      };
-
-      // Clone trucks for optimization
       const trucks = trucksScenario.map(t => ({ ...t }));
 
-      // Run AI Optimization
-      const aiResult = runAIOptimization(shipment, trucks, priority);
-      const target = aiResult.bestOption.truck;
-      const newLoadFactor = aiResult.bestOption.potentialLoad;
+      let destKey = destinationInput.trim();
+      if (!destKey) destKey = "riyadh";
 
-      // Update target truck
-      target.newLoad = Math.min(1, newLoadFactor);
-      trucks.forEach(t => { 
-        if (t.id !== target.id) t.newLoad = t.currentLoad; 
-        else t.newLoad = target.newLoad;
+      let inbound = trucks.filter(t => t.dest.toLowerCase().includes(destKey));
+      if (inbound.length === 0) {
+        inbound = trucks.filter(t => t.dest.toLowerCase() === "riyadh");
+      }
+
+      let target = inbound[0];
+      inbound.forEach(t => {
+        if (priority === "high") {
+          const diffT = Math.abs(t.currentLoad - 0.6);
+          const diffCurrent = Math.abs(target.currentLoad - 0.6);
+          if (diffT < diffCurrent) target = t;
+        } else {
+          if (t.currentLoad < target.currentLoad) target = t;
+        }
       });
 
-      // Calculate fleet-wide improvements
-      const afterAvgLoad = trucks.reduce((sum, t) => sum + t.newLoad, 0) / trucks.length;
-      
-      // Calculate actual cost and CO2 savings
-      const totalDistance = trucks.reduce((sum, t) => sum + getRouteDistance(t.origin, t.dest), 0);
-      const beforeTotalCost = trucks.reduce((sum, t) => sum + calculateTripCost(getRouteDistance(t.origin, t.dest), t.currentLoad), 0);
-      const afterTotalCost = trucks.reduce((sum, t) => sum + calculateTripCost(getRouteDistance(t.origin, t.dest), t.newLoad), 0);
-      
-      const beforeTotalCO2 = trucks.reduce((sum, t) => sum + calculateCO2(getRouteDistance(t.origin, t.dest), t.currentLoad), 0);
-      const afterTotalCO2 = trucks.reduce((sum, t) => sum + calculateCO2(getRouteDistance(t.origin, t.dest), t.newLoad), 0);
+      const existingTons = target.currentLoad * CAPACITY_TONS;
+      const addedTons = isNaN(weight) ? 0 : weight;
+      const newTotalTons = existingTons + addedTons;
+      const newLoadFactor = Math.min(1, newTotalTons / CAPACITY_TONS);
+      target.newLoad = newLoadFactor;
 
-      // Use actual calculated values or baseline
-      const costAfter = baselineCost > 0 ? baselineCost * (beforeTotalCost / afterTotalCost) * 0.85 : afterTotalCost;
-      const co2After = baselineCO2 > 0 ? baselineCO2 * (beforeTotalCO2 / afterTotalCO2) * 0.9 : afterTotalCO2;
+      trucks.forEach(t => { if (t.id !== target.id) t.newLoad = t.currentLoad; });
+
+      const afterAvgLoad = trucks.reduce((sum, t) => sum + t.newLoad, 0) / trucks.length;
+      const costAfter = baselineCost * (baselineAvgLoad / afterAvgLoad);
+      const co2After = baselineCO2 * (costAfter / baselineCost);
 
       lastAfterAvgLoad = afterAvgLoad;
       lastCostAfter = costAfter;
       lastCO2After = co2After;
 
-      // Update KPI displays
       const loadAfterPct = (afterAvgLoad * 100).toFixed(0) + "%";
       document.getElementById("kpi-load-after").textContent = loadAfterPct;
 
       document.getElementById("kpi-cost-after").textContent = "~" + costAfter.toFixed(0) + " SAR";
-      const costSavePct = baselineCost > 0 ? ((baselineCost - costAfter) / baselineCost) * 100 : 0;
+      const costSavePct = ((baselineCost - costAfter) / baselineCost) * 100;
       document.getElementById("kpi-cost-savings").textContent = costSavePct > 0
         ? "-" + costSavePct.toFixed(1) + "% vs baseline"
         : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
 
       document.getElementById("kpi-co2-after").textContent = "~" + co2After.toFixed(0) + " kg";
-      const co2SavePct = baselineCO2 > 0 ? ((baselineCO2 - co2After) / baselineCO2) * 100 : 0;
+      const co2SavePct = ((baselineCO2 - co2After) / baselineCO2) * 100;
       document.getElementById("kpi-co2-savings").textContent = co2SavePct > 0
         ? "-" + co2SavePct.toFixed(1) + "% vs baseline"
         : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
 
       updateCharts(afterAvgLoad, costAfter, co2After);
 
-      // Build suggestions for all trucks
       const suggestionById = {};
-      aiResult.allScores.forEach((scored, index) => {
-        const t = scored.truck;
-        if (t.id === target.id) {
-          suggestionById[t.id] = {
-            truck: t,
-            newLoad: scored.potentialLoad,
-            action: currentLang === "ar"
-              ? `✨ أفضل خيار (نقاط: ${scored.score})`
-              : `✨ Best option (Score: ${scored.score})`,
-          };
-        } else if (index < 3) {
-          suggestionById[t.id] = {
-            truck: t,
-            newLoad: t.currentLoad,
-            action: currentLang === "ar"
-              ? `بديل (نقاط: ${scored.score})`
-              : `Alternative (Score: ${scored.score})`,
-          };
-        }
-      });
-      
+      suggestionById[target.id] = {
+        truck: target,
+        newLoad: newLoadFactor,
+        action: currentLang === "ar"
+          ? "دمج الشحنة الجديدة مع رحلة العودة"
+          : "Merge new shipment with return trip",
+      };
       populateOptimizationTable(trucks, suggestionById);
 
-      // Update summary with AI recommendation
       const summary = document.getElementById("opt-summary");
       if (currentLang === "ar") {
         summary.innerHTML =
-          `<div style="margin-bottom: 10px; padding: 10px; background: rgba(34,197,94,0.1); border-radius: 10px; border: 1px solid rgba(34,197,94,0.3);">` +
-          `🤖 <strong>تحليل الذكاء الاصطناعي:</strong> ${aiResult.recommendation}</div>` +
-          `تم إسناد شحنة وزن <strong>${weight || 0} طن</strong> ` +
-          `وحجم <strong>${volume || 0} م³</strong> إلى ` +
-          `<strong>${target.id} (${target.origin} → ${target.dest})</strong>، ` +
-          `مما يرفع متوسط الحمولة من <strong>${(baselineAvgLoad * 100).toFixed(0)}%</strong> ` +
-          `إلى <strong>${(afterAvgLoad * 100).toFixed(0)}%</strong>.`;
+          "تم إسناد شحنة وزن <strong>" + (weight || 0) + " طن</strong> " +
+          "وحجم <strong>" + (volume || 0) + " م³</strong> إلى " +
+          "<strong>" + target.id + " (" + target.origin + " → " + target.dest + ")</strong>، " +
+          "مما يرفع متوسط الحمولة من <strong>" + (baselineAvgLoad * 100).toFixed(0) + "%</strong> " +
+          "إلى <strong>" + (afterAvgLoad * 100).toFixed(0) + "%</strong>، " +
+          "مع تقليل تقريبي في تكلفة التشغيل بنسبة <strong>" + Math.abs(costSavePct).toFixed(1) + "%</strong> " +
+          "وانبعاثات CO₂ بنسبة <strong>" + Math.abs(co2SavePct).toFixed(1) + "%</strong>.";
       } else {
         summary.innerHTML =
-          `<div style="margin-bottom: 10px; padding: 10px; background: rgba(34,197,94,0.1); border-radius: 10px; border: 1px solid rgba(34,197,94,0.3);">` +
-          `🤖 <strong>AI Analysis:</strong> ${aiResult.recommendation}</div>` +
-          `Shipment of <strong>${weight || 0} tons</strong> / ` +
-          `<strong>${volume || 0} m³</strong> assigned to ` +
-          `<strong>${target.id} (${target.origin} → ${target.dest})</strong>, ` +
-          `raising average fleet load from <strong>${(baselineAvgLoad * 100).toFixed(0)}%</strong> ` +
-          `to <strong>${(afterAvgLoad * 100).toFixed(0)}%</strong>.`;
+          "The new shipment of <strong>" + (weight || 0) + " tons</strong> / " +
+          "<strong>" + (volume || 0) + " m³</strong> is assigned to " +
+          "<strong>" + target.id + " (" + target.origin + " → " + target.dest + ")</strong>, " +
+          "raising average fleet load from <strong>" + (baselineAvgLoad * 100).toFixed(0) + "%</strong> " +
+          "to <strong>" + (afterAvgLoad * 100).toFixed(0) + "%</strong>, " +
+          "with an estimated reduction of <strong>" + Math.abs(costSavePct).toFixed(1) + "%</strong> " +
+          "in operating cost and <strong>" + Math.abs(co2SavePct).toFixed(1) + "%</strong> in CO₂ emissions.";
       }
 
-      // Store optimization results
       lastOptimizationLoads = {};
       trucks.forEach(t => { lastOptimizationLoads[t.id] = { before: t.currentLoad, after: t.newLoad }; });
 
@@ -2022,23 +1621,7 @@
           baselineCost,
           costAfter,
           baselineCO2,
-          co2After,
-          aiScore: aiResult.bestOption.score,
-          aiRecommendation: aiResult.recommendation
-        });
-
-        // Send assignment to driver - REAL-TIME UPDATE
-        const driverId = target.id.replace(/\D/g, ''); // Extract number from "Truck #2" -> "2"
-        await assignToDriver(target.id, {
-          destination: target.dest,
-          origin: target.origin,
-          weight: weight || 0,
-          volume: volume || 0,
-          deliveryTime: deliveryTime,
-          route: target.origin + " → " + target.dest,
-          notes: currentLang === "ar" 
-            ? `دمج الشحنة - نقاط AI: ${aiResult.bestOption.score}` 
-            : `Shipment merge - AI Score: ${aiResult.bestOption.score}`
+          co2After
         });
       }
 
@@ -2060,7 +1643,7 @@
       if (msg) {
         msg.textContent = currentLang === "ar"
           ? "تم رفع الملف بنجاح (تحليل تجريبي للعرض فقط)."
-          : "CSV file uploaded successfully.";
+          : "CSV file uploaded successfully (demo analysis only).";
       }
     }
 
@@ -2144,7 +1727,7 @@
 
         docPDF.setFontSize(12);
         docPDF.setFont("helvetica", "normal");
-        docPDF.text("Naqlthon 4 - Smart Load Optimization Report", 10, 28);
+        docPDF.text("Naqlthon 4 - Smart Load Optimization Demo", 10, 28);
 
         // Company Info
         const companyName = (currentCompanyData && currentCompanyData.name) || "Logixperts";
@@ -2306,7 +1889,7 @@
         y += 10;
         docPDF.setFontSize(8);
         docPDF.setTextColor(128, 128, 128);
-        docPDF.text("This report was generated by Smart Load Analyzer - Naqlthon 4", 10, y);
+        docPDF.text("This report was generated by Smart Load Analyzer - Naqlthon 4 Demo", 10, y);
 
         docPDF.save("SmartLoad_Report.pdf");
 
@@ -2327,7 +1910,6 @@
       document.getElementById("tab_dashboard").style.display = "none";
       document.getElementById("tab_analyze").style.display = "none";
       document.getElementById("tab_opt").style.display = "none";
-      document.getElementById("tab_drivers").style.display = "none";
 
       // FIX: Initialize hero metrics as hidden (dash) before login
       updateHeroVisibility();
@@ -2358,219 +1940,17 @@
       applyLanguage();
       populateOptimizationTableInitial();
       initMap();
-      
-      // Initialize drivers monitoring
-      if (typeof initDriversMonitoring === 'function') {
-        initDriversMonitoring();
-      }
     });
 
-    // ========== DRIVERS MONITORING ==========
-    let driversMap = null;
-    let driverMarkers = {};
-    let driversUnsubscribe = null;
-    let chatUnsubscribes = {};
-
-    function initDriversMonitoring() {
-      // Initialize drivers map
-      const mapEl = document.getElementById('driversMap');
-      if (mapEl && !driversMap) {
-        driversMap = L.map('driversMap').setView([24.7, 44], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(driversMap);
-        
-        // Add city markers
-        const cities = { 'Riyadh': [24.7136, 46.6753], 'Jeddah': [21.4858, 39.1925], 'Dammam': [26.4207, 50.0888] };
-        Object.entries(cities).forEach(([name, coords]) => {
-          L.circleMarker(coords, { radius: 6, fillColor: '#22c55e', color: '#166534', weight: 2, fillOpacity: 0.8 })
-            .addTo(driversMap).bindTooltip(name);
-        });
-      }
-    }
-
-    function startDriversSync() {
-      if (!companyCode || driversUnsubscribe) return;
-      
-      const driversRef = collection(db, 'drivers');
-      const q = query(driversRef, where('companyCode', '==', companyCode));
-      
-      driversUnsubscribe = onSnapshot(q, (snapshot) => {
-        const drivers = [];
-        snapshot.forEach(doc => drivers.push({ id: doc.id, ...doc.data() }));
-        renderDriversGrid(drivers);
-        updateDriversMap(drivers);
-      }, (err) => {
-        console.log('Drivers sync error:', err);
-      });
-    }
-
-    function renderDriversGrid(drivers) {
-      const grid = document.getElementById('driversGrid');
-      if (!grid) return;
-      
-      if (drivers.length === 0) {
-        grid.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: var(--muted); grid-column: 1/-1;">
-            <div style="font-size: 48px; margin-bottom: 12px;">📡</div>
-            <div>No active drivers</div>
-            <div style="font-size: 12px; margin-top: 4px;">Drivers will appear here when they log in</div>
-          </div>`;
-        return;
-      }
-      
-      grid.innerHTML = drivers.map(d => {
-        const statusLabels = { 
-          ready: '✅ Ready', arrived: '📍 Arrived', loaded: '📦 Loaded', 
-          transit: '🚚 In Transit', done: '🏁 Done', offline: '⚫ Offline' 
-        };
-        const status = d.status || 'offline';
-        const assignment = d.currentAssignment;
-        const location = d.currentLocation;
-        
-        return `
-          <div class="driver-card" data-driver-id="${d.id}">
-            <div class="driver-card-header">
-              <div>
-                <div class="driver-name">🚚 ${d.name || 'Driver ' + d.driverId}</div>
-                <div class="driver-id">ID: ${d.driverId} | Truck #${d.driverId}</div>
-              </div>
-              <span class="driver-status status-${status}">${statusLabels[status] || statusLabels.offline}</span>
-            </div>
-            
-            <div class="driver-info-row">
-              <span class="driver-info-label">📍 Location</span>
-              <span class="driver-info-value">${location ? location.latitude.toFixed(4) + ', ' + location.longitude.toFixed(4) : 'Unknown'}</span>
-            </div>
-            
-            ${assignment ? `
-              <div class="driver-info-row">
-                <span class="driver-info-label">🎯 Route</span>
-                <span class="driver-info-value">${assignment.origin || '?'} → ${assignment.destination || '?'}</span>
-              </div>
-              <div class="driver-info-row">
-                <span class="driver-info-label">📦 Load</span>
-                <span class="driver-info-value">${assignment.weight || '?'} tons</span>
-              </div>
-            ` : `
-              <div class="driver-info-row">
-                <span class="driver-info-label">🎯 Assignment</span>
-                <span class="driver-info-value">No active assignment</span>
-              </div>
-            `}
-            
-            <div class="driver-chat-box" id="chat-${d.id}">
-              <div style="text-align: center; color: var(--muted); font-size: 11px;">Loading chat...</div>
-            </div>
-            
-            <div class="driver-chat-input">
-              <input type="text" placeholder="Message driver..." id="input-${d.id}" onkeypress="if(event.key==='Enter')sendToDriver('${d.id}')" />
-              <button onclick="sendToDriver('${d.id}')">Send</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      // Start chat listeners for each driver
-      drivers.forEach(d => startChatListener(d.id));
-    }
-
-    function startChatListener(driverId) {
-      if (chatUnsubscribes[driverId]) chatUnsubscribes[driverId]();
-      
-      const chatRef = collection(db, 'drivers', driverId, 'chat');
-      const q = query(chatRef, orderBy('timestamp', 'asc'));
-      
-      chatUnsubscribes[driverId] = onSnapshot(q, (snapshot) => {
-        const messages = [];
-        snapshot.forEach(doc => messages.push(doc.data()));
-        renderChatMessages(driverId, messages);
-      });
-    }
-
-    function renderChatMessages(driverId, messages) {
-      const chatBox = document.getElementById('chat-' + driverId);
-      if (!chatBox) return;
-      
-      if (messages.length === 0) {
-        chatBox.innerHTML = '<div style="text-align: center; color: var(--muted); font-size: 11px;">No messages yet</div>';
-        return;
-      }
-      
-      chatBox.innerHTML = messages.slice(-10).map(m => `
-        <div class="driver-chat-bubble ${m.sender === 'driver' ? 'chat-from-driver' : 'chat-from-admin'}">
-          ${m.sender === 'driver' ? '🚚' : '🏢'} ${m.text}
-        </div>
-      `).join('');
-      
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    async function sendToDriver(driverId) {
-      const input = document.getElementById('input-' + driverId);
-      if (!input) return;
-      
-      const text = input.value.trim();
-      if (!text) return;
-      
-      input.value = '';
-      
-      try {
-        await addDoc(collection(db, 'drivers', driverId, 'chat'), {
-          text: text,
-          sender: 'admin',
-          timestamp: serverTimestamp()
-        });
-      } catch (e) {
-        console.error('Failed to send message:', e);
-      }
-    }
-    window.sendToDriver = sendToDriver;
-
-    function updateDriversMap(drivers) {
-      if (!driversMap) return;
-      
-      // Clear old markers
-      Object.values(driverMarkers).forEach(m => driversMap.removeLayer(m));
-      driverMarkers = {};
-      
-      // Add new markers
-      drivers.forEach(d => {
-        if (d.currentLocation) {
-          const { latitude, longitude } = d.currentLocation;
-          const statusColors = {
-            ready: '#22c55e', arrived: '#eab308', loaded: '#3b82f6',
-            transit: '#a855f7', done: '#22c55e', offline: '#6b7280'
-          };
-          const color = statusColors[d.status] || statusColors.offline;
-          
-          const marker = L.circleMarker([latitude, longitude], {
-            radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: 1
-          }).addTo(driversMap);
-          
-          marker.bindTooltip(`🚚 ${d.name || 'Driver ' + d.driverId}<br>Status: ${d.status || 'offline'}`, { direction: 'top' });
-          
-          driverMarkers[d.id] = marker;
-        }
-      });
-      
-      // Fit bounds if we have markers
-      const positions = Object.values(driverMarkers).map(m => m.getLatLng());
-      if (positions.length > 0) {
-        driversMap.fitBounds(positions.map(p => [p.lat, p.lng]), { padding: [50, 50], maxZoom: 10 });
-      }
-    }
-
-    // Call startDriversSync after login
-    const originalDemoLogin = window.demoLogin;
-    window.demoLogin = async function() {
-      await originalDemoLogin();ال
-      if (isLoggedIn) {
-        document.getElementById('tab_drivers').style.display = 'inline-flex';
-        setTimeout(() => {
-          initDriversMonitoring();
-          startDriversSync();
-        }, 500);
-      }
-    };
+    // expose for HTML
+    window.toggleLanguage = toggleLanguage;
+    window.togglePassword = togglePassword;
+    window.demoLogin = demoLogin;
+    window.signUp = signUp;
+    window.runOptimization = runOptimization;
+    window.analyzeCSV = analyzeCSV;
+    window.generatePdfReport = generatePdfReport;
+    window.sendAIMessage = sendAIMessage;
   </script>
 </body>
 </html>
