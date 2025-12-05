@@ -236,13 +236,6 @@
     .kpi-value{font-size:18px;font-weight:700;margin-bottom:2px;}
     .kpi-footnote{font-size:11px;color:#4ade80;}
 
-    #analyzeChart{
-      width:100% !important;
-      height:220px !important;
-      max-height:220px !important;
-      display:block;
-    }
-
     #map{
       width:100%;
       height:230px;
@@ -371,10 +364,6 @@
 
     .support-icon{
       font-size:13px;
-    }
-
-    .analyze-chart-card {
-      margin-top: 14px;
     }
 
     footer{margin-top:4px;font-size:10px;color:#4b5563;text-align:right;}
@@ -786,17 +775,6 @@
             <p id="pdf_message" class="hint"></p>
           </div>
         </div>
-
-        <!-- ANALYZE CHART -->
-        <div class="card analyze-chart-card">
-          <div class="card-header">
-            <div>
-              <div class="card-title" id="chart_title">Before vs After (Load, Cost, CO₂)</div>
-              <div class="card-sub" id="chart_sub">Comparison of key KPIs before and after the last optimization.</div>
-            </div>
-          </div>
-          <canvas id="analyzeChart"></canvas>
-        </div>
       </section>
 
       <!-- OPTIMIZATION -->
@@ -821,6 +799,16 @@
             <p class="opt-summary" id="opt-summary">
               Run manual or CSV analysis to see results.
             </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title" id="chart_title">KPIs Before vs After</div>
+                <div class="card-sub" id="chart_sub">Avg Load, Cost, CO₂ comparison</div>
+              </div>
+            </div>
+            <canvas id="optChart"></canvas>
           </div>
         </div>
       </section>
@@ -970,8 +958,8 @@
         opt_col_load: "Load Factor",
         opt_col_ai: "AI Suggestion",
 
-        chart_title: "Before vs After (Load, Cost, CO₂)",
-        chart_sub: "Comparison of key KPIs before and after the last optimization.",
+        chart_title: "KPIs Before vs After",
+        chart_sub: "Avg Load, Cost, CO₂ comparison",
 
         support_title: "Customer Support",
         support_phone_label: "Phone:",
@@ -1062,8 +1050,8 @@
         opt_col_load: "نسبة التحميل",
         opt_col_ai: "اقتراح الذكاء الاصطناعي",
 
-        chart_title: "قبل وبعد (التحميل، التكلفة، الكربون)",
-        chart_sub: "مقارنة مؤشرات الأداء الرئيسية قبل وبعد آخر عملية تحسين.",
+        chart_title: "المؤشرات قبل وبعد",
+        chart_sub: "متوسط التحميل، التكلفة، وانبعاثات CO₂",
 
         support_title: "دعم العملاء",
         support_phone_label: "الهاتف:",
@@ -1113,13 +1101,13 @@
     let currentCompanyData = null;
     let companyStats = null;
 
-    // آخر نتيجة تحسين (عشان جدول الشاحنات + PDF)
-    let lastOptimizationLoads = null; // { "Truck #1": {before, after}, ... }
+    // آخر نتيجة تحسين (عشان جدول الشاحنات + PDF + الرسم)
+    let lastOptimizationLoads = null;
     let lastAfterAvgLoad = null;
     let lastCostAfter = null;
     let lastCO2After = null;
 
-    let analyzeChart = null;
+    let optChart = null;
     let mapInstance = null;
 
     // ========== UI HELPERS ==========
@@ -1135,11 +1123,9 @@
         else tab.classList.remove("active");
       });
 
-      // إصلاح مشكلة الخريطة (تحديث الحجم بعد إظهار التاب)
+      // إصلاح الخريطة كل ما ندخل على الداشبورد
       if (viewId === "dashboard-view" && mapInstance) {
-        setTimeout(() => {
-          mapInstance.invalidateSize();
-        }, 200);
+        setTimeout(() => mapInstance.invalidateSize(), 200);
       }
     }
 
@@ -1164,18 +1150,6 @@
       const kpiCostBefore = document.getElementById("kpi-cost-before");
       const kpiCO2Before  = document.getElementById("kpi-co2-before");
 
-      // لو ما فيه بيانات شركة → نخفي الأرقام (نستخدم شرطات فقط)
-      if (!companyStats) {
-        if (heroLoad) heroLoad.textContent = "–";
-        if (heroCost) heroCost.textContent = "–";
-        if (heroCO2)  heroCO2.textContent  = "–";
-
-        if (kpiLoadBefore) kpiLoadBefore.textContent = "–";
-        if (kpiCostBefore) kpiCostBefore.textContent = "–";
-        if (kpiCO2Before)  kpiCO2Before.textContent  = "–";
-        return;
-      }
-
       const baseLoadPct = (baselineAvgLoad * 100).toFixed(0);
 
       if (heroLoad) heroLoad.textContent = baseLoadPct + "%";
@@ -1197,9 +1171,9 @@
           companyStats = currentCompanyData.stats;
           const { loadPct, costPerDay, co2PerDay } = companyStats;
 
-          if (!isNaN(loadPct)) baselineAvgLoad = loadPct / 100;
-          if (!isNaN(costPerDay)) baselineCost = costPerDay;
-          if (!isNaN(co2PerDay)) baselineCO2 = co2PerDay;
+          if (loadPct && !isNaN(loadPct)) baselineAvgLoad = loadPct / 100;
+          if (costPerDay && !isNaN(costPerDay)) baselineCost = costPerDay;
+          if (co2PerDay && !isNaN(co2PerDay)) baselineCO2 = co2PerDay;
         }
       } else {
         currentCompanyData = { name: "Logixperts", email: "demo@logixperts.sa" };
@@ -1305,10 +1279,8 @@
       const costPerDay = parseFloat(costInput.value || "0");
       const co2PerDay  = parseFloat(co2Input.value || "0");
 
-      if (
-        isNaN(loadPct) || isNaN(costPerDay) || isNaN(co2PerDay) ||
-        loadPct < 0 || loadPct > 100
-      ) {
+      if (isNaN(loadPct) || isNaN(costPerDay) || isNaN(co2PerDay) ||
+          loadPct < 0 || loadPct > 100) {
         if (hint) {
           hint.textContent =
             currentLang === "ar"
@@ -1336,7 +1308,7 @@
             : "Company metrics saved successfully.";
       }
 
-      if (analyzeChart && lastAfterAvgLoad != null) {
+      if (lastAfterAvgLoad != null) {
         updateCharts(lastAfterAvgLoad, lastCostAfter ?? baselineCost, lastCO2After ?? baselineCO2);
       }
     }
@@ -1354,18 +1326,15 @@
     }
 
     // ========== CHARTS ==========
-    function initCharts(afterAvgLoad) {
-      const canvas = document.getElementById("analyzeChart");
+    function initChart(afterAvgLoad, costAfter, co2After) {
+      const canvas = document.getElementById("optChart");
       if (!canvas) return;
-      const ctx = canvas.getContext("2d");
+      const ctxOpt  = canvas.getContext("2d");
 
       const beforeLoadPct = baselineAvgLoad * 100;
       const afterLoadPct  = afterAvgLoad * 100;
 
-      const costAfter  = lastCostAfter ?? baselineCost;
-      const co2After   = lastCO2After ?? baselineCO2;
-
-      analyzeChart = new Chart(ctx, {
+      optChart = new Chart(ctxOpt, {
         type: "bar",
         data: {
           labels: ["Avg Load (%)", "Cost / day", "CO₂ / day"],
@@ -1379,32 +1348,51 @@
               data: [afterLoadPct, costAfter, co2After]
             }
           ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                color: "#e5e7eb",
+                font: { size: 11 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#9ca3af" },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: "#9ca3af" },
+              grid: { color: "#1f2937" }
+            }
+          }
         }
       });
     }
 
     function updateCharts(afterAvgLoad, costAfter, co2After) {
-      lastAfterAvgLoad = afterAvgLoad;
-      lastCostAfter = costAfter;
-      lastCO2After = co2After;
-
-      if (!analyzeChart) {
-        initCharts(afterAvgLoad);
+      if (!optChart) {
+        initChart(afterAvgLoad, costAfter, co2After);
         return;
       }
 
       const beforeLoadPct = baselineAvgLoad * 100;
       const afterLoadPct  = afterAvgLoad * 100;
 
-      analyzeChart.data.datasets[0].data = [beforeLoadPct, baselineCost, baselineCO2];
-      analyzeChart.data.datasets[1].data = [afterLoadPct, costAfter, co2After];
-      analyzeChart.update();
+      optChart.data.datasets[0].data = [beforeLoadPct, baselineCost, baselineCO2];
+      optChart.data.datasets[1].data = [afterLoadPct, costAfter, co2After];
+      optChart.update();
     }
 
     // ========== MAP ==========
     function initMap() {
       if (mapInstance || !window.L) return;
-      const center = [23.8859, 45.0792]; // KSA center-ish
+      const center = [23.8859, 45.0792];
       mapInstance = L.map("map").setView(center, 6);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -1417,9 +1405,7 @@
         Dammam: [26.4207, 50.0888]
       };
 
-      const markerStyle = {
-        radius: 7,
-      };
+      const markerStyle = { radius: 7 };
 
       function addCityMarker(name, coord, color) {
         L.circleMarker(coord, { ...markerStyle, color, fillColor: color, fillOpacity: 0.8 })
@@ -1437,6 +1423,11 @@
 
       L.polyline([riyadh, jeddah], { weight: 2 }).addTo(mapInstance);
       L.polyline([riyadh, dammam], { weight: 2 }).addTo(mapInstance);
+
+      // إصلاح حجم الخريطة بعد الإنشاء
+      setTimeout(() => {
+        if (mapInstance) mapInstance.invalidateSize();
+      }, 200);
     }
 
     // ========== OPTIMIZATION TABLE ==========
