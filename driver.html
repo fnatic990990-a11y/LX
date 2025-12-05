@@ -6,251 +6,317 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
   <style>
     :root {
       --bg: #020617;
       --card: #111827;
       --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.15);
       --text: #e5e7eb;
       --muted: #9ca3af;
       --border: #1f2937;
+      --red: #ef4444;
+      --blue: #3b82f6;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui; }
 
-    body { background: #020617; color: var(--text); padding: 20px; }
+    body {
+      background: radial-gradient(circle at top, #111827, #020617 60%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-    /* LOGIN SCREEN */
-    #loginScreen {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
+    /* HEADER */
+    .header {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      z-index: 1000;
+      margin-bottom: 25px;
     }
 
-    .login-box {
-      width: 360px;
-      padding: 30px;
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .logout-btn {
+      background: #dc2626;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    @media(max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      padding: 22px;
       background: var(--card);
-      border-radius: 18px;
       border: 1px solid var(--border);
-      text-align: center;
+      border-radius: 18px;
     }
 
-    .login-box h2 {
-      margin-bottom: 20px;
-      font-size: 22px;
+    .title {
+      font-size: 20px;
+      margin-bottom: 12px;
       font-weight: 700;
       color: var(--accent);
     }
 
-    .input {
+    /* STATUS BAR */
+    .status-bar {
+      background: #166534;
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 600;
+      color: #d1fae5;
+      margin-top: 10px;
+    }
+
+    /* MAP */
+    #map {
+      width: 100%;
+      height: 240px; /* الحجم القديم */
+      border-radius: 12px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    /* UPDATE BUTTONS */
+    .updates {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .update-btn {
+      flex: 1;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      transition: 0.2s;
+    }
+
+    .update-btn:hover {
+      border-color: var(--accent);
+      background: rgba(34, 197, 94, 0.15);
+    }
+
+    .chat-btn {
+      margin-top: 14px;
+      padding: 18px;
+      background: var(--accent);
+      color: black;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* LOGIN MODAL */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal-box {
+      background: var(--card);
+      padding: 30px;
+      border-radius: 18px;
+      width: 340px;
+      border: 1px solid var(--border);
+    }
+
+    .modal-box h2 {
+      text-align: center;
+      margin-bottom: 18px;
+      color: var(--accent);
+    }
+
+    .modal input {
       width: 100%;
       padding: 12px;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
+      margin-top: 10px;
       background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
       color: var(--text);
     }
 
-    .login-btn {
+    .modal button {
+      margin-top: 16px;
       width: 100%;
       padding: 12px;
       background: var(--accent);
       border: none;
       border-radius: 10px;
-      color: #000;
-      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
-      font-weight: 700;
     }
-
-    /* DRIVER PAGE */
-    #driverPage { display: none; }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .logo { font-size: 26px; font-weight: 800; color: var(--accent); }
-
-    .logout { background: #dc2626; padding: 8px 15px; border-radius: 10px; cursor: pointer; }
-
-    .card {
-      background: var(--card);
-      padding: 20px;
-      margin-bottom: 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-    }
-
-    .title { font-size: 20px; color: var(--accent); margin-bottom: 10px; }
-
-    .status-bar {
-      background: #166534;
-      padding: 12px;
-      color: #d1fae5;
-      text-align: center;
-      font-weight: 700;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    #map { width: 100%; height: 230px; border-radius: 12px; margin-top: 10px; }
-
-    .updates { display: flex; gap: 10px; margin-top: 10px; }
-    .update-btn {
-      flex: 1;
-      background: #0f172a;
-      padding: 14px;
-      border-radius: 12px;
-      text-align: center;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: .2s;
-    }
-    .update-btn:hover { background: rgba(34,197,94,0.15); border-color: var(--accent); }
-
-    #toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--accent);
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-weight: 700;
-      display: none;
-      color: #000;
-    }
-
   </style>
 </head>
 
 <body>
 
-<!-- 🔵 LOGIN SCREEN -->
-<div id="loginScreen">
-  <div class="login-box">
-    <h2>Driver Login</h2>
+  <!-- LOGIN MODAL -->
+  <div class="modal" id="loginModal">
+    <div class="modal-box">
+      <h2>Driver Login</h2>
 
-    <input id="companyCode" class="input" placeholder="Company Code" />
-    <input id="driverId" class="input" placeholder="Driver ID" />
+      <input id="companyCode" placeholder="Company Code" />
+      <input id="driverId" placeholder="Driver ID" />
 
-    <button class="login-btn" onclick="loginDriver()">Enter</button>
+      <button onclick="enterPortal()">Enter</button>
+    </div>
   </div>
-</div>
 
-<!-- 🟢 DRIVER PAGE -->
-<div id="driverPage">
-
+  <!-- HEADER -->
   <div class="header">
     <div class="logo">LOGIXPERTS</div>
-    <div class="logout" onclick="location.reload()">Logout</div>
+    <button class="logout-btn" onclick="location.reload()">Logout</button>
   </div>
 
+  <!-- DRIVER CARD -->
   <div class="card">
-    <h2 class="title">Driver Portal</h2>
-    <div class="status-bar" id="driverStatus">✔ Ready</div>
+    <h2 class="title" id="driverTitle">Driver</h2>
+    <p id="driverInfo">ID: - | Company: -</p>
+    <div class="status-bar" id="statusBar">✔ Ready</div>
   </div>
 
-  <div class="card">
-    <h2 class="title">📦 Current Assignment</h2>
-    <p style="color:var(--muted)">No active assignment<br>Waiting for dispatch…</p>
+  <div class="grid">
+
+    <!-- CURRENT ASSIGNMENT -->
+    <div class="card">
+      <h2 class="title">📦 Current Assignment</h2>
+
+      <p style="text-align:center;margin-top:60px;color:var(--muted);font-size:17px;">
+        No active assignment<br>Waiting for dispatch...
+      </p>
+    </div>
+
+    <!-- MAP -->
+    <div class="card">
+      <h2 class="title">🗺️ Route Map</h2>
+      <div id="map"></div>
+
+      <div style="font-size:13px; margin-top:6px;">
+        <span style="color:var(--blue)">●</span> Your Location —
+        <span style="color:var(--red)">●</span> Destination
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2 class="title">🗺 Route Map</h2>
-    <div id="map"></div>
-  </div>
-
-  <div class="card">
+  <!-- UPDATE STATUS -->
+  <div class="card" style="margin-top:20px;">
     <h2 class="title">⚡ Update Status</h2>
+
     <div class="updates">
       <div class="update-btn" onclick="updateStatus('Arrived')">📍 Arrived</div>
       <div class="update-btn" onclick="updateStatus('Loaded')">✅ Loaded</div>
       <div class="update-btn" onclick="updateStatus('Transit')">🚚 Transit</div>
       <div class="update-btn" onclick="updateStatus('Done')">🏁 Done</div>
     </div>
+
+    <div class="chat-btn">💬 Chat with Dispatch</div>
   </div>
-</div>
 
-<div id="toast"></div>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    /* ---------------- LOGIN ---------------- */
 
-<script>
+    function enterPortal() {
+      const c = document.getElementById("companyCode").value;
+      const d = document.getElementById("driverId").value;
 
-function loginDriver() {
-  let c = document.getElementById("companyCode").value.trim();
-  let d = document.getElementById("driverId").value.trim();
+      if (c && d) {
+        document.getElementById("driverTitle").innerText = "Driver " + d;
+        document.getElementById("driverInfo").innerText = `ID: ${d} | Company: ${c}`;
+        document.getElementById("loginModal").style.display = "none";
+      }
+    }
 
-  if (c === "" || d === "") {
-    alert("Enter Company Code & Driver ID");
-    return;
-  }
+    /* ---------------- STATUS UPDATE ---------------- */
 
-  document.getElementById("loginScreen").style.display = "none";
-  document.getElementById("driverPage").style.display = "block";
+    function updateStatus(txt) {
+      const bar = document.getElementById("statusBar");
 
-  initMap();
-}
+      const colors = {
+        "Arrived": "#0ea5e9",
+        "Loaded": "#22c55e",
+        "Transit": "#facc15",
+        "Done": "#a855f7"
+      };
 
-/* ---------------- MAP + ROUTE ---------------- */
-function initMap() {
-  const driver = [24.7136, 46.6753]; // Riyadh
-  const dest = [21.3891, 39.8579]; // Jeddah
+      bar.style.background = colors[txt];
+      bar.innerText = txt;
+    }
 
-  const map = L.map("map").setView(driver, 6);
+    /* ---------------- MAP ---------------- */
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-    .addTo(map);
+    const driverLat = 24.7136; // Riyadh
+    const driverLng = 46.6753;
 
-  L.marker(driver, { icon: blueDot() }).addTo(map).bindPopup("Your Location");
-  L.marker(dest, { icon: redDot() }).addTo(map).bindPopup("Destination");
+    const destLat = 21.4858; // Jeddah
+    const destLng = 39.1925;
 
-  // Draw Route
-  const route = L.polyline([driver, dest], {
-    color: "#22c55e",
-    weight: 5,
-    opacity: 0.8
-  }).addTo(map);
+    const map = L.map('map').setView([driverLat, driverLng], 6);
 
-  map.fitBounds(route.getBounds());
-}
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-function blueDot() {
-  return L.divIcon({
-    html: `<div style="background:#3b82f6;width:14px;height:14px;border-radius:50%;border:2px solid white;"></div>`
-  });
-}
+    const driverMarker = L.circleMarker([driverLat, driverLng], {
+      radius: 7,
+      color: "#3b82f6",
+      fillColor: "#3b82f6",
+      fillOpacity: 1
+    }).addTo(map);
 
-function redDot() {
-  return L.divIcon({
-    html: `<div style="background:#ef4444;width:14px;height:14px;border-radius:50%;border:2px solid white;"></div>`
-  });
-}
+    const destMarker = L.circleMarker([destLat, destLng], {
+      radius: 7,
+      color: "#ef4444",
+      fillColor: "#ef4444",
+      fillOpacity: 1
+    }).addTo(map);
 
-/* --------------- STATUS UPDATE TOAST ---------------- */
-function updateStatus(status) {
-  let toast = document.getElementById("toast");
-  toast.innerText = "Status Updated: " + status;
-  toast.style.display = "block";
-
-  setTimeout(() => toast.style.display = "none", 2500);
-
-  document.getElementById("driverStatus").innerText = "✔ " + status;
-}
-
-</script>
+    // Route Line
+    const routeLine = L.polyline(
+      [
+        [driverLat, driverLng],
+        [destLat, destLng]
+      ],
+      { color: "#22c55e", weight: 5 }
+    ).addTo(map);
+  </script>
 
 </body>
 </html>
