@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
   <style>
     :root {
@@ -20,7 +20,9 @@
       --red: #ef4444;
       --blue: #3b82f6;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui; }
+
+    * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui; }
+
     body {
       background: radial-gradient(circle at top, #111827, #020617 60%);
       color: var(--text);
@@ -28,183 +30,297 @@
       padding: 20px;
     }
 
+    /* LOGIN SCREEN */
+    #loginScreen {
+      position: fixed;
+      inset:0;
+      background: rgba(0,0,0,0.8);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      backdrop-filter: blur(4px);
+    }
+
+    .login-box {
+      background: var(--card);
+      padding: 25px;
+      border-radius: 16px;
+      width: 320px;
+      border:1px solid var(--border);
+      text-align:center;
+    }
+    .login-box input {
+      width:100%;
+      padding:10px;
+      margin:8px 0;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:#0f172a;
+      color:white;
+    }
+    .login-btn {
+      margin-top:10px;
+      padding:10px;
+      width:100%;
+      background:var(--accent);
+      border:none;
+      cursor:pointer;
+      border-radius:8px;
+      font-weight:700;
+    }
+
     /* HEADER */
     .header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 25px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:25px;
     }
-    .logo { font-size: 26px; font-weight: 800; color: var(--accent); }
-    .lang-box { display: flex; gap: 6px; }
-    .lang-btn, .logout-btn {
-      padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer;
+    .logo { font-size:26px; font-weight:800; color:var(--accent); }
+
+    .lang-box { display:flex; gap:6px; }
+    .lang-btn {
+      padding:6px 14px;
+      border-radius:8px;
+      background:var(--card);
+      border:none;
+      color:white;
     }
-    .lang-btn { background: var(--card); color: var(--text); }
-    .logout-btn { background: #dc2626; color: white; }
+    .logout-btn {
+      background:#dc2626;
+      color:white;
+      padding:6px 14px;
+      border-radius:8px;
+      cursor:pointer;
+    }
 
     /* CARDS */
     .card {
-      padding: 22px; background: var(--card);
-      border-radius: 18px; border: 1px solid var(--border);
+      padding:22px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      margin-bottom:20px;
     }
-    .title { font-size: 20px; margin-bottom: 12px; color: var(--accent); font-weight: 700; }
+    .title { color:var(--accent); font-size:20px; font-weight:700; margin-bottom:12px; }
 
     /* GRID */
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-    @media(max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-
-    /* STATUS */
-    .status-bar {
-      background: #166534; color: #d1fae5;
-      padding: 12px; border-radius: 12px; text-align: center; font-weight: 600;
-      margin-top: 10px;
+    .grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:22px;
     }
-    #liveStatus { margin-top: 8px; font-size: 15px; color: var(--muted); }
+    @media(max-width:800px) {
+      .grid { grid-template-columns:1fr; }
+    }
 
     /* MAP */
-    #map {
-      width: 100%; height: 260px; border-radius: 12px; margin-bottom: 10px;
-    }
+    #map { width:100%; height:260px; border-radius:12px; }
 
-    /* STATUS BUTTONS */
-    .updates { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    /* UPDATE BUTTONS */
+    .updates { display:flex; gap:10px; flex-wrap:wrap; }
     .update-btn {
-      flex: 1; padding: 16px; border-radius: 12px;
-      text-align: center; cursor: pointer;
-      background: var(--bg); border: 1px solid var(--border);
-      transition: 0.2s;
+      flex:1;
+      padding:16px;
+      border-radius:12px;
+      text-align:center;
+      cursor:pointer;
+      background:var(--bg);
+      border:1px solid var(--border);
+      transition:0.2s;
     }
-    .update-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .update-btn:hover { background:rgba(34,197,94,0.15); border-color:var(--accent); }
 
+    /* CHAT */
     .chat-btn {
-      margin-top: 14px; padding: 18px; background: var(--accent);
-      color: black; border-radius: 12px; cursor: pointer; font-weight: 700;
-      text-align: center;
+      margin-top:14px;
+      padding:18px;
+      background:var(--accent);
+      border-radius:12px;
+      text-align:center;
+      font-weight:700;
+      cursor:pointer;
+      color:black;
+    }
+
+    /* TOAST */
+    #toast {
+      position:fixed;
+      top:20px;
+      right:20px;
+      background:#22c55e;
+      padding:12px 20px;
+      border-radius:10px;
+      display:none;
+      color:black;
+      font-weight:700;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo">LOGIXPERTS</div>
-    <div class="lang-box">
-      <button class="lang-btn">EN</button>
-      <button class="lang-btn">عربي</button>
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h2 style="margin-bottom:10px;">Driver Login</h2>
+    <input id="companyInput" placeholder="Company Code">
+    <input id="driverInput" placeholder="Driver ID">
+    <button class="login-btn" onclick="login()">Enter</button>
   </div>
+</div>
 
-  <!-- DRIVER CARD -->
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">LOGIXPERTS</div>
+  <div class="lang-box">
+    <button class="lang-btn">EN</button>
+    <button class="lang-btn">عربي</button>
+    <button class="logout-btn" onclick="location.reload()">Logout</button>
+  </div>
+</div>
+
+<!-- DRIVER CARD -->
+<div class="card">
+  <h2 class="title">Driver e1e</h2>
+  <p>ID: e1e | Company: CSE</p>
+  <div class="status-bar" id="statusBar" style="background:#166534;padding:14px;border-radius:12px;text-align:center;font-weight:600;">
+    ✔ Ready
+  </div>
+</div>
+
+<div class="grid">
+  <!-- CURRENT ASSIGNMENT -->
   <div class="card">
-    <h2 class="title" id="driverName">Driver</h2>
-    <p id="driverInfo">ID: --- | Company: ---</p>
-    <div class="status-bar">✔ Ready</div>
-    <p id="liveStatus">No updates yet...</p>
+    <h2 class="title">📦 Current Assignment</h2>
+    <p style="text-align:center;margin-top:60px;color:var(--muted);font-size:17px;">
+      No active assignment<br>Waiting for dispatch...
+    </p>
   </div>
 
-  <div class="grid">
+  <!-- MAP -->
+  <div class="card">
+    <h2 class="title">🗺️ Route Map</h2>
+    <div id="map"></div>
 
-    <!-- ASSIGNMENT -->
-    <div class="card">
-      <h2 class="title">📦 Current Assignment</h2>
-      <p style="text-align:center;margin-top:60px;color:var(--muted);font-size:17px;">
-        No active assignment<br>Waiting for dispatch...
-      </p>
-    </div>
-
-    <!-- MAP -->
-    <div class="card">
-      <h2 class="title">🗺️ Route Map</h2>
-      <div id="map"></div>
-
-      <div style="font-size:13px; margin-top:6px;">
-        <span style="color:var(--blue)">●</span> Your Location —
-        <span style="color:var(--red)">●</span> Destination
-      </div>
+    <div style="font-size:13px; margin-top:6px;">
+      <span style="color:var(--blue)">●</span> Your Location —
+      <span style="color:var(--red)">●</span> Destination
     </div>
   </div>
+</div>
 
-  <!-- UPDATE STATUS -->
-  <div class="card" style="margin-top:20px;">
-    <h2 class="title">⚡ Update Status</h2>
+<!-- UPDATE STATUS -->
+<div class="card">
+  <h2 class="title">⚡ Update Status</h2>
 
-    <div class="updates">
-      <div class="update-btn" onclick="updateStatus('Arrived')">📍 Arrived</div>
-      <div class="update-btn" onclick="updateStatus('Loaded')">✅ Loaded</div>
-      <div class="update-btn" onclick="updateStatus('Transit')">🚚 Transit</div>
-      <div class="update-btn" onclick="updateStatus('Done')">🏁 Done</div>
-    </div>
-
-    <div class="chat-btn">💬 Chat with Dispatch</div>
+  <div class="updates">
+    <div class="update-btn" onclick="updateStatus('Arrived')">📍 Arrived</div>
+    <div class="update-btn" onclick="updateStatus('Loaded')">✅ Loaded</div>
+    <div class="update-btn" onclick="updateStatus('Transit')">🚚 Transit</div>
+    <div class="update-btn" onclick="updateStatus('Done')">🏁 Done</div>
   </div>
 
-  <!-- Leaflet -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <div class="chat-btn">💬 Chat with Dispatch</div>
+</div>
 
-  <script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    /* ---------------------- LOGIN MOCK ---------------------- */
-    document.addEventListener("DOMContentLoaded", () => {
-      const name = localStorage.getItem("driverName") || "Driver";
-      const company = localStorage.getItem("companyCode") || "N/A";
+<script>
 
-      document.getElementById("driverName").textContent = "Driver " + name;
-      document.getElementById("driverInfo").textContent =
-        `ID: ${name} | Company: ${company}`;
-    });
+/////////////////////
+// LOGIN SYSTEM
+/////////////////////
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
+function login() {
+  let c = document.getElementById("companyInput").value.trim();
+  let d = document.getElementById("driverInput").value.trim();
 
-    /* ---------------------- UPDATE STATUS ---------------------- */
-    function updateStatus(type) {
-      const live = document.getElementById("liveStatus");
+  if (c === "" || d === "") {
+    alert("Please enter both fields.");
+    return;
+  }
 
-      const messages = {
-        Arrived: "Driver has arrived at pickup location.",
-        Loaded: "Shipment has been loaded.",
-        Transit: "Driver is now in transit.",
-        Done: "Delivery completed successfully."
-      };
+  document.getElementById("loginScreen").style.display = "none";
+}
 
-      live.textContent = messages[type];
-      live.style.color = "#22c55e";
-    }
 
-    /* ---------------------- MAP + ROUTE ---------------------- */
+/////////////////////
+// MAP + ROUTE LINE
+/////////////////////
 
-    const driverPos = [24.7136, 46.6753]; // Riyadh
-    const destPos   = [21.3891, 39.8579]; // Jeddah
+const driverLat = 24.7136;  // Riyadh Example
+const driverLng = 46.6753;
 
-    const map = L.map("map").setView(driverPos, 6);
+const destLat = 21.3891;   // Jeddah Example
+const destLng = 39.8579;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+// MAP INIT
+const map = L.map('map').setView([driverLat, driverLng], 6);
 
-    // driver marker
-    L.circleMarker(driverPos, {
-      radius: 9, color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 1
-    }).addTo(map).bindPopup("Your Location");
+// MAP TILES
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    // destination marker
-    L.circleMarker(destPos, {
-      radius: 9, color: "#ef4444", fillColor: "#ef4444", fillOpacity: 1
-    }).addTo(map).bindPopup("Destination");
+// BLUE MARKER
+L.marker([driverLat, driverLng], {
+  icon: L.divIcon({
+    html:`<div style="background:#3b82f6;width:16px;height:16px;border-radius:50%;border:3px solid white;"></div>`
+  })
+}).addTo(map).bindPopup("Your Location");
 
-    // route line
-    const route = L.polyline([driverPos, destPos], {
-      color: "#22c55e",
-      weight: 5,
-      opacity: 0.85,
-      smoothFactor: 1
-    }).addTo(map);
+// RED MARKER
+L.marker([destLat, destLng], {
+  icon: L.divIcon({
+    html:`<div style="background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid white;"></div>`
+  })
+}).addTo(map).bindPopup("Destination");
 
-    // zoom map to route
-    map.fitBounds(route.getBounds());
+// ROUTE LINE (REALISTIC)
+L.polyline(
+  [
+    [driverLat, driverLng],
+    [23.5, 45.2], // نقطة وسط الطريق
+    [22.3, 41.8], // نقطة قبل جدة
+    [destLat, destLng]
+  ],
+  {
+    color: "#22c55e",
+    weight: 4,
+    opacity: 0.9
+  }
+).addTo(map);
 
-  </script>
+
+/////////////////////
+// STATUS UPDATE + TOAST
+/////////////////////
+
+function updateStatus(type) {
+  const statusBar = document.getElementById("statusBar");
+  const toast = document.getElementById("toast");
+
+  let text = "";
+
+  if (type === "Arrived") text = "✔ تم الوصول";
+  if (type === "Loaded") text = "✔ تم التحميل";
+  if (type === "Transit") text = "✔ في الطريق";
+  if (type === "Done") text = "✔ انتهت المهمة";
+
+  statusBar.textContent = text;
+
+  toast.textContent = text;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 2500);
+}
+
+</script>
 
 </body>
 </html>
