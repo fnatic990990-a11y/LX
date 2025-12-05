@@ -775,56 +775,6 @@
             <p id="pdf_message" class="hint"></p>
           </div>
         </div>
-
-        <!-- AI CHAT ASSISTANT (كرت مستقل تحت الكروت الثلاثة) -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-header">
-            <div>
-              <div class="card-title" id="ai_chat_title">AI Chat Assistant</div>
-              <div class="card-sub" id="ai_chat_sub">
-                Ask AI about loads, trips, cost and CO₂ optimization for this company.
-              </div>
-            </div>
-          </div>
-
-          <div
-            id="chat-log"
-            style="
-              max-height: 220px;
-              overflow-y: auto;
-              font-size: 13px;
-              margin-bottom: 10px;
-              padding: 8px;
-              background: #020617;
-              border-radius: 16px;
-              border: 1px solid #1f2937;
-            "
-          ></div>
-
-          <textarea
-            id="chat-input"
-            rows="3"
-            placeholder="اكتب سؤالك عن الرحلات، دمج الشحنات، التكلفة أو الكربون..."
-            style="
-              width: 100%;
-              margin-bottom: 8px;
-              padding: 8px;
-              border-radius: 12px;
-              border: 1px solid #374151;
-              background: #020617;
-              color: #e5e7eb;
-              font-size: 13px;
-            "
-          ></textarea>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            onclick="sendAIMessage()"
-          >
-            إرسال للذكاء الاصطناعي 🤖
-          </button>
-        </div>
       </section>
 
       <!-- OPTIMIZATION -->
@@ -1014,10 +964,7 @@
         support_title: "Customer Support",
         support_phone_label: "Phone:",
         support_email_label: "Email:",
-        support_fax_label: "Fax:",
-
-        ai_chat_title: "AI Chat Assistant",
-        ai_chat_sub: "Ask AI about loads, trips, cost and CO₂ optimization for this company."
+        support_fax_label: "Fax:"
       },
       ar: {
         text_brand: "لوﭬيكسبرتس",
@@ -1109,10 +1056,7 @@
         support_title: "دعم العملاء",
         support_phone_label: "الهاتف:",
         support_email_label: "الإيميل:",
-        support_fax_label: "فاكس:",
-
-        ai_chat_title: "مساعد الذكاء الاصطناعي",
-        ai_chat_sub: "اسأل الذكاء الاصطناعي عن التحميل، الرحلات، التكلفة وانبعاثات CO₂ لشركتك."
+        support_fax_label: "فاكس:"
       }
     };
 
@@ -1720,57 +1664,6 @@
       }
     }
 
-    // ========== AI CHAT ASSISTANT ==========
-    async function sendAIMessage() {
-      const inputEl = document.getElementById("chat-input");
-      const logEl = document.getElementById("chat-log");
-      if (!inputEl || !logEl) return;
-
-      const text = inputEl.value.trim();
-      if (!text) return;
-
-      const youLabel = currentLang === "ar" ? "أنت" : "You";
-      const aiLabel  = "AI";
-
-      logEl.innerHTML += `<div style="margin-bottom: 6px;"><strong>${youLabel}:</strong> ${text}</div>`;
-      inputEl.value = "";
-
-      const loadingId = "ai-loading-" + Date.now();
-      const thinkingText = currentLang === "ar" ? "المساعد يفكر..." : "Assistant is thinking...";
-      logEl.innerHTML += `<div id="${loadingId}" style="margin-bottom: 6px; color: #9ca3af;">${thinkingText}</div>`;
-      logEl.scrollTop = logEl.scrollHeight;
-
-      try {
-        const res = await fetch("http://localhost:3000/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
-        });
-
-        const data = await res.json();
-        const replyText = data && data.reply
-          ? data.reply
-          : (currentLang === "ar"
-              ? "حدثت مشكلة في الرد من خادم الذكاء الاصطناعي."
-              : "There was a problem getting a reply from the AI server.");
-
-        const loadingEl = document.getElementById(loadingId);
-        if (loadingEl) loadingEl.remove();
-
-        logEl.innerHTML += `<div style="margin-bottom: 8px;"><strong>${aiLabel}:</strong> ${replyText}</div>`;
-        logEl.scrollTop = logEl.scrollHeight;
-      } catch (err) {
-        console.error(err);
-        const loadingEl = document.getElementById(loadingId);
-        if (loadingEl) loadingEl.remove();
-        const errorText = currentLang === "ar"
-          ? "تعذر الاتصال بخادم الذكاء الاصطناعي. تأكد أن السيرفر شغال على جهازك."
-          : "Could not connect to the AI server. Make sure the server is running on your machine.";
-        logEl.innerHTML += `<div style="margin-bottom: 8px; color: #f97373;">${errorText}</div>`;
-        logEl.scrollTop = logEl.scrollHeight;
-      }
-    }
-
     // ========== PDF REPORT ==========
     function generatePdfReport() {
       const msg = document.getElementById("pdf_message");
@@ -2033,7 +1926,7 @@
     window.runOptimization = runOptimization;
     window.analyzeCSV = analyzeCSV;
     window.generatePdfReport = generatePdfReport;
-    window.sendAIMessage = sendAIMessage;
   </script>
 </body>
 </html>
+
