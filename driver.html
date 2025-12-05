@@ -6,26 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
     :root {
       --bg: #020617;
       --card: #111827;
       --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.15);
+      --accent-soft: rgba(34,197,94,0.15);
       --text: #e5e7eb;
       --muted: #9ca3af;
       --border: #1f2937;
       --red: #ef4444;
       --blue: #3b82f6;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui; }
-
     body {
       background: radial-gradient(circle at top, #111827, #020617 60%);
       color: var(--text);
@@ -35,117 +30,54 @@
 
     /* HEADER */
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 25px;
     }
-
-    .logo {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: 2px;
+    .logo { font-size: 26px; font-weight: 800; color: var(--accent); }
+    .lang-box { display: flex; gap: 6px; }
+    .lang-btn, .logout-btn {
+      padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer;
     }
+    .lang-btn { background: var(--card); color: var(--text); }
+    .logout-btn { background: #dc2626; color: white; }
 
-    .lang-box {
-      display: flex;
-      gap: 6px;
+    /* CARDS */
+    .card {
+      padding: 22px; background: var(--card);
+      border-radius: 18px; border: 1px solid var(--border);
     }
-
-    .lang-btn {
-      padding: 6px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background: var(--card);
-      color: var(--text);
-    }
-
-    .logout-btn {
-      background: #dc2626;
-      color: white;
-      padding: 6px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-    }
+    .title { font-size: 20px; margin-bottom: 12px; color: var(--accent); font-weight: 700; }
 
     /* GRID */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 22px;
-    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    @media(max-width: 800px) { .grid { grid-template-columns: 1fr; } }
 
-    @media(max-width: 800px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      padding: 22px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-    }
-
-    .title {
-      font-size: 20px;
-      margin-bottom: 12px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    /* STATUS BAR */
+    /* STATUS */
     .status-bar {
-      background: #166534;
-      padding: 14px;
-      border-radius: 12px;
-      text-align: center;
-      font-weight: 600;
-      color: #d1fae5;
+      background: #166534; color: #d1fae5;
+      padding: 12px; border-radius: 12px; text-align: center; font-weight: 600;
       margin-top: 10px;
     }
+    #liveStatus { margin-top: 8px; font-size: 15px; color: var(--muted); }
 
     /* MAP */
     #map {
-      width: 100%;
-      height: 260px;
-      border-radius: 12px;
-      margin-bottom: 10px;
+      width: 100%; height: 260px; border-radius: 12px; margin-bottom: 10px;
     }
 
-    /* UPDATE BUTTONS */
-    .updates {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
+    /* STATUS BUTTONS */
+    .updates { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
     .update-btn {
-      flex: 1;
-      padding: 16px;
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      background: var(--bg);
-      border: 1px solid var(--border);
+      flex: 1; padding: 16px; border-radius: 12px;
+      text-align: center; cursor: pointer;
+      background: var(--bg); border: 1px solid var(--border);
       transition: 0.2s;
     }
-
-    .update-btn:hover {
-      border-color: var(--accent);
-      background: rgba(34, 197, 94, 0.15);
-    }
+    .update-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
 
     .chat-btn {
-      margin-top: 14px;
-      padding: 18px;
-      background: var(--accent);
-      color: black;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 700;
+      margin-top: 14px; padding: 18px; background: var(--accent);
+      color: black; border-radius: 12px; cursor: pointer; font-weight: 700;
       text-align: center;
     }
   </style>
@@ -156,28 +88,26 @@
   <!-- HEADER -->
   <div class="header">
     <div class="logo">LOGIXPERTS</div>
-
     <div class="lang-box">
       <button class="lang-btn">EN</button>
       <button class="lang-btn">عربي</button>
-      <button class="logout-btn">Logout</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </div>
 
   <!-- DRIVER CARD -->
   <div class="card">
-    <h2 class="title">Driver e1e</h2>
-    <p>ID: e1e | Company: CSE</p>
-
+    <h2 class="title" id="driverName">Driver</h2>
+    <p id="driverInfo">ID: --- | Company: ---</p>
     <div class="status-bar">✔ Ready</div>
+    <p id="liveStatus">No updates yet...</p>
   </div>
 
   <div class="grid">
 
-    <!-- CURRENT ASSIGNMENT -->
+    <!-- ASSIGNMENT -->
     <div class="card">
       <h2 class="title">📦 Current Assignment</h2>
-
       <p style="text-align:center;margin-top:60px;color:var(--muted);font-size:17px;">
         No active assignment<br>Waiting for dispatch...
       </p>
@@ -200,49 +130,79 @@
     <h2 class="title">⚡ Update Status</h2>
 
     <div class="updates">
-      <div class="update-btn">📍 Arrived</div>
-      <div class="update-btn">✅ Loaded</div>
-      <div class="update-btn">🚚 Transit</div>
-      <div class="update-btn">🏁 Done</div>
+      <div class="update-btn" onclick="updateStatus('Arrived')">📍 Arrived</div>
+      <div class="update-btn" onclick="updateStatus('Loaded')">✅ Loaded</div>
+      <div class="update-btn" onclick="updateStatus('Transit')">🚚 Transit</div>
+      <div class="update-btn" onclick="updateStatus('Done')">🏁 Done</div>
     </div>
 
     <div class="chat-btn">💬 Chat with Dispatch</div>
   </div>
 
-  <!-- Leaflet JS -->
+  <!-- Leaflet -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // --- DRIVER LOCATION ---
-    const driverLat = 24.7136;   // Riyadh Example
-    const driverLng = 46.6753;
 
-    // --- DESTINATION LOCATION ---
-    const destLat = 21.3891;     // Jeddah Example
-    const destLng = 39.8579;
+    /* ---------------------- LOGIN MOCK ---------------------- */
+    document.addEventListener("DOMContentLoaded", () => {
+      const name = localStorage.getItem("driverName") || "Driver";
+      const company = localStorage.getItem("companyCode") || "N/A";
 
-    // Initialize map
-    const map = L.map('map').setView([driverLat, driverLng], 6);
+      document.getElementById("driverName").textContent = "Driver " + name;
+      document.getElementById("driverInfo").textContent =
+        `ID: ${name} | Company: ${company}`;
+    });
 
-    // Tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-      .addTo(map);
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
 
-    // Driver Marker (blue)
-    L.marker([driverLat, driverLng], {
-      icon: L.divIcon({
-        className: "custom-marker",
-        html: `<div style="background:#3b82f6;width:14px;height:14px;border-radius:50%;border:2px solid white;"></div>`
-      })
+    /* ---------------------- UPDATE STATUS ---------------------- */
+    function updateStatus(type) {
+      const live = document.getElementById("liveStatus");
+
+      const messages = {
+        Arrived: "Driver has arrived at pickup location.",
+        Loaded: "Shipment has been loaded.",
+        Transit: "Driver is now in transit.",
+        Done: "Delivery completed successfully."
+      };
+
+      live.textContent = messages[type];
+      live.style.color = "#22c55e";
+    }
+
+    /* ---------------------- MAP + ROUTE ---------------------- */
+
+    const driverPos = [24.7136, 46.6753]; // Riyadh
+    const destPos   = [21.3891, 39.8579]; // Jeddah
+
+    const map = L.map("map").setView(driverPos, 6);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+    // driver marker
+    L.circleMarker(driverPos, {
+      radius: 9, color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 1
     }).addTo(map).bindPopup("Your Location");
 
-    // Destination (red)
-    L.marker([destLat, destLng], {
-      icon: L.divIcon({
-        className: "custom-marker",
-        html: `<div style="background:#ef4444;width:14px;height:14px;border-radius:50%;border:2px solid white;"></div>`
-      })
+    // destination marker
+    L.circleMarker(destPos, {
+      radius: 9, color: "#ef4444", fillColor: "#ef4444", fillOpacity: 1
     }).addTo(map).bindPopup("Destination");
+
+    // route line
+    const route = L.polyline([driverPos, destPos], {
+      color: "#22c55e",
+      weight: 5,
+      opacity: 0.85,
+      smoothFactor: 1
+    }).addTo(map);
+
+    // zoom map to route
+    map.fitBounds(route.getBounds());
 
   </script>
 
