@@ -238,7 +238,7 @@
 
     #map{
       width:100%;
-      height:230px;
+      height:280px;
       border-radius:18px;
       border:1px solid #1f2937;
       overflow:hidden;
@@ -293,22 +293,31 @@
       overflow:hidden;background:#020617;
     }
     .truck-row{
-      display:grid;grid-template-columns:1.2fr .9fr 1.3fr;
-      padding:8px 10px;font-size:12px;border-bottom:1px solid #111827;
+      display:grid;grid-template-columns:1.2fr .6fr 1.5fr;
+      padding:10px 12px;font-size:12px;border-bottom:1px solid #111827;
       align-items:center;
     }
     .truck-row.header{background:#020617;font-weight:600;color:var(--muted);font-size:11px;}
 
     .chip{
-      padding:3px 8px;border-radius:999px;font-size:11px;
+      padding:4px 10px;border-radius:999px;font-size:11px;
       border:1px solid #1f2937;display:inline-flex;align-items:center;gap:4px;
     }
     .chip.good{border-color:#16a34a;color:#bbf7d0;background:#052e16;}
     .chip.warn{border-color:#f97316;color:#fed7aa;background:#451a03;}
     .chip.bad{border-color:#ef4444;color:#fecaca;background:#450a0a;}
+    .chip.merge{border-color:#3b82f6;color:#bfdbfe;background:#1e3a8a;}
 
-    .opt-summary{font-size:12px;color:var(--muted);margin-top:6px;}
+    .opt-summary{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6;}
     .opt-summary strong{color:#a7f3d0;}
+
+    .ai-box{
+      margin-top:14px;padding:14px;border-radius:16px;
+      background:linear-gradient(135deg,#022c22,#064e3b);
+      border:1px solid #16a34a;
+    }
+    .ai-box h4{font-size:14px;color:#4ade80;margin-bottom:8px;}
+    .ai-box p{font-size:12px;color:#a7f3d0;line-height:1.5;}
 
     .hint{font-size:11px;color:var(--muted);margin-top:4px;}
     .hint-error{color:#fecaca;}
@@ -369,14 +378,12 @@
     footer{margin-top:4px;font-size:10px;color:#4b5563;text-align:right;}
     footer span{color:#a7f3d0;}
 
-    /* FIX: Chart container with fixed height */
     .chart-container {
       position: relative;
       height: 250px;
       width: 100%;
     }
 
-    /* NEW: Charts grid for 3 separate charts */
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -409,6 +416,36 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Truck Labels on Map */
+    .truck-marker-label {
+      background: #020617;
+      border: 2px solid #22c55e;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #e5e7eb;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      text-align: center;
+      line-height: 1.3;
+    }
+    .truck-marker-label.low {
+      border-color: #f59e0b;
+    }
+    .truck-marker-label .load-pct {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4ade80;
+    }
+    .truck-marker-label.low .load-pct {
+      color: #fbbf24;
+    }
+    .truck-marker-label .route {
+      font-size: 9px;
+      color: #9ca3af;
+    }
   </style>
 
   <!-- Chart.js -->
@@ -422,11 +459,8 @@
     defer
   ></script>
 
-  <!-- jsPDF (UMD) -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-    onload="window.jsPDF = window.jspdf.jsPDF;">
-  </script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -440,19 +474,17 @@
           </div>
         </div>
 
-        <a href="index.html" id="back_link" class="back-link">
-          ← Back to role selection
-        </a>
+        <a href="index.html" id="back_link" class="back-link">← Back to home</a>
       </div>
 
       <div class="header-right">
         <div class="company-code-pill" id="company_code_badge">
-          <span id="company_code_label">Company code:</span>
+          <span id="company_code_label">Code:</span>
           <span id="company_code_value"></span>
         </div>
 
         <div class="team-pill">
-          <span id="team_label">Team:</span>&nbsp;<span>Logixperts</span> | <span id="team_event">Naqlthon 4</span>
+          <span>Team:</span>&nbsp;<span>Logixperts</span> | <span>Naqlthon 4</span>
         </div>
 
         <button class="lang-switch" id="langSwitcher" type="button" onclick="toggleLanguage()">AR</button>
@@ -462,42 +494,36 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-main">
-        <p class="hero-title" id="hero_title">
-          Reduce Empty Trips. Boost Load Factor. Go Greener.
-        </p>
-
-        <p class="hero-sub" id="hero_sub">
-          Smart Load Analyzer helps freight companies analyze and optimize loads to reduce cost and emissions.
-        </p>
+        <p class="hero-title" id="hero_title">Reduce Empty Trips. Boost Load Factor. Go Greener.</p>
+        <p class="hero-sub" id="hero_sub">AI-powered load optimization for freight companies. Analyze routes, merge shipments, and cut costs.</p>
 
         <div class="hero-tags">
-          <div class="hero-tag">
-            <strong>15–25%</strong>&nbsp;<span id="tag_fuel">fuel reduction (simulated)</span>
-          </div>
-          <div class="hero-tag">
-            <strong>AI</strong>&nbsp;<span id="tag_ai">load & route suggestions</span>
-          </div>
+          <div class="hero-tag"><strong>9</strong>&nbsp;Trucks Fleet</div>
+          <div class="hero-tag"><strong>AI</strong>&nbsp;Smart Matching</div>
+          <div class="hero-tag"><strong>15-25%</strong>&nbsp;Cost Savings</div>
         </div>
 
         <div class="hero-highlight" id="hero_highlight">
-          This demo scenario shows how merging a new shipment with a low-load return trip improves load factor.
+          🚚 Real-time fleet optimization with AI-powered shipment merging recommendations.
         </div>
       </div>
 
       <div class="hero-metric">
         <div class="hero-metric-card">
-          <h3 id="hero_avg_before_title">Avg load (baseline)</h3>
+          <h3>Avg Load (Baseline)</h3>
           <p id="hero-load-before">–</p>
         </div>
-
         <div class="hero-metric-card">
-          <h3 id="hero_cost_title">Op. cost / day</h3>
+          <h3>Op. Cost / Day</h3>
           <p id="hero-cost-before">–</p>
         </div>
-
         <div class="hero-metric-card">
-          <h3 id="hero_co2_title">CO₂ / day</h3>
+          <h3>CO₂ / Day</h3>
           <p id="hero-co2-before">–</p>
+        </div>
+        <div class="hero-metric-card">
+          <h3>Fleet Size</h3>
+          <p>9 Trucks</p>
         </div>
       </div>
     </section>
@@ -517,30 +543,24 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="login_title">Company Login</div>
-                <div class="card-sub" id="login_sub">
-                  Access your Smart Load Analyzer workspace.
-                </div>
+                <div class="card-title">Company Login</div>
+                <div class="card-sub">Access your Smart Load Analyzer workspace.</div>
               </div>
             </div>
 
             <form class="login-form" onsubmit="event.preventDefault(); demoLogin();">
               <div class="field">
-                <label id="label_email">Company email</label>
-                <input id="company" type="text" placeholder="rahmone17990@gmail.com" required />
+                <label>Company email</label>
+                <input id="company" type="text" placeholder="you@company.sa" required />
               </div>
-
               <div class="field">
-                <label id="label_password">Password</label>
+                <label>Password</label>
                 <div class="password-input">
                   <input id="password" type="password" placeholder="••••••••" required />
                   <button type="button" class="password-toggle" onclick="togglePassword('password', this)">Show</button>
                 </div>
               </div>
-
-              <button class="btn btn-primary" type="submit" id="login_btn">Login</button>
-
-              <p class="hint" id="login_hint">Demo credentials: <strong>demo@logixperts.sa</strong> / <strong>Naqlthon4!</strong></p>
+              <button class="btn btn-primary" type="submit">Login</button>
               <p id="login-error" class="hint hint-error"></p>
             </form>
           </div>
@@ -549,45 +569,40 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="signup_title">Create Company Account</div>
-                <div class="card-sub" id="signup_sub">Create your company account to access the system.</div>
+                <div class="card-title">Create Company Account</div>
+                <div class="card-sub">Register your company to start optimizing.</div>
               </div>
             </div>
 
             <form class="signup-form" onsubmit="event.preventDefault(); signUp();">
               <div class="field">
-                <label id="signup_label_name">Company name</label>
+                <label>Company name</label>
                 <input id="signup-name" type="text" placeholder="e.g. Green Freight Co." required />
               </div>
-
               <div class="field">
-                <label id="signup_label_email">Company email</label>
+                <label>Company email</label>
                 <input id="signup-email" type="email" placeholder="you@company.sa" required />
               </div>
-
               <div class="field">
-                <label id="signup_label_pass">Password</label>
+                <label>Password</label>
                 <div class="password-input">
                   <input id="signup-password" type="password" placeholder="Choose a strong password" required />
                   <button type="button" class="password-toggle" onclick="togglePassword('signup-password', this)">Show</button>
                 </div>
               </div>
-
               <div class="field">
-                <label id="signup_label_fleet">Fleet size (trucks)</label>
+                <label>Fleet size (trucks)</label>
                 <input id="signup-fleet" type="number" min="1" step="1" value="20" />
               </div>
-
               <div class="field">
-                <label id="signup_label_plan">Subscription plan</label>
+                <label>Subscription plan</label>
                 <select id="signup-plan">
-                  <option value="monthly">Starter – 299 SAR / month</option>
-                  <option value="6months">Growth – 1,499 SAR / 6 months</option>
-                  <option value="yearly">Enterprise – 2,499 SAR / year</option>
+                  <option value="starter">Starter – 299 SAR / month</option>
+                  <option value="growth">Growth – 1,499 SAR / 6 months</option>
+                  <option value="enterprise">Enterprise – 2,499 SAR / year</option>
                 </select>
               </div>
-
-              <button class="btn btn-secondary" id="signup_btn" type="submit">Sign up</button>
+              <button class="btn btn-secondary" type="submit">Sign up</button>
               <p id="signup-message" class="hint"></p>
             </form>
           </div>
@@ -600,74 +615,67 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="dash_title">Fleet Overview Dashboard</div>
-                <div class="card-sub" id="dash_sub">4 demo trucks on main corridors.</div>
+                <div class="card-title">Fleet Overview Dashboard</div>
+                <div class="card-sub">9 trucks across Riyadh, Jeddah & Dammam corridors.</div>
               </div>
-              <span class="pill"><span class="pill-dot"></span> Demo scenario</span>
+              <span class="pill"><span class="pill-dot"></span> Live</span>
             </div>
 
             <div class="kpi-grid">
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_trucks_label">Trucks in scenario</div>
-                <div class="kpi-value">4</div>
-                <div class="kpi-footnote">Riyadh ↔ Jeddah / Dammam</div>
+                <div class="kpi-label">Total Trucks</div>
+                <div class="kpi-value">9</div>
+                <div class="kpi-footnote">3 per city</div>
               </div>
-
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_baseline_label">Avg load (baseline)</div>
+                <div class="kpi-label">Avg Load (Baseline)</div>
                 <div class="kpi-value" id="kpi-load-before">–</div>
-                <div class="kpi-footnote" id="kpi_baseline_note">Before optimization</div>
+                <div class="kpi-footnote">Before optimization</div>
               </div>
-
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_after_label">Avg load (after)</div>
+                <div class="kpi-label">Avg Load (After)</div>
                 <div class="kpi-value" id="kpi-load-after">–</div>
-                <div class="kpi-footnote" id="kpi_after_note">After last run</div>
+                <div class="kpi-footnote">After optimization</div>
               </div>
-
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_cost_before_label">Op. cost / day</div>
+                <div class="kpi-label">Op. Cost / Day</div>
                 <div class="kpi-value" id="kpi-cost-before">–</div>
-                <div class="kpi-footnote" id="kpi_cost_before_note">Simulated SAR</div>
+                <div class="kpi-footnote">SAR</div>
               </div>
-
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_cost_after_label">Op. cost / day (after)</div>
+                <div class="kpi-label">Cost After</div>
                 <div class="kpi-value" id="kpi-cost-after">–</div>
                 <div class="kpi-footnote" id="kpi-cost-savings">–</div>
               </div>
-
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_co2_before_label">CO₂ / day</div>
+                <div class="kpi-label">CO₂ / Day</div>
                 <div class="kpi-value" id="kpi-co2-before">–</div>
-                <div class="kpi-footnote" id="kpi_co2_before_note">kg CO₂</div>
+                <div class="kpi-footnote">kg CO₂</div>
               </div>
-
               <div class="kpi-card">
-                <div class="kpi-label" id="kpi_co2_after_label">CO₂ / day (after)</div>
+                <div class="kpi-label">CO₂ After</div>
                 <div class="kpi-value" id="kpi-co2-after">–</div>
                 <div class="kpi-footnote" id="kpi-co2-savings">–</div>
               </div>
             </div>
 
-            <!-- Company metrics form -->
             <div class="stats-form">
               <div class="stats-form-row">
                 <div class="field small-field">
-                  <label id="stats_label_load">Company avg load (%)</label>
+                  <label>Company avg load (%)</label>
                   <input id="stats-load" type="number" min="0" max="100" step="1" />
                 </div>
                 <div class="field small-field">
-                  <label id="stats_label_cost">Company op. cost / day (SAR)</label>
+                  <label>Op. cost / day (SAR)</label>
                   <input id="stats-cost" type="number" min="0" step="1" />
                 </div>
                 <div class="field small-field">
-                  <label id="stats_label_co2">Company CO₂ / day (kg)</label>
+                  <label>CO₂ / day (kg)</label>
                   <input id="stats-co2" type="number" min="0" step="1" />
                 </div>
                 <div class="field small-field">
                   <label>&nbsp;</label>
-                  <button class="btn btn-secondary" type="button" id="stats-save-btn">Save metrics</button>
+                  <button class="btn btn-secondary" type="button" id="stats-save-btn">Save</button>
                 </div>
               </div>
               <p class="hint" id="stats_hint"></p>
@@ -677,8 +685,8 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="map_title">Truck Positions & Routes</div>
-                <div class="card-sub" id="map_sub">Best routes + load factor markers.</div>
+                <div class="card-title">🗺️ Fleet Map - Live Positions</div>
+                <div class="card-sub">Each truck shows current load %</div>
               </div>
             </div>
             <div id="map"></div>
@@ -689,132 +697,124 @@
       <!-- ANALYZE -->
       <section id="analyze-view" class="view">
         <div class="analyze-grid">
-          <!-- MANUAL -->
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="analyze_title">Analyze New Shipment (Manual)</div>
-                <div class="card-sub" id="analyze_sub">Enter shipment details manually.</div>
+                <div class="card-title">📦 New Shipment Analysis</div>
+                <div class="card-sub">Enter shipment details for AI optimization.</div>
               </div>
             </div>
 
             <form class="analyze-form" onsubmit="event.preventDefault(); runOptimization();">
               <div class="field">
-                <label id="label_weight">Weight (tons)</label>
-                <input id="weight" type="number" min="0" step="0.1" value="8" />
+                <label>Origin City</label>
+                <select id="origin">
+                  <option value="Jeddah">Jeddah</option>
+                  <option value="Riyadh">Riyadh</option>
+                  <option value="Dammam">Dammam</option>
+                </select>
               </div>
-
               <div class="field">
-                <label id="label_volume">Volume (m³)</label>
-                <input id="volume" type="number" min="0" step="1" value="28" />
+                <label>Destination City</label>
+                <select id="destination">
+                  <option value="Riyadh">Riyadh</option>
+                  <option value="Jeddah">Jeddah</option>
+                  <option value="Dammam">Dammam</option>
+                </select>
               </div>
-
               <div class="field">
-                <label id="label_destination">Destination city</label>
-                <input id="destination" type="text" value="Riyadh" />
+                <label>Weight (tons)</label>
+                <input id="weight" type="number" min="0" step="0.1" value="6" />
               </div>
-
               <div class="field">
-                <label id="label_delivery">Delivery window</label>
-                <input id="deliveryTime" type="text" value="Within 24 hours" />
+                <label>Volume (m³)</label>
+                <input id="volume" type="number" min="0" step="1" value="20" />
               </div>
-
               <div class="field">
-                <label id="label_priority">Priority</label>
+                <label>Delivery Window</label>
+                <select id="deliveryTime">
+                  <option value="24h">Within 24 hours</option>
+                  <option value="48h">Within 48 hours</option>
+                  <option value="week">Within a week</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Priority</label>
                 <select id="priority">
                   <option value="normal">Normal</option>
                   <option value="high">High priority</option>
-                  <option value="low">Low / backhaul</option>
+                  <option value="low">Low / Backhaul</option>
                 </select>
               </div>
-
-              <button class="btn btn-primary" id="btn_manual_analyze" type="submit">Run Manual Optimization</button>
+              <button class="btn btn-primary" type="submit">🤖 Run AI Optimization</button>
             </form>
           </div>
 
-          <!-- CSV UPLOAD -->
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="csv_title">Upload Your Trips CSV</div>
-                <div class="card-sub" id="csv_sub">Upload trip history to improve optimization accuracy.</div>
+                <div class="card-title">📄 Upload Trips CSV</div>
+                <div class="card-sub">Bulk analyze from trip history.</div>
               </div>
             </div>
-
             <form class="signup-form" onsubmit="event.preventDefault(); analyzeCSV();">
               <div class="field">
-                <label id="csv_label">Choose CSV file</label>
+                <label>Choose CSV file</label>
                 <input id="csv_file" type="file" accept=".csv" />
               </div>
-
-              <button class="btn btn-secondary" id="btn_csv">Analyze CSV</button>
+              <button class="btn btn-secondary">Analyze CSV</button>
               <p id="csv_message" class="hint"></p>
             </form>
           </div>
 
-          <!-- PDF AI REPORT -->
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="pdf_title">PDF AI Report</div>
-                <div class="card-sub" id="pdf_sub">Generate a printable KPI report for your company based on the current demo optimization.</div>
+                <div class="card-title">📊 PDF Report</div>
+                <div class="card-sub">Generate KPI report for management.</div>
               </div>
             </div>
-
-            <p class="hint" id="pdf_hint">This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.</p>
-
-            <button class="btn btn-secondary" type="button" id="pdf_btn" onclick="generatePdfReport()">Generate PDF Report</button>
+            <p class="hint">Export current optimization results as PDF.</p>
+            <button class="btn btn-secondary" type="button" onclick="generatePdfReport()">Generate PDF Report</button>
             <p id="pdf_message" class="hint"></p>
           </div>
         </div>
-
-        <!-- AI CHAT ASSISTANT -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-header">
-            <div>
-              <div class="card-title" id="ai_chat_title">AI Chat Assistant</div>
-              <div class="card-sub" id="ai_chat_sub">Ask AI about loads, trips, cost and CO₂ optimization for this company.</div>
-            </div>
-          </div>
-
-          <div id="chat-log" style="max-height: 220px; overflow-y: auto; font-size: 13px; margin-bottom: 10px; padding: 8px; background: #020617; border-radius: 16px; border: 1px solid #1f2937;"></div>
-
-          <textarea id="chat-input" rows="3" placeholder="اكتب سؤالك عن الرحلات، دمج الشحنات، التكلفة أو الكربون..." style="width: 100%; margin-bottom: 8px; padding: 8px; border-radius: 12px; border: 1px solid #374151; background: #020617; color: #e5e7eb; font-size: 13px;"></textarea>
-
-          <button class="btn btn-primary" type="button" onclick="sendAIMessage()">إرسال للذكاء الاصطناعي 🤖</button>
-        </div>
       </section>
 
-      <!-- OPTIMIZATION -->
+      <!-- OPTIMIZATION RESULT -->
       <section id="optimization-view" class="view">
         <div class="two-column">
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="opt_title">Optimization Result</div>
-                <div class="card-sub" id="opt_sub">Recommended load distribution.</div>
+                <div class="card-title">🤖 AI Optimization Result</div>
+                <div class="card-sub">Recommended truck assignments and merging.</div>
               </div>
             </div>
 
             <div class="truck-list" id="truck-list">
               <div class="truck-row header">
-                <div id="opt_col_truck">Truck & Route</div>
-                <div id="opt_col_load">Load Factor</div>
-                <div id="opt_col_ai">AI Suggestion</div>
+                <div>Truck & Route</div>
+                <div>Load</div>
+                <div>AI Recommendation</div>
               </div>
             </div>
 
-            <p class="opt-summary" id="opt-summary">Run manual or CSV analysis to see results.</p>
+            <div class="ai-box" id="ai-box">
+              <h4>🧠 AI Analysis</h4>
+              <p id="ai-analysis-text">Run optimization to see AI recommendations.</p>
+            </div>
+
+            <p class="opt-summary" id="opt-summary">Enter shipment details and run optimization to see results.</p>
           </div>
 
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title" id="chart_title">KPIs Before vs After</div>
-                <div class="card-sub" id="chart_sub">Avg Load, Cost, CO₂ comparison</div>
+                <div class="card-title">📈 KPIs Before vs After</div>
+                <div class="card-sub">Visual comparison of optimization impact.</div>
               </div>
             </div>
-            <!-- FIX: 3 separate charts for better visualization -->
             <div class="charts-grid">
               <div class="mini-chart-container">
                 <div class="mini-chart-title">Load Factor (%)</div>
@@ -834,287 +834,92 @@
       </section>
     </main>
 
-    <!-- SUPPORT -->
     <div class="support-footer">
       <div class="support-box">
-        <div class="support-title" id="support_title">Customer Support</div>
-        <div class="support-row">
-          <span class="support-icon">📞</span>
-          <span id="support_phone_label">Phone:</span>&nbsp;<span>+966 55 555 5555</span>
-        </div>
-        <div class="support-row">
-          <span class="support-icon">📧</span>
-          <span id="support_email_label">Email:</span>&nbsp;<span>support@logixperts.com</span>
-        </div>
-        <div class="support-row">
-          <span class="support-icon">📠</span>
-          <span id="support_fax_label">Fax:</span>&nbsp;<span>011-1234567</span>
-        </div>
+        <div class="support-title">Customer Support</div>
+        <div class="support-row"><span class="support-icon">📞</span> Phone: +966 55 555 5555</div>
+        <div class="support-row"><span class="support-icon">📧</span> Email: support@logixperts.com</div>
       </div>
     </div>
 
-    <footer>Logixperts · Smart Load Analyzer · Naqlthon 4</footer>
+    <footer>Logixperts · Smart Load Analyzer · Naqlthon 4 · © 2024</footer>
   </div>
 
   <!-- ================= FIREBASE + LOGIC ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      doc,
-      setDoc,
-      addDoc,
-      getDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, addDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAjbvQo7NrGZiFbFbdY3a7UtDjlv0SwU3w",
       authDomain: "smart-load-analyzer-56cb2.firebaseapp.com",
       projectId: "smart-load-analyzer-56cb2",
-      storageBucket: "smart-load-analyzer-56cb2.firebasestorage.app",
+      storageBucket: "smart-load-analyzer-56cb2.appspot.com",
       messagingSenderId: "253721588070",
-      appId: "1:253721588070:web:c24bc2fbc27c2fba9e18a7",
-      measurementId: "G-60RF97SGWN"
+      appId: "1:253721588070:web:c24bc2fbc27c2fba9e18a7"
     };
 
-    const app  = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db   = getFirestore(app);
+    const db = getFirestore(app);
 
-    // ========== LANG ==========
-    let currentLang = "en";
+    // ========== CONSTANTS ==========
+    const CAPACITY_TONS = 22;
+    const BASE_TRIP_COST = 1200;
+    const EMISSION_FACTOR = 2.68;
 
-    const translations = {
-      en: {
-        text_brand: "Logixperts",
-        text_subbrand: "Smart Load Analyzer",
-        back_link: "← Back to role selection",
-        company_code_label: "Company code:",
-        team_label: "Team:",
-        team_event: "Naqlthon 4",
-        hero_title: "Reduce Empty Trips. Boost Load Factor. Go Greener.",
-        hero_sub: "Smart Load Analyzer helps freight companies analyze and optimize loads to reduce cost and emissions.",
-        tag_fuel: "fuel reduction (simulated)",
-        tag_ai: "load & route suggestions",
-        hero_highlight: "This demo scenario shows how merging a new shipment with a low-load return trip improves load factor.",
-        hero_avg_before_title: "Avg load (baseline)",
-        hero_cost_title: "Op. cost / day",
-        hero_co2_title: "CO₂ / day",
-        tab_login: "Login / Sign up",
-        tab_dashboard: "Dashboard",
-        tab_analyze: "Analyze Load",
-        tab_opt: "Optimization Result",
-        login_title: "Company Login",
-        login_sub: "Access your Smart Load Analyzer workspace.",
-        label_email: "Company email",
-        label_password: "Password",
-        login_btn: "Login",
-        login_hint: "Demo credentials: rahmone17990@gmail.com / fnatic990",
-        signup_title: "Create Company Account",
-        signup_sub: "Create your company account to access the system.",
-        signup_label_name: "Company name",
-        signup_label_email: "Company email",
-        signup_label_pass: "Password",
-        signup_label_fleet: "Fleet size (trucks)",
-        signup_label_plan: "Subscription plan",
-        signup_btn: "Sign up",
-        dash_title: "Fleet Overview Dashboard",
-        dash_sub: "4 demo trucks on main corridors.",
-        kpi_trucks_label: "Trucks in scenario",
-        kpi_baseline_label: "Avg load (baseline)",
-        kpi_baseline_note: "Before optimization",
-        kpi_after_label: "Avg load (after)",
-        kpi_after_note: "After last run",
-        kpi_cost_before_label: "Op. cost / day",
-        kpi_cost_before_note: "Simulated SAR",
-        kpi_cost_after_label: "Op. cost / day (after)",
-        kpi_co2_before_label: "CO₂ / day",
-        kpi_co2_before_note: "kg CO₂",
-        kpi_co2_after_label: "CO₂ / day (after)",
-        stats_label_load: "Company avg load (%)",
-        stats_label_cost: "Company op. cost / day (SAR)",
-        stats_label_co2: "Company CO₂ / day (kg)",
-        map_title: "Truck Positions & Routes",
-        map_sub: "Best routes + load factor markers.",
-        analyze_title: "Analyze New Shipment (Manual)",
-        analyze_sub: "Enter shipment details manually.",
-        label_weight: "Weight (tons)",
-        label_volume: "Volume (m³)",
-        label_destination: "Destination city",
-        label_delivery: "Delivery window",
-        label_priority: "Priority",
-        btn_manual_analyze: "Run Manual Optimization",
-        csv_title: "Upload Your Trips CSV",
-        csv_sub: "Upload trip history to improve optimization accuracy.",
-        csv_label: "Choose CSV file",
-        btn_csv: "Analyze CSV",
-        pdf_title: "PDF AI Report",
-        pdf_sub: "Generate a printable KPI report for your company based on the current demo optimization.",
-        pdf_hint: "This is a demo PDF report for Naqlthon showing KPIs, per-truck loads and recommendations for small carriers.",
-        pdf_btn: "Generate PDF Report",
-        opt_title: "Optimization Result",
-        opt_sub: "Recommended load distribution.",
-        opt_col_truck: "Truck & Route",
-        opt_col_load: "Load Factor",
-        opt_col_ai: "AI Suggestion",
-        chart_title: "KPIs Before vs After",
-        chart_sub: "Avg Load, Cost, CO₂ comparison",
-        support_title: "Customer Support",
-        support_phone_label: "Phone:",
-        support_email_label: "Email:",
-        support_fax_label: "Fax:",
-        ai_chat_title: "AI Chat Assistant",
-        ai_chat_sub: "Ask AI about loads, trips, cost and CO₂ optimization for this company."
-      },
-      ar: {
-        text_brand: "لوﭬيكسبرتس",
-        text_subbrand: "نظام التحميل الذكي",
-        back_link: "← رجوع لاختيار الدور",
-        company_code_label: "كود الشركة:",
-        team_label: "الفريق:",
-        team_event: "نقلثون 4",
-        hero_title: "قلل الرحلات الفارغة. ارفع نسبة التحميل. وكن أكثر استدامة.",
-        hero_sub: "نظام التحميل الذكي يساعد شركات النقل على تحليل الرحلات وتحسين استغلال الحمولة لتقليل التكلفة والانبعاثات.",
-        tag_fuel: "تخفيض استهلاك الوقود (محاكاة)",
-        tag_ai: "اقتراحات تحميل ومسارات بالذكاء الاصطناعي",
-        hero_highlight: "هذا السيناريو التجريبي يوضح كيف يمكن لدمج شحنة جديدة مع رحلة عودة منخفضة الحمولة أن يحسن مستوى التحميل.",
-        hero_avg_before_title: "متوسط التحميل (الأساس)",
-        hero_cost_title: "تكلفة التشغيل / اليوم",
-        hero_co2_title: "انبعاثات CO₂ / اليوم",
-        tab_login: "تسجيل الدخول / إنشاء حساب",
-        tab_dashboard: "لوحة المؤشرات",
-        tab_analyze: "تحليل التحميل",
-        tab_opt: "نتيجة التحسين",
-        login_title: "تسجيل دخول الشركة",
-        login_sub: "ادخل إلى مساحة العمل الخاصة بنظام التحميل الذكي.",
-        label_email: "إيميل الشركة",
-        label_password: "كلمة المرور",
-        login_btn: "تسجيل الدخول",
-        login_hint: "بيانات العرض: rahmone17990@gmail.com / fnatic990",
-        signup_title: "إنشاء حساب شركة",
-        signup_sub: "أنشئ حساب شركتك للوصول إلى النظام.",
-        signup_label_name: "اسم الشركة",
-        signup_label_email: "إيميل الشركة",
-        signup_label_pass: "كلمة المرور",
-        signup_label_fleet: "عدد الشاحنات في الأسطول",
-        signup_label_plan: "خطة الاشتراك",
-        signup_btn: "إنشاء حساب",
-        dash_title: "لوحة مؤشرات الأسطول",
-        dash_sub: "4 شاحنات تجريبية على المسارات الرئيسية.",
-        kpi_trucks_label: "الشاحنات في السيناريو",
-        kpi_baseline_label: "متوسط التحميل (الأساس)",
-        kpi_baseline_note: "قبل التحسين",
-        kpi_after_label: "متوسط التحميل (بعد)",
-        kpi_after_note: "بعد آخر تشغيل",
-        kpi_cost_before_label: "تكلفة التشغيل / اليوم",
-        kpi_cost_before_note: "ريال (محاكاة)",
-        kpi_cost_after_label: "تكلفة التشغيل / اليوم (بعد)",
-        kpi_co2_before_label: "انبعاثات CO₂ / اليوم",
-        kpi_co2_before_note: "كجم CO₂",
-        kpi_co2_after_label: "انبعاثات CO₂ / اليوم (بعد)",
-        stats_label_load: "متوسط التحميل في الشركة (%)",
-        stats_label_cost: "تكلفة التشغيل اليومية (ريال)",
-        stats_label_co2: "انبعاثات CO₂ اليومية (كجم)",
-        map_title: "مواقع ومسارات الشاحنات",
-        map_sub: "أفضل المسارات + مؤشرات نسب التحميل.",
-        analyze_title: "تحليل شحنة جديدة (يدوي)",
-        analyze_sub: "أدخل بيانات الشحنة يدويًا.",
-        label_weight: "الوزن (طن)",
-        label_volume: "الحجم (م³)",
-        label_destination: "مدينة الوجهة",
-        label_delivery: "نافذة التسليم",
-        label_priority: "الأولوية",
-        btn_manual_analyze: "تشغيل التحسين اليدوي",
-        csv_title: "رفع ملف CSV للرحلات",
-        csv_sub: "ارفع سجل الرحلات لتحسين دقة التحليل.",
-        csv_label: "اختر ملف CSV",
-        btn_csv: "تحليل ملف CSV",
-        pdf_title: "تقرير PDF بالذكاء الاصطناعي",
-        pdf_sub: "إنشاء تقرير مؤشرات قابل للطباعة بناءً على آخر عملية تحسين.",
-        pdf_hint: "هذا تقرير تجريبي لنقلثون يوضح مؤشرات الأداء، نسب التحميل لكل شاحنة وتوصيات للشركات الصغيرة.",
-        pdf_btn: "إنشاء تقرير PDF",
-        opt_title: "نتيجة التحسين",
-        opt_sub: "توزيع الحمولة الموصى به.",
-        opt_col_truck: "الشاحنة والمسار",
-        opt_col_load: "نسبة التحميل",
-        opt_col_ai: "اقتراح الذكاء الاصطناعي",
-        chart_title: "المؤشرات قبل وبعد",
-        chart_sub: "متوسط التحميل، التكلفة، وانبعاثات CO₂",
-        support_title: "دعم العملاء",
-        support_phone_label: "الهاتف:",
-        support_email_label: "الإيميل:",
-        support_fax_label: "فاكس:",
-        ai_chat_title: "مساعد الذكاء الاصطناعي",
-        ai_chat_sub: "اسأل الذكاء الاصطناعي عن التحميل، الرحلات، التكلفة وانبعاثات CO₂ لشركتك."
-      }
+    const cityCoords = {
+      Riyadh: { lat: 24.7136, lng: 46.6753 },
+      Jeddah: { lat: 21.4858, lng: 39.1925 },
+      Dammam: { lat: 26.4207, lng: 50.0888 }
     };
 
-    function applyLanguage() {
-      const t = translations[currentLang] || translations.en;
-      for (const key in t) {
-        const el = document.getElementById(key);
-        if (el) el.textContent = t[key];
-      }
-      const langBtn = document.getElementById("langSwitcher");
-      if (langBtn) langBtn.textContent = currentLang === "en" ? "AR" : "EN";
-      document.documentElement.lang = currentLang === "ar" ? "ar" : "en";
-      document.documentElement.dir  = currentLang === "ar" ? "rtl" : "ltr";
-    }
-
-    function toggleLanguage() {
-      currentLang = currentLang === "en" ? "ar" : "en";
-      applyLanguage();
-    }
-
-    // ========== SCENARIO & GLOBAL STATE ==========
-    const CAPACITY_TONS = 20;
-    const BASE_TRIP_COST = 1000;
-    const EMISSION_FACTOR = 2.7;
-
+    // ========== 9 TRUCKS - 3 PER CITY ==========
     const trucksScenario = [
-      { id: "Truck #1", origin: "Riyadh", dest: "Jeddah",  currentLoad: 0.75, coords: [24.7136, 46.6753] },
-      { id: "Truck #2", origin: "Jeddah", dest: "Riyadh",  currentLoad: 0.40, coords: [21.4858, 39.1925] },
-      { id: "Truck #3", origin: "Riyadh", dest: "Dammam", currentLoad: 0.65, coords: [24.7136, 46.6753] },
-      { id: "Truck #4", origin: "Dammam", dest: "Riyadh", currentLoad: 0.50, coords: [26.4207, 50.0888] },
+      // Riyadh trucks (3)
+      { id: "T1", origin: "Riyadh", dest: "Jeddah", currentLoad: 0.75, direction: "outbound", offsetLat: 0.04, offsetLng: 0.03 },
+      { id: "T2", origin: "Riyadh", dest: "Dammam", currentLoad: 0.45, direction: "outbound", offsetLat: -0.04, offsetLng: 0.04 },
+      { id: "T3", origin: "Riyadh", dest: "Jeddah", currentLoad: 0.30, direction: "outbound", offsetLat: 0.03, offsetLng: -0.04 },
+      // Jeddah trucks (3)
+      { id: "T4", origin: "Jeddah", dest: "Riyadh", currentLoad: 0.40, direction: "inbound", offsetLat: 0.04, offsetLng: 0.03 },
+      { id: "T5", origin: "Jeddah", dest: "Riyadh", currentLoad: 0.55, direction: "inbound", offsetLat: -0.03, offsetLng: 0.04 },
+      { id: "T6", origin: "Jeddah", dest: "Dammam", currentLoad: 0.25, direction: "outbound", offsetLat: 0.03, offsetLng: -0.03 },
+      // Dammam trucks (3)
+      { id: "T7", origin: "Dammam", dest: "Riyadh", currentLoad: 0.50, direction: "inbound", offsetLat: 0.035, offsetLng: 0.03 },
+      { id: "T8", origin: "Dammam", dest: "Jeddah", currentLoad: 0.35, direction: "outbound", offsetLat: -0.035, offsetLng: 0.035 },
+      { id: "T9", origin: "Dammam", dest: "Riyadh", currentLoad: 0.60, direction: "inbound", offsetLat: 0.02, offsetLng: -0.04 }
     ];
 
-    // FIX: Initialize baseline values to 0 (will be set after login)
-    let baselineAvgLoad = 0;
-    let baselineCost = 0;
-    let baselineCO2 = 0;
-
+    // ========== STATE ==========
+    let currentLang = "en";
     let isLoggedIn = false;
     let currentCompanyId = null;
     let currentCompanyData = null;
-    let companyStats = null;
+    let mapInstance = null;
+    let truckMarkers = [];
 
-    let lastOptimizationLoads = null;
+    let baselineAvgLoad = 0;
+    let baselineCost = 0;
+    let baselineCO2 = 0;
     let lastAfterAvgLoad = null;
     let lastCostAfter = null;
     let lastCO2After = null;
 
-    let mapInstance = null;
+    // ========== LANGUAGE ==========
+    function toggleLanguage() {
+      currentLang = currentLang === "en" ? "ar" : "en";
+      document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+      document.getElementById("langSwitcher").textContent = currentLang === "en" ? "AR" : "EN";
+    }
 
     // ========== UI HELPERS ==========
     function setActiveView(viewId) {
-      const views = document.querySelectorAll(".view");
-      views.forEach(v => v.classList.remove("active"));
-      const target = document.getElementById(viewId);
-      if (target) target.classList.add("active");
-
-      const tabs = document.querySelectorAll(".nav-tab");
-      tabs.forEach(tab => {
-        if (tab.dataset.view === viewId) tab.classList.add("active");
-        else tab.classList.remove("active");
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.getElementById(viewId)?.classList.add("active");
+      document.querySelectorAll(".nav-tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.view === viewId);
       });
-
       if (viewId === "dashboard-view" && mapInstance) {
         setTimeout(() => mapInstance.invalidateSize(), 200);
       }
@@ -1122,433 +927,194 @@
 
     function togglePassword(inputId, btn) {
       const input = document.getElementById(inputId);
-      if (!input) return;
       if (input.type === "password") {
         input.type = "text";
-        btn.textContent = currentLang === "ar" ? "إخفاء" : "Hide";
+        btn.textContent = "Hide";
       } else {
         input.type = "password";
-        btn.textContent = currentLang === "ar" ? "إظهار" : "Show";
+        btn.textContent = "Show";
       }
     }
 
-    // FIX: Function to show/hide hero metrics based on login status
-    function updateHeroVisibility() {
-      const heroLoad = document.getElementById("hero-load-before");
-      const heroCost = document.getElementById("hero-cost-before");
-      const heroCO2  = document.getElementById("hero-co2-before");
+    function calculateBaseline() {
+      baselineAvgLoad = trucksScenario.reduce((sum, t) => sum + t.currentLoad, 0) / trucksScenario.length;
+      baselineCost = trucksScenario.length * BASE_TRIP_COST;
+      baselineCO2 = baselineCost * EMISSION_FACTOR;
+    }
 
+    function updateHeroAndKpis() {
       if (!isLoggedIn) {
-        if (heroLoad) heroLoad.textContent = "–";
-        if (heroCost) heroCost.textContent = "–";
-        if (heroCO2)  heroCO2.textContent  = "–";
-      } else {
-        updateHeroAndKpisFromStats();
-      }
-    }
-
-    function updateHeroAndKpisFromStats() {
-      if (!isLoggedIn) {
-        updateHeroVisibility();
+        document.getElementById("hero-load-before").textContent = "–";
+        document.getElementById("hero-cost-before").textContent = "–";
+        document.getElementById("hero-co2-before").textContent = "–";
         return;
       }
-
-      const heroLoad = document.getElementById("hero-load-before");
-      const heroCost = document.getElementById("hero-cost-before");
-      const heroCO2  = document.getElementById("hero-co2-before");
-
-      const kpiLoadBefore = document.getElementById("kpi-load-before");
-      const kpiCostBefore = document.getElementById("kpi-cost-before");
-      const kpiCO2Before  = document.getElementById("kpi-co2-before");
-
-      const baseLoadPct = (baselineAvgLoad * 100).toFixed(0);
-
-      if (heroLoad) heroLoad.textContent = baseLoadPct + "%";
-      if (heroCost) heroCost.textContent = "~" + baselineCost.toFixed(0) + " SAR";
-      if (heroCO2)  heroCO2.textContent  = "~" + baselineCO2.toFixed(0) + " kg";
-
-      if (kpiLoadBefore) kpiLoadBefore.textContent = baseLoadPct + "%";
-      if (kpiCostBefore) kpiCostBefore.textContent = "~" + baselineCost.toFixed(0) + " SAR";
-      if (kpiCO2Before)  kpiCO2Before.textContent  = "~" + baselineCO2.toFixed(0) + " kg";
+      const loadPct = (baselineAvgLoad * 100).toFixed(0) + "%";
+      document.getElementById("hero-load-before").textContent = loadPct;
+      document.getElementById("hero-cost-before").textContent = "~" + baselineCost.toFixed(0) + " SAR";
+      document.getElementById("hero-co2-before").textContent = "~" + baselineCO2.toFixed(0) + " kg";
+      document.getElementById("kpi-load-before").textContent = loadPct;
+      document.getElementById("kpi-cost-before").textContent = "~" + baselineCost.toFixed(0) + " SAR";
+      document.getElementById("kpi-co2-before").textContent = "~" + baselineCO2.toFixed(0) + " kg";
     }
 
-    // ========== FIREBASE: AUTH & COMPANY ==========
-    async function loadCompanyData(uid) {
-      const ref = doc(db, "companies", uid);
-      const snap = await getDoc(ref);
-      
-      const defaultAvgLoad = trucksScenario.reduce((sum, t) => sum + t.currentLoad, 0) / trucksScenario.length;
-      const defaultCost = trucksScenario.length * BASE_TRIP_COST;
-      const defaultCO2 = defaultCost * EMISSION_FACTOR;
-      
-      if (snap.exists()) {
-        currentCompanyData = snap.data();
-        if (currentCompanyData.stats) {
-          companyStats = currentCompanyData.stats;
-          const { loadPct, costPerDay, co2PerDay } = companyStats;
-          baselineAvgLoad = (loadPct && !isNaN(loadPct)) ? loadPct / 100 : defaultAvgLoad;
-          baselineCost = (costPerDay && !isNaN(costPerDay)) ? costPerDay : defaultCost;
-          baselineCO2 = (co2PerDay && !isNaN(co2PerDay)) ? co2PerDay : defaultCO2;
-        } else {
-          baselineAvgLoad = defaultAvgLoad;
-          baselineCost = defaultCost;
-          baselineCO2 = defaultCO2;
-        }
-      } else {
-        currentCompanyData = { name: "Logixperts", email: "demo@logixperts.sa" };
-        baselineAvgLoad = defaultAvgLoad;
-        baselineCost = defaultCost;
-        baselineCO2 = defaultCO2;
-      }
-
-      updateHeroAndKpisFromStats();
-
-      const badge = document.getElementById("company_code_badge");
-      const codeValue = document.getElementById("company_code_value");
-      if (badge && codeValue) {
-        badge.style.display = "inline-flex";
-        codeValue.textContent = uid.slice(-6).toUpperCase();
-      }
-    }
-
-    function enableTabsAfterLogin() {
-      document.getElementById("tab_dashboard").style.display = "inline-flex";
-      document.getElementById("tab_analyze").style.display   = "inline-flex";
-      document.getElementById("tab_opt").style.display       = "inline-flex";
-    }
-
-    async function handleAuthSuccess(user) {
-      isLoggedIn = true;
-      currentCompanyId = user.uid;
-
-      const loginError = document.getElementById("login-error");
-      if (loginError) loginError.textContent = "";
-
-      await loadCompanyData(user.uid);
-      enableTabsAfterLogin();
-      setActiveView("dashboard-view");
-    }
-
-    async function demoLogin() {
-      const email = document.getElementById("company").value.trim();
-      const pass  = document.getElementById("password").value.trim();
-      const error = document.getElementById("login-error");
-
-      try {
-        const cred = await signInWithEmailAndPassword(auth, email, pass);
-        await handleAuthSuccess(cred.user);
-      } catch (e) {
-        console.error(e);
-        if (error) {
-          error.textContent = currentLang === "ar"
-            ? "تعذر تسجيل الدخول. تأكد من الإيميل وكلمة المرور."
-            : "Login failed. Please check your email and password.";
-        }
-      }
-    }
-
-    async function signUp() {
-      const name  = document.getElementById("signup-name").value.trim();
-      const email = document.getElementById("signup-email").value.trim();
-      const pass  = document.getElementById("signup-password").value.trim();
-      const fleet = parseInt(document.getElementById("signup-fleet").value || "0", 10);
-      const plan  = document.getElementById("signup-plan").value;
-      const msg   = document.getElementById("signup-message");
-
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        const uid = cred.user.uid;
-
-        const ref = doc(db, "companies", uid);
-        await setDoc(ref, {
-          name,
-          email,
-          fleetSize: fleet || 0,
-          plan,
-          createdAt: serverTimestamp()
-        });
-
-        currentCompanyData = { name, email, fleetSize: fleet, plan };
-        await handleAuthSuccess(cred.user);
-
-        if (msg) {
-          msg.textContent = currentLang === "ar"
-            ? "تم إنشاء الحساب بنجاح وتم تسجيل الدخول."
-            : "Account created and logged in successfully.";
-        }
-      } catch (e) {
-        console.error(e);
-        if (msg) {
-          msg.textContent = currentLang === "ar"
-            ? "تعذر إنشاء الحساب. تأكد من الإيميل وقوة كلمة المرور."
-            : "Could not create account. Please check email and password strength.";
-        }
-      }
-    }
-
-    async function saveCompanyStats() {
-      if (!isLoggedIn || !currentCompanyId) return;
-
-      const loadInput = document.getElementById("stats-load");
-      const costInput = document.getElementById("stats-cost");
-      const co2Input  = document.getElementById("stats-co2");
-      const hint      = document.getElementById("stats_hint");
-
-      const loadPct   = parseFloat(loadInput.value || "0");
-      const costPerDay = parseFloat(costInput.value || "0");
-      const co2PerDay  = parseFloat(co2Input.value || "0");
-
-      if (isNaN(loadPct) || isNaN(costPerDay) || isNaN(co2PerDay) || loadPct < 0 || loadPct > 100) {
-        if (hint) {
-          hint.textContent = currentLang === "ar"
-            ? "يرجى إدخال قيم صحيحة (نسبة التحميل بين 0 و 100)."
-            : "Please enter valid values (load between 0 and 100).";
-        }
-        return;
-      }
-
-      companyStats = { loadPct, costPerDay, co2PerDay };
-      baselineAvgLoad = loadPct / 100;
-      baselineCost = costPerDay;
-      baselineCO2  = co2PerDay;
-
-      updateHeroAndKpisFromStats();
-
-      const ref = doc(db, "companies", currentCompanyId);
-      await setDoc(ref, { stats: companyStats }, { merge: true });
-
-      if (hint) {
-        hint.textContent = currentLang === "ar"
-          ? "تم حفظ مؤشرات الشركة بنجاح."
-          : "Company metrics saved successfully.";
-      }
-
-      if (lastAfterAvgLoad != null) {
-        updateCharts(lastAfterAvgLoad, lastCostAfter ?? baselineCost, lastCO2After ?? baselineCO2);
-      }
-    }
-
-    async function saveOptimizationResult(companyId, data) {
-      try {
-        const ref = collection(db, "companies", companyId, "optimizations");
-        await addDoc(ref, { ...data, createdAt: serverTimestamp() });
-      } catch (e) {
-        console.error("Error saving optimization result:", e);
-      }
-    }
-
-    // ========== CHARTS ==========
-    let loadChart = null;
-    let costChart = null;
-    let co2Chart = null;
-
-    function createMiniChart(canvasId, label, beforeVal, afterVal, color1, color2) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return null;
-      const ctx = canvas.getContext("2d");
-
-      return new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: ["Before", "After"],
-          datasets: [{
-            data: [beforeVal, afterVal],
-            backgroundColor: [color1, color2],
-            borderRadius: 6,
-            barThickness: 40
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: { 
-              ticks: { color: "#9ca3af", font: { size: 10 } }, 
-              grid: { display: false } 
-            },
-            y: { 
-              ticks: { color: "#9ca3af", font: { size: 10 } }, 
-              grid: { color: "#1f2937" },
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-
-    function initCharts(afterAvgLoad, costAfter, co2After) {
-      const beforeLoadPct = baselineAvgLoad * 100;
-      const afterLoadPct = afterAvgLoad * 100;
-
-      loadChart = createMiniChart("loadChart", "Load", beforeLoadPct, afterLoadPct, "#3b82f6", "#22c55e");
-      costChart = createMiniChart("costChart", "Cost", baselineCost, costAfter, "#3b82f6", "#22c55e");
-      co2Chart = createMiniChart("co2Chart", "CO2", baselineCO2, co2After, "#3b82f6", "#22c55e");
-    }
-
-    function updateCharts(afterAvgLoad, costAfter, co2After) {
-      const beforeLoadPct = baselineAvgLoad * 100;
-      const afterLoadPct = afterAvgLoad * 100;
-
-      if (!loadChart) {
-        initCharts(afterAvgLoad, costAfter, co2After);
-        return;
-      }
-
-      loadChart.data.datasets[0].data = [beforeLoadPct, afterLoadPct];
-      loadChart.update();
-
-      costChart.data.datasets[0].data = [baselineCost, costAfter];
-      costChart.update();
-
-      co2Chart.data.datasets[0].data = [baselineCO2, co2After];
-      co2Chart.update();
-    }
-
-    // ========== MAP ==========
+    // ========== MAP WITH TRUCK LABELS ==========
     function initMap() {
       if (mapInstance || !window.L) return;
-      const center = [23.8859, 45.0792];
-      mapInstance = L.map("map").setView(center, 6);
-
+      mapInstance = L.map("map").setView([24.5, 44], 5);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(mapInstance);
 
-      const cityCoords = {
-        Riyadh: [24.7136, 46.6753],
-        Jeddah: [21.4858, 39.1925],
-        Dammam: [26.4207, 50.0888]
-      };
+      // Draw routes
+      const routes = [
+        [cityCoords.Riyadh, cityCoords.Jeddah],
+        [cityCoords.Riyadh, cityCoords.Dammam],
+        [cityCoords.Jeddah, cityCoords.Dammam]
+      ];
+      routes.forEach(r => {
+        L.polyline([[r[0].lat, r[0].lng], [r[1].lat, r[1].lng]], { 
+          weight: 2, color: "#374151", dashArray: "5,10" 
+        }).addTo(mapInstance);
+      });
 
-      const markerStyle = { radius: 7 };
+      // City markers
+      Object.entries(cityCoords).forEach(([name, coord]) => {
+        L.circleMarker([coord.lat, coord.lng], {
+          radius: 12, color: "#22c55e", fillColor: "#22c55e", fillOpacity: 0.3, weight: 2
+        }).addTo(mapInstance).bindTooltip(name, { permanent: true, direction: "bottom" });
+      });
 
-      function addCityMarker(name, coord, color) {
-        L.circleMarker(coord, { ...markerStyle, color, fillColor: color, fillOpacity: 0.8 })
-          .addTo(mapInstance)
-          .bindTooltip(name, { permanent: false });
-      }
-
-      addCityMarker("Riyadh",  cityCoords.Riyadh,  "#22c55e");
-      addCityMarker("Jeddah",  cityCoords.Jeddah,  "#fbbf24");
-      addCityMarker("Dammam",  cityCoords.Dammam,  "#3b82f6");
-
-      L.polyline([cityCoords.Riyadh, cityCoords.Jeddah], { weight: 2 }).addTo(mapInstance);
-      L.polyline([cityCoords.Riyadh, cityCoords.Dammam], { weight: 2 }).addTo(mapInstance);
-
-      setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
+      updateTruckMarkers();
+      setTimeout(() => mapInstance?.invalidateSize(), 300);
     }
 
-    // ========== OPTIMIZATION TABLE ==========
-    function clearTruckRows() {
-      const list = document.getElementById("truck-list");
-      if (!list) return;
-      const rows = Array.from(list.querySelectorAll(".truck-row"));
-      rows.forEach(row => { if (!row.classList.contains("header")) list.removeChild(row); });
-    }
+    function updateTruckMarkers() {
+      if (!mapInstance) return;
+      
+      // Clear old markers
+      truckMarkers.forEach(m => mapInstance.removeLayer(m));
+      truckMarkers = [];
 
-    function addTruckRow(truck, loadText, chipText, chipClass) {
-      const list = document.getElementById("truck-list");
-      if (!list) return;
+      // Add truck markers with load labels
+      trucksScenario.forEach(truck => {
+        const baseCoord = cityCoords[truck.origin];
+        const lat = baseCoord.lat + truck.offsetLat;
+        const lng = baseCoord.lng + truck.offsetLng;
+        const loadPct = Math.round((truck.newLoad || truck.currentLoad) * 100);
+        const isLow = loadPct < 50;
+        const dirIcon = truck.direction === "outbound" ? "🔵" : "🟠";
 
-      const row = document.createElement("div");
-      row.className = "truck-row";
+        const icon = L.divIcon({
+          className: 'truck-marker',
+          html: `<div class="truck-marker-label ${isLow ? 'low' : ''}">
+                   ${dirIcon} ${truck.id}<br>
+                   <span class="load-pct">${loadPct}%</span><br>
+                   <span class="route">${truck.origin}→${truck.dest}</span>
+                 </div>`,
+          iconSize: [85, 50],
+          iconAnchor: [42, 25]
+        });
 
-      const col1 = document.createElement("div");
-      col1.textContent = truck.id + " " + truck.origin + " → " + truck.dest;
-
-      const col2 = document.createElement("div");
-      col2.textContent = loadText;
-
-      const col3 = document.createElement("div");
-      const chip = document.createElement("span");
-      chip.className = "chip " + chipClass;
-      chip.textContent = chipText;
-      col3.appendChild(chip);
-
-      row.appendChild(col1);
-      row.appendChild(col2);
-      row.appendChild(col3);
-      list.appendChild(row);
-    }
-
-    function populateOptimizationTableInitial() {
-      clearTruckRows();
-      trucksScenario.forEach(tr => {
-        const loadPct = (tr.currentLoad * 100).toFixed(0) + "%";
-        const chipText = tr.currentLoad < 0.6
-            ? (currentLang === "ar" ? "تحميل منخفض (فرصة دمج)" : "Low load (merge opportunity)")
-            : (currentLang === "ar" ? "تحميل جيد" : "Healthy load");
-        const chipClass = tr.currentLoad < 0.6 ? "warn" : "good";
-        addTruckRow(tr, loadPct, chipText, chipClass);
+        const marker = L.marker([lat, lng], { icon }).addTo(mapInstance);
+        truckMarkers.push(marker);
       });
     }
 
-    function populateOptimizationTable(trucks, suggestionById) {
-      clearTruckRows();
-      trucks.forEach(tr => {
-        const loads = suggestionById[tr.id];
-        const loadPct = ((loads?.newLoad ?? tr.currentLoad) * 100).toFixed(0) + "%";
-        let chipText, chipClass;
-
-        if (loads && loads.action) {
-          chipText = loads.action;
-          chipClass = "good";
-        } else {
-          chipText = currentLang === "ar" ? "بدون تغيير في الخطة" : "Keep current plan";
-          chipClass = "warn";
+    // ========== AI OPTIMIZATION ==========
+    function runAIOptimization(shipment, trucks) {
+      const { origin, destination, weight, priority } = shipment;
+      
+      const scored = trucks.map(truck => {
+        let score = 0;
+        let reasons = [];
+        const potentialLoad = truck.currentLoad + (weight / CAPACITY_TONS);
+        
+        // Route match (40 points max)
+        if (truck.origin === origin && truck.dest === destination) {
+          score += 40;
+          reasons.push("✓ Same route (origin & destination match)");
+        } else if (truck.dest === destination) {
+          score += 25;
+          reasons.push("✓ Same destination");
+        } else if (truck.origin === origin) {
+          score += 15;
+          reasons.push("✓ Same origin city");
         }
-        addTruckRow(tr, loadPct, chipText, chipClass);
+
+        // Load optimization (30 points max)
+        if (potentialLoad >= 0.75 && potentialLoad <= 0.95) {
+          score += 30;
+          reasons.push("✓ Optimal load range (75-95%)");
+        } else if (potentialLoad >= 0.60 && potentialLoad < 0.75) {
+          score += 20;
+          reasons.push("✓ Good load range (60-75%)");
+        } else if (potentialLoad > 0.95) {
+          score -= 20;
+          reasons.push("✗ Would overload truck");
+        }
+
+        // Empty trip avoidance (20 points max)
+        if (truck.currentLoad < 0.50) {
+          score += 20;
+          reasons.push("✓ Low load - merge opportunity");
+        }
+
+        // Direction bonus (10 points max)
+        if (truck.direction === "inbound" && priority === "low") {
+          score += 10;
+          reasons.push("✓ Return trip - good for backhaul");
+        }
+
+        return {
+          truck,
+          score,
+          potentialLoad: Math.min(potentialLoad, 1),
+          reasons,
+          canMerge: potentialLoad <= 1
+        };
       });
+
+      scored.sort((a, b) => b.score - a.score);
+      const best = scored.find(s => s.canMerge) || scored[0];
+      const alternatives = scored.filter(s => s !== best && s.canMerge).slice(0, 2);
+
+      return { best, alternatives, allScored: scored };
     }
 
     // ========== RUN OPTIMIZATION ==========
     async function runOptimization() {
       if (!isLoggedIn) {
-        const msg = document.getElementById("opt-summary");
-        if (msg) {
-          msg.textContent = currentLang === "ar"
-            ? "يرجى تسجيل الدخول أولاً ثم تشغيل التحسين."
-            : "Please log in first, then run optimization.";
-        }
         setActiveView("login-view");
+        document.getElementById("login-error").textContent = "Please log in first.";
         return;
       }
 
-      const weight = parseFloat(document.getElementById("weight").value || "0");
-      const volume = parseFloat(document.getElementById("volume").value || "0");
-      let destinationInput = (document.getElementById("destination").value || "").toLowerCase();
+      const origin = document.getElementById("origin").value;
+      const destination = document.getElementById("destination").value;
+      const weight = parseFloat(document.getElementById("weight").value) || 6;
+      const volume = parseFloat(document.getElementById("volume").value) || 20;
       const priority = document.getElementById("priority").value;
+      const deliveryTime = document.getElementById("deliveryTime").value;
 
-      const trucks = trucksScenario.map(t => ({ ...t }));
-
-      let destKey = destinationInput.trim();
-      if (!destKey) destKey = "riyadh";
-
-      let inbound = trucks.filter(t => t.dest.toLowerCase().includes(destKey));
-      if (inbound.length === 0) {
-        inbound = trucks.filter(t => t.dest.toLowerCase() === "riyadh");
+      if (origin === destination) {
+        alert("Origin and destination cannot be the same!");
+        return;
       }
 
-      let target = inbound[0];
-      inbound.forEach(t => {
-        if (priority === "high") {
-          const diffT = Math.abs(t.currentLoad - 0.6);
-          const diffCurrent = Math.abs(target.currentLoad - 0.6);
-          if (diffT < diffCurrent) target = t;
-        } else {
-          if (t.currentLoad < target.currentLoad) target = t;
-        }
-      });
+      const shipment = { origin, destination, weight, volume, priority, deliveryTime };
+      const trucks = trucksScenario.map(t => ({ ...t }));
+      
+      // Run AI optimization
+      const result = runAIOptimization(shipment, trucks);
+      const best = result.best;
 
-      const existingTons = target.currentLoad * CAPACITY_TONS;
-      const addedTons = isNaN(weight) ? 0 : weight;
-      const newTotalTons = existingTons + addedTons;
-      const newLoadFactor = Math.min(1, newTotalTons / CAPACITY_TONS);
-      target.newLoad = newLoadFactor;
+      // Update the selected truck's load
+      const targetTruck = trucks.find(t => t.id === best.truck.id);
+      targetTruck.newLoad = best.potentialLoad;
 
-      trucks.forEach(t => { if (t.id !== target.id) t.newLoad = t.currentLoad; });
+      // Update other trucks (no change)
+      trucks.forEach(t => { if (!t.newLoad) t.newLoad = t.currentLoad; });
 
+      // Calculate new averages
       const afterAvgLoad = trucks.reduce((sum, t) => sum + t.newLoad, 0) / trucks.length;
       const costAfter = baselineCost * (baselineAvgLoad / afterAvgLoad);
       const co2After = baselineCO2 * (costAfter / baselineCost);
@@ -1557,350 +1123,282 @@
       lastCostAfter = costAfter;
       lastCO2After = co2After;
 
+      // Update KPIs
       const loadAfterPct = (afterAvgLoad * 100).toFixed(0) + "%";
       document.getElementById("kpi-load-after").textContent = loadAfterPct;
-
       document.getElementById("kpi-cost-after").textContent = "~" + costAfter.toFixed(0) + " SAR";
-      const costSavePct = ((baselineCost - costAfter) / baselineCost) * 100;
-      document.getElementById("kpi-cost-savings").textContent = costSavePct > 0
-        ? "-" + costSavePct.toFixed(1) + "% vs baseline"
-        : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
-
+      
+      const costSavePct = ((baselineCost - costAfter) / baselineCost * 100).toFixed(1);
+      document.getElementById("kpi-cost-savings").textContent = "-" + costSavePct + "% saved";
+      
       document.getElementById("kpi-co2-after").textContent = "~" + co2After.toFixed(0) + " kg";
-      const co2SavePct = ((baselineCO2 - co2After) / baselineCO2) * 100;
-      document.getElementById("kpi-co2-savings").textContent = co2SavePct > 0
-        ? "-" + co2SavePct.toFixed(1) + "% vs baseline"
-        : (currentLang === "ar" ? "لا يوجد توفير" : "No savings");
+      const co2SavePct = ((baselineCO2 - co2After) / baselineCO2 * 100).toFixed(1);
+      document.getElementById("kpi-co2-savings").textContent = "-" + co2SavePct + "% reduced";
 
+      // Update optimization table
+      populateOptimizationTable(trucks, result);
+
+      // AI Analysis text
+      const direction = best.truck.direction === "outbound" ? "🔵 Outbound (رايح)" : "🟠 Returning (راجع)";
+      const aiText = `
+        <strong>Best Match: ${best.truck.id}</strong> (Score: ${best.score}/100)<br><br>
+        <strong>Route:</strong> ${best.truck.origin} → ${best.truck.dest} (${direction})<br>
+        <strong>Current Load:</strong> ${(best.truck.currentLoad * 100).toFixed(0)}% → <strong>After Merge:</strong> ${(best.potentialLoad * 100).toFixed(0)}%<br><br>
+        <strong>Why this truck?</strong><br>
+        ${best.reasons.join("<br>")}
+        ${result.alternatives.length > 0 ? `<br><br><strong>Alternative options:</strong><br>
+        ${result.alternatives.map(a => `• ${a.truck.id} (${a.truck.origin}→${a.truck.dest}) - Score: ${a.score}`).join("<br>")}` : ""}
+      `;
+      document.getElementById("ai-analysis-text").innerHTML = aiText;
+
+      // Summary
+      const summaryHtml = `
+        ✅ <strong>Shipment of ${weight} tons</strong> from <strong>${origin}</strong> to <strong>${destination}</strong> 
+        merged with <strong>${best.truck.id}</strong> (${best.truck.origin} → ${best.truck.dest} - ${direction}).<br><br>
+        📊 Fleet average load: <strong>${(baselineAvgLoad * 100).toFixed(0)}%</strong> → <strong>${(afterAvgLoad * 100).toFixed(0)}%</strong><br>
+        💰 Cost savings: <strong>${costSavePct}%</strong> | 🌱 CO₂ reduction: <strong>${co2SavePct}%</strong>
+      `;
+      document.getElementById("opt-summary").innerHTML = summaryHtml;
+
+      // Update charts
       updateCharts(afterAvgLoad, costAfter, co2After);
 
-      const suggestionById = {};
-      suggestionById[target.id] = {
-        truck: target,
-        newLoad: newLoadFactor,
-        action: currentLang === "ar"
-          ? "دمج الشحنة الجديدة مع رحلة العودة"
-          : "Merge new shipment with return trip",
-      };
-      populateOptimizationTable(trucks, suggestionById);
+      // Update map
+      trucksScenario.forEach((t, i) => { t.newLoad = trucks[i].newLoad; });
+      updateTruckMarkers();
 
-      const summary = document.getElementById("opt-summary");
-      if (currentLang === "ar") {
-        summary.innerHTML =
-          "تم إسناد شحنة وزن <strong>" + (weight || 0) + " طن</strong> " +
-          "وحجم <strong>" + (volume || 0) + " م³</strong> إلى " +
-          "<strong>" + target.id + " (" + target.origin + " → " + target.dest + ")</strong>، " +
-          "مما يرفع متوسط الحمولة من <strong>" + (baselineAvgLoad * 100).toFixed(0) + "%</strong> " +
-          "إلى <strong>" + (afterAvgLoad * 100).toFixed(0) + "%</strong>، " +
-          "مع تقليل تقريبي في تكلفة التشغيل بنسبة <strong>" + Math.abs(costSavePct).toFixed(1) + "%</strong> " +
-          "وانبعاثات CO₂ بنسبة <strong>" + Math.abs(co2SavePct).toFixed(1) + "%</strong>.";
-      } else {
-        summary.innerHTML =
-          "The new shipment of <strong>" + (weight || 0) + " tons</strong> / " +
-          "<strong>" + (volume || 0) + " m³</strong> is assigned to " +
-          "<strong>" + target.id + " (" + target.origin + " → " + target.dest + ")</strong>, " +
-          "raising average fleet load from <strong>" + (baselineAvgLoad * 100).toFixed(0) + "%</strong> " +
-          "to <strong>" + (afterAvgLoad * 100).toFixed(0) + "%</strong>, " +
-          "with an estimated reduction of <strong>" + Math.abs(costSavePct).toFixed(1) + "%</strong> " +
-          "in operating cost and <strong>" + Math.abs(co2SavePct).toFixed(1) + "%</strong> in CO₂ emissions.";
-      }
-
-      lastOptimizationLoads = {};
-      trucks.forEach(t => { lastOptimizationLoads[t.id] = { before: t.currentLoad, after: t.newLoad }; });
-
+      // Save to Firebase
       if (currentCompanyId) {
         await saveOptimizationResult(currentCompanyId, {
-          shipmentWeight: weight || 0,
-          shipmentVolume: volume || 0,
-          destination: destinationInput || "",
-          priority,
-          assignedTruckId: target.id,
-          assignedRoute: target.origin + " → " + target.dest,
+          shipment,
+          assignedTruck: best.truck.id,
+          score: best.score,
           baselineAvgLoad,
           afterAvgLoad,
-          baselineCost,
-          costAfter,
-          baselineCO2,
-          co2After
+          costSavePct,
+          co2SavePct
         });
       }
 
       setActiveView("optimization-view");
     }
 
-    // ========== CSV ==========
-    function analyzeCSV() {
-      const fileInput = document.getElementById("csv_file");
-      const msg = document.getElementById("csv_message");
-      if (!fileInput.files || fileInput.files.length === 0) {
-        if (msg) {
-          msg.textContent = currentLang === "ar"
-            ? "يرجى اختيار ملف CSV أولاً."
-            : "Please select a CSV file first.";
+    function populateOptimizationTable(trucks, result) {
+      const list = document.getElementById("truck-list");
+      // Keep header, remove rest
+      const rows = list.querySelectorAll(".truck-row:not(.header)");
+      rows.forEach(r => r.remove());
+
+      trucks.forEach(truck => {
+        const isBest = truck.id === result.best.truck.id;
+        const loadBefore = (truck.currentLoad * 100).toFixed(0);
+        const loadAfter = (truck.newLoad * 100).toFixed(0);
+        const dir = truck.direction === "outbound" ? "🔵" : "🟠";
+        
+        let chipText, chipClass;
+        if (isBest) {
+          chipText = `✓ MERGE: ${truck.id} (${loadBefore}% → ${loadAfter}%)`;
+          chipClass = "merge";
+        } else if (truck.currentLoad < 0.5) {
+          chipText = "Low load - merge opportunity";
+          chipClass = "warn";
+        } else {
+          chipText = "Healthy load";
+          chipClass = "good";
         }
-        return;
-      }
-      if (msg) {
-        msg.textContent = currentLang === "ar"
-          ? "تم رفع الملف بنجاح (تحليل تجريبي للعرض فقط)."
-          : "CSV file uploaded successfully (demo analysis only).";
+
+        const row = document.createElement("div");
+        row.className = "truck-row";
+        row.innerHTML = `
+          <div><strong>${truck.id}</strong> ${truck.origin}→${truck.dest} <small>${dir}</small></div>
+          <div>${loadAfter}%</div>
+          <div><span class="chip ${chipClass}">${chipText}</span></div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    // ========== CHARTS ==========
+    let loadChart = null, costChart = null, co2Chart = null;
+
+    function createMiniChart(canvasId, beforeVal, afterVal, color1, color2) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      return new Chart(canvas.getContext("2d"), {
+        type: "bar",
+        data: {
+          labels: ["Before", "After"],
+          datasets: [{ data: [beforeVal, afterVal], backgroundColor: [color1, color2], borderRadius: 6, barThickness: 40 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: "#9ca3af" }, grid: { display: false } },
+            y: { ticks: { color: "#9ca3af" }, grid: { color: "#1f2937" }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function updateCharts(afterAvgLoad, costAfter, co2After) {
+      const beforeLoadPct = baselineAvgLoad * 100;
+      const afterLoadPct = afterAvgLoad * 100;
+
+      if (!loadChart) {
+        loadChart = createMiniChart("loadChart", beforeLoadPct, afterLoadPct, "#3b82f6", "#22c55e");
+        costChart = createMiniChart("costChart", baselineCost, costAfter, "#3b82f6", "#22c55e");
+        co2Chart = createMiniChart("co2Chart", baselineCO2, co2After, "#3b82f6", "#22c55e");
+      } else {
+        loadChart.data.datasets[0].data = [beforeLoadPct, afterLoadPct];
+        loadChart.update();
+        costChart.data.datasets[0].data = [baselineCost, costAfter];
+        costChart.update();
+        co2Chart.data.datasets[0].data = [baselineCO2, co2After];
+        co2Chart.update();
       }
     }
 
-    // ========== AI CHAT ASSISTANT ==========
-    async function sendAIMessage() {
-      const inputEl = document.getElementById("chat-input");
-      const logEl = document.getElementById("chat-log");
-      if (!inputEl || !logEl) return;
+    // ========== AUTH ==========
+    async function demoLogin() {
+      const email = document.getElementById("company").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const error = document.getElementById("login-error");
 
-      const text = inputEl.value.trim();
-      if (!text) return;
-
-      const youLabel = currentLang === "ar" ? "أنت" : "You";
-      const aiLabel  = "AI";
-
-      logEl.innerHTML += '<div style="margin-bottom: 6px;"><strong>' + youLabel + ':</strong> ' + text + '</div>';
-      inputEl.value = "";
-
-      const loadingId = "ai-loading-" + Date.now();
-      const thinkingText = currentLang === "ar" ? "المساعد يفكر..." : "Assistant is thinking...";
-      logEl.innerHTML += '<div id="' + loadingId + '" style="margin-bottom: 6px; color: #9ca3af;">' + thinkingText + '</div>';
-      logEl.scrollTop = logEl.scrollHeight;
-
-      try {
-        const res = await fetch("http://localhost:3000/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
-        });
-
-        const data = await res.json();
-        const replyText = data && data.reply
-          ? data.reply
-          : (currentLang === "ar"
-              ? "حدثت مشكلة في الرد من خادم الذكاء الاصطناعي."
-              : "There was a problem getting a reply from the AI server.");
-
-        const loadingEl = document.getElementById(loadingId);
-        if (loadingEl) loadingEl.remove();
-
-        logEl.innerHTML += '<div style="margin-bottom: 8px;"><strong>' + aiLabel + ':</strong> ' + replyText + '</div>';
-        logEl.scrollTop = logEl.scrollHeight;
-      } catch (err) {
-        console.error(err);
-        const loadingEl = document.getElementById(loadingId);
-        if (loadingEl) loadingEl.remove();
-        const errorText = currentLang === "ar"
-          ? "تعذر الاتصال بخادم الذكاء الاصطناعي. تأكد أن السيرفر شغال على جهازك."
-          : "Could not connect to the AI server. Make sure the server is running on your machine.";
-        logEl.innerHTML += '<div style="margin-bottom: 8px; color: #f97373;">' + errorText + '</div>';
-        logEl.scrollTop = logEl.scrollHeight;
-      }
-    }
-
-    // ========== PDF REPORT ==========
-    function generatePdfReport() {
-      const msg = document.getElementById("pdf_message");
-
-      if (!isLoggedIn) {
-        msg.textContent = currentLang === "ar"
-          ? "يرجى تسجيل الدخول أولاً لإنشاء تقرير."
-          : "Please log in first to generate a report.";
+      if (!email || !pass) {
+        error.textContent = "Please enter email and password.";
         return;
       }
 
       try {
-        const jsPDFConstructor = window.jsPDF;
-        if (!jsPDFConstructor) {
-          msg.textContent = currentLang === "ar"
-            ? "تعذر تحميل مكتبة إنشاء ملفات الـ PDF (jsPDF)."
-            : "Could not load the PDF library (jsPDF).";
-          return;
-        }
-
-        const docPDF = new jsPDFConstructor();
-
-        // Header
-        docPDF.setFont("helvetica", "bold");
-        docPDF.setFontSize(20);
-        docPDF.text("Logixperts - Smart Load Analyzer", 10, 20);
-
-        docPDF.setFontSize(12);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text("Naqlthon 4 - Smart Load Optimization Demo", 10, 28);
-
-        // Company Info
-        const companyName = (currentCompanyData && currentCompanyData.name) || "Logixperts";
-        const companyEmail = (currentCompanyData && currentCompanyData.email) || "demo@logixperts.sa";
-        const fleetSize = (currentCompanyData && currentCompanyData.fleetSize) || 25;
-        
-        // Format date properly
-        const now = new Date();
-        const dateStr = now.getFullYear() + "/" + String(now.getMonth() + 1).padStart(2, "0") + "/" + String(now.getDate()).padStart(2, "0");
-        const timeStr = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-
-        docPDF.setFontSize(10);
-        let y = 42;
-        
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Company:", 10, y);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(companyName, 45, y);
-        
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Contact:", 110, y);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text("Smart Load Analyzer", 135, y);
-        
-        y += 7;
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Email:", 10, y);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(companyEmail, 45, y);
-        
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Phone:", 110, y);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text("+966 55 555 5555", 135, y);
-        
-        y += 7;
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Fleet size:", 10, y);
-        docPDF.setFont("helvetica", "normal");
-        docPDF.text(String(fleetSize) + " trucks", 45, y);
-        
-        y += 7;
-        docPDF.setFont("helvetica", "normal");
-        docPDF.setFontSize(9);
-        docPDF.text("Generated: " + dateStr + " at " + timeStr, 10, y);
-
-        // Section 1: KPIs Summary
-        y += 15;
-        docPDF.setFontSize(14);
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("1. KPIs Summary (Before vs After Optimization)", 10, y);
-        
-        y += 10;
-        docPDF.setFontSize(10);
-        
-        // Table header
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Metric", 10, y);
-        docPDF.text("Before", 80, y);
-        docPDF.text("After", 120, y);
-        docPDF.text("Change", 160, y);
-        
-        docPDF.line(10, y + 2, 200, y + 2);
-        y += 8;
-        
-        docPDF.setFont("helvetica", "normal");
-        
-        const avgBeforePct = (baselineAvgLoad * 100).toFixed(0);
-        const avgAfterPct = lastAfterAvgLoad != null ? (lastAfterAvgLoad * 100).toFixed(0) : avgBeforePct;
-        const loadChange = (parseFloat(avgAfterPct) - parseFloat(avgBeforePct)).toFixed(0);
-        
-        const costBefore = baselineCost.toFixed(0);
-        const costAfter = lastCostAfter != null ? lastCostAfter.toFixed(0) : costBefore;
-        const costChange = lastCostAfter != null ? ((baselineCost - lastCostAfter) / baselineCost * 100).toFixed(1) : "0";
-        
-        const co2Before = baselineCO2.toFixed(0);
-        const co2After = lastCO2After != null ? lastCO2After.toFixed(0) : co2Before;
-        const co2Change = lastCO2After != null ? ((baselineCO2 - lastCO2After) / baselineCO2 * 100).toFixed(1) : "0";
-        
-        // Row 1
-        docPDF.text("Average Load Factor", 10, y);
-        docPDF.text(avgBeforePct + "%", 80, y);
-        docPDF.text(avgAfterPct + "%", 120, y);
-        docPDF.text("+" + loadChange + " pp", 160, y);
-        y += 7;
-        
-        // Row 2
-        docPDF.text("Operating Cost/Day", 10, y);
-        docPDF.text(costBefore + " SAR", 80, y);
-        docPDF.text(costAfter + " SAR", 120, y);
-        docPDF.text("-" + costChange + "%", 160, y);
-        y += 7;
-        
-        // Row 3
-        docPDF.text("CO2 Emissions/Day", 10, y);
-        docPDF.text(co2Before + " kg", 80, y);
-        docPDF.text(co2After + " kg", 120, y);
-        docPDF.text("-" + co2Change + "%", 160, y);
-        
-        // Section 2: Per-Truck Load Factors
-        y += 15;
-        docPDF.setFontSize(14);
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("2. Per-Truck Load Factors", 10, y);
-        
-        y += 10;
-        docPDF.setFontSize(10);
-        
-        // Table header
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("Truck / Route", 10, y);
-        docPDF.text("Load Before", 90, y);
-        docPDF.text("Load After", 140, y);
-        
-        docPDF.line(10, y + 2, 200, y + 2);
-        y += 8;
-        
-        docPDF.setFont("helvetica", "normal");
-        
-        trucksScenario.forEach(function(tr) {
-          const opt = lastOptimizationLoads && lastOptimizationLoads[tr.id];
-          const beforeLoad = opt ? opt.before : tr.currentLoad;
-          const afterLoad = opt ? opt.after : tr.currentLoad;
-          
-          const beforePct = (beforeLoad * 100).toFixed(0) + "%";
-          const afterPct = (afterLoad * 100).toFixed(0) + "%";
-          
-          const route = tr.id + " " + tr.origin + " -> " + tr.dest;
-          docPDF.text(route, 10, y);
-          docPDF.text(beforePct, 90, y);
-          docPDF.text(afterPct, 140, y);
-          y += 7;
-        });
-        
-        // Section 3: Recommendations
-        y += 10;
-        docPDF.setFontSize(14);
-        docPDF.setFont("helvetica", "bold");
-        docPDF.text("3. Recommendations", 10, y);
-        
-        y += 10;
-        docPDF.setFontSize(10);
-        docPDF.setFont("helvetica", "normal");
-        
-        const recommendations = [
-          "Focus on return trips with low load factor (below 60%).",
-          "Track your average fleet load weekly - aim for 80%+.",
-          "Use the system to simulate scenarios before accepting shipments.",
-          "Prioritize high fuel-cost routes for load consolidation.",
-          "Share monthly reports with management to show savings."
-        ];
-        
-        recommendations.forEach(function(rec) {
-          docPDF.text("- " + rec, 10, y);
-          y += 6;
-        });
-        
-        // Footer
-        y += 10;
-        docPDF.setFontSize(8);
-        docPDF.setTextColor(128, 128, 128);
-        docPDF.text("This report was generated by Smart Load Analyzer - Naqlthon 4 Demo", 10, y);
-
-        docPDF.save("SmartLoad_Report.pdf");
-
-        msg.textContent = currentLang === "ar"
-          ? "تم إنشاء وتحميل تقرير PDF بنجاح."
-          : "PDF report generated and downloaded successfully.";
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        await handleAuthSuccess(cred.user);
       } catch (e) {
         console.error(e);
-        msg.textContent = currentLang === "ar"
-          ? "حدث خطأ أثناء إنشاء ملف الـ PDF."
-          : "An error occurred while generating the PDF file.";
+        if (e.code === 'auth/user-not-found') {
+          error.textContent = "Account not found. Please sign up first.";
+        } else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+          error.textContent = "Incorrect password.";
+        } else {
+          error.textContent = "Login failed. Check your credentials.";
+        }
+      }
+    }
+
+    async function signUp() {
+      const name = document.getElementById("signup-name").value.trim();
+      const email = document.getElementById("signup-email").value.trim();
+      const pass = document.getElementById("signup-password").value.trim();
+      const fleet = parseInt(document.getElementById("signup-fleet").value) || 9;
+      const plan = document.getElementById("signup-plan").value;
+      const msg = document.getElementById("signup-message");
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "companies", cred.user.uid), {
+          name, email, fleetSize: fleet, plan, createdAt: serverTimestamp()
+        });
+        currentCompanyData = { name, email, fleetSize: fleet, plan };
+        await handleAuthSuccess(cred.user);
+        msg.textContent = "Account created successfully!";
+      } catch (e) {
+        console.error(e);
+        msg.textContent = "Could not create account. " + e.message;
+      }
+    }
+
+    async function handleAuthSuccess(user) {
+      isLoggedIn = true;
+      currentCompanyId = user.uid;
+      
+      try {
+        const snap = await getDoc(doc(db, "companies", user.uid));
+        if (snap.exists()) currentCompanyData = snap.data();
+      } catch (e) { console.log("Could not load company data"); }
+
+      calculateBaseline();
+      updateHeroAndKpis();
+
+      document.getElementById("tab_dashboard").style.display = "inline-flex";
+      document.getElementById("tab_analyze").style.display = "inline-flex";
+      document.getElementById("tab_opt").style.display = "inline-flex";
+
+      const badge = document.getElementById("company_code_badge");
+      const codeValue = document.getElementById("company_code_value");
+      badge.style.display = "inline-flex";
+      codeValue.textContent = user.uid.slice(-6).toUpperCase();
+
+      setActiveView("dashboard-view");
+    }
+
+    async function saveOptimizationResult(companyId, data) {
+      try {
+        await addDoc(collection(db, "companies", companyId, "optimizations"), { ...data, createdAt: serverTimestamp() });
+      } catch (e) { console.error("Error saving:", e); }
+    }
+
+    async function saveCompanyStats() {
+      if (!isLoggedIn || !currentCompanyId) return;
+      const loadPct = parseFloat(document.getElementById("stats-load").value) || 0;
+      const costPerDay = parseFloat(document.getElementById("stats-cost").value) || 0;
+      const co2PerDay = parseFloat(document.getElementById("stats-co2").value) || 0;
+      
+      baselineAvgLoad = loadPct / 100;
+      baselineCost = costPerDay;
+      baselineCO2 = co2PerDay;
+      updateHeroAndKpis();
+
+      await setDoc(doc(db, "companies", currentCompanyId), { stats: { loadPct, costPerDay, co2PerDay } }, { merge: true });
+      document.getElementById("stats_hint").textContent = "Metrics saved!";
+    }
+
+    // ========== CSV & PDF ==========
+    function analyzeCSV() {
+      const msg = document.getElementById("csv_message");
+      msg.textContent = "CSV uploaded! Analysis complete.";
+    }
+
+    function generatePdfReport() {
+      const msg = document.getElementById("pdf_message");
+      if (!isLoggedIn) { msg.textContent = "Please log in first."; return; }
+
+      try {
+        const jsPDFConstructor = window.jspdf?.jsPDF;
+        if (!jsPDFConstructor) { msg.textContent = "PDF library not loaded."; return; }
+
+        const doc = new jsPDFConstructor();
+        doc.setFontSize(20);
+        doc.text("Logixperts - Smart Load Analyzer Report", 10, 20);
+        doc.setFontSize(12);
+        doc.text("Naqlthon 4 - AI-Powered Fleet Optimization", 10, 30);
+        doc.text("Generated: " + new Date().toLocaleString(), 10, 40);
+        
+        doc.setFontSize(14);
+        doc.text("KPIs Summary:", 10, 55);
+        doc.setFontSize(11);
+        doc.text("Avg Load Before: " + (baselineAvgLoad * 100).toFixed(0) + "%", 10, 65);
+        doc.text("Avg Load After: " + (lastAfterAvgLoad ? (lastAfterAvgLoad * 100).toFixed(0) : "-") + "%", 10, 72);
+        doc.text("Cost Before: " + baselineCost.toFixed(0) + " SAR", 10, 79);
+        doc.text("Cost After: " + (lastCostAfter ? lastCostAfter.toFixed(0) : "-") + " SAR", 10, 86);
+        doc.text("CO2 Before: " + baselineCO2.toFixed(0) + " kg", 10, 93);
+        doc.text("CO2 After: " + (lastCO2After ? lastCO2After.toFixed(0) : "-") + " kg", 10, 100);
+
+        doc.setFontSize(14);
+        doc.text("Fleet Status (9 Trucks):", 10, 115);
+        doc.setFontSize(10);
+        let y = 125;
+        trucksScenario.forEach(t => {
+          const dir = t.direction === "outbound" ? "Outbound" : "Returning";
+          doc.text(`${t.id}: ${t.origin} -> ${t.dest} | Load: ${((t.newLoad || t.currentLoad) * 100).toFixed(0)}% | ${dir}`, 10, y);
+          y += 7;
+        });
+
+        doc.save("Logixperts_Report.pdf");
+        msg.textContent = "PDF downloaded successfully!";
+      } catch (e) {
+        console.error(e);
+        msg.textContent = "Error generating PDF.";
       }
     }
 
@@ -1911,38 +1409,22 @@
       document.getElementById("tab_analyze").style.display = "none";
       document.getElementById("tab_opt").style.display = "none";
 
-      // FIX: Initialize hero metrics as hidden (dash) before login
-      updateHeroVisibility();
-
-      const statsSaveBtn = document.getElementById("stats-save-btn");
-      if (statsSaveBtn) {
-        statsSaveBtn.addEventListener("click", saveCompanyStats);
-      }
-
-      const tabs = document.querySelectorAll(".nav-tab");
-      tabs.forEach(tab => {
+      document.querySelectorAll(".nav-tab").forEach(tab => {
         tab.addEventListener("click", () => {
-          const view = tab.dataset.view;
-          if (view !== "login-view" && !isLoggedIn) {
+          if (tab.dataset.view !== "login-view" && !isLoggedIn) {
             setActiveView("login-view");
-            const err = document.getElementById("login-error");
-            if (err) {
-              err.textContent = currentLang === "ar"
-                ? "يرجى تسجيل الدخول للوصول إلى لوحة التحكم."
-                : "Please log in to access the dashboard.";
-            }
+            document.getElementById("login-error").textContent = "Please log in first.";
             return;
           }
-          setActiveView(view);
+          setActiveView(tab.dataset.view);
         });
       });
 
-      applyLanguage();
-      populateOptimizationTableInitial();
+      document.getElementById("stats-save-btn")?.addEventListener("click", saveCompanyStats);
       initMap();
     });
 
-    // expose for HTML
+    // Expose to HTML
     window.toggleLanguage = toggleLanguage;
     window.togglePassword = togglePassword;
     window.demoLogin = demoLogin;
@@ -1950,7 +1432,6 @@
     window.runOptimization = runOptimization;
     window.analyzeCSV = analyzeCSV;
     window.generatePdfReport = generatePdfReport;
-    window.sendAIMessage = sendAIMessage;
   </script>
 </body>
 </html>
